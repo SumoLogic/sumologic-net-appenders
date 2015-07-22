@@ -1,0 +1,53 @@
+﻿/**
+ *    _____ _____ _____ _____    __    _____ _____ _____ _____
+ *   |   __|  |  |     |     |  |  |  |     |   __|     |     |
+ *   |__   |  |  | | | |  |  |  |  |__|  |  |  |  |-   -|   --|
+ *   |_____|_____|_|_|_|_____|  |_____|_____|_____|_____|_____|
+ *
+ *                UNICORNS AT WARP SPEED SINCE 2010
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+namespace SumoLogic.Logging.Log4Net.Example
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using log4net;
+
+    /// <summary>
+    /// Logging example.
+    /// </summary>
+    public static class Program
+    {
+        /// <summary>
+        /// The log4net log.
+        /// </summary>
+        private static ILog log4netLog = LogManager.GetLogger(typeof(Program));
+
+        /// <summary>
+        /// An example application that logs.
+        /// </summary>
+        [SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.Console.WriteLine(System.String)", Justification = "Example")]
+        public static void Main()
+        {
+            Console.WriteLine("Hello world!");
+            log4netLog.Info("Hello world!");
+            Console.ReadKey();
+        }
+    }
+}

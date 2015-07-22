@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="SumoLogic.Logging Rules" Description="This rule set contains all rules for project SumoLogic.Logging." ToolsVersion="10.0">
+  <IncludeAll Action="Error" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1006" Action="None" />
+    <Rule Id="CA1020" Action="None" />
+    <Rule Id="CA1710" Action="None" />
+    <Rule Id="CA1819" Action="None" />
+  </Rules>
+</RuleSet>
