@@ -59,7 +59,8 @@ namespace SumoLogic.Logging.NLog
             this.SourceName = "Nlog-SumoObject";
             this.ConnectionTimeout = 60000;            
             this.LogLog = log ?? new DummyLog();
-            this.HttpMessageHandler = httpMessageHandler;            
+            this.HttpMessageHandler = httpMessageHandler;
+            this.AppendException = true;          
         }
 
         /// <summary>
@@ -94,6 +95,15 @@ namespace SumoLogic.Logging.NLog
         /// Gets or sets a value indicating whether the console log should be used.
         /// </summary>
         public bool UseConsoleLog
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the exception.ToString() should be automatically appended to the message being sent
+        /// </summary>
+        public bool AppendException
         {
             get;
             set;
@@ -188,7 +198,7 @@ namespace SumoLogic.Logging.NLog
             using (var textWriter = new StringWriter(bodyBuilder, CultureInfo.InvariantCulture))
             {
                 textWriter.Write(Layout.Render(logEvent));
-                if (logEvent.Exception != null)
+                if (logEvent.Exception != null && this.AppendException)
                 {
                     textWriter.Write(logEvent.Exception.ToString());
                 }
