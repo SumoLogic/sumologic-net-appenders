@@ -141,7 +141,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <summary>
         /// Flush and send all messages from the queue of messages.
         /// </summary>
-        private void FlushAndSend()
+        public void FlushAndSend()
         {
             var messages = new List<TBufferItem>();
             this.MessageQueue.DrainTo(messages);
