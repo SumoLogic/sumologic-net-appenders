@@ -34,7 +34,6 @@ namespace SumoLogic.Logging.NLog
     using System.Timers;
     using global::NLog;
     using global::NLog.Targets;
-    using NLog.Common;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
