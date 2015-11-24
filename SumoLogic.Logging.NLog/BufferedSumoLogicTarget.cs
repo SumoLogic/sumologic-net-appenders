@@ -1,4 +1,4 @@
-﻿/**
+/**
  *    _____ _____ _____ _____    __    _____ _____ _____ _____
  *   |   __|  |  |     |     |  |  |  |     |   __|     |     |
  *   |__   |  |  | | | |  |  |  |  |__|  |  |  |  |-   -|   --|
@@ -34,17 +34,18 @@ namespace SumoLogic.Logging.NLog
     using System.Timers;
     using global::NLog;
     using global::NLog.Targets;
+    using NLog.Common;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
-    using SumoLogic.Logging.Common.Sender;   
-      
+    using SumoLogic.Logging.Common.Sender;
+
     /// <summary>
     /// Buffered Sumo Logic target implementation.
     /// </summary>
     [Target("BufferedSumoLogicTarget")]
     public class BufferedSumoLogicTarget : TargetWithLayout
     {
-         /// <summary>
+        /// <summary>
         /// The Sumo HTTP sender executor.
         /// </summary>
         private Timer flushBufferTimer;
@@ -53,6 +54,11 @@ namespace SumoLogic.Logging.NLog
         /// The messages queue.
         /// </summary>
         private volatile BufferWithEviction<string> messagesQueue;
+
+        /// <summary>
+        /// The task that flushes the buffer.
+        /// </summary>
+        private SumoLogicMessageSenderBufferFlushingTask flushBufferTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferedSumoLogicTarget"/> class.
@@ -69,7 +75,7 @@ namespace SumoLogic.Logging.NLog
         public BufferedSumoLogicTarget(ILog log, HttpMessageHandler httpMessageHandler)
         {
             this.SourceName = "Nlog-SumoObject-Buffered";
-            this.ConnectionTimeout = 60000;            
+            this.ConnectionTimeout = 60000;
             this.RetryInterval = 10000;
             this.MessagesPerRequest = 100;
             this.MaxFlushInterval = 10000;
@@ -253,7 +259,13 @@ namespace SumoLogic.Logging.NLog
                 this.flushBufferTimer.Dispose();
             }
 
-            var flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
+            // Ensure any existing buffer is flushed
+            if (this.flushBufferTask != null)
+            {
+                flushBufferTask.FlushAndSend();
+            }
+
+            this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
                 this.messagesQueue,
                 this.SumoLogicMessageSender,
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
@@ -284,7 +296,7 @@ namespace SumoLogic.Logging.NLog
                 {
                     this.LogLog.Warn("Buffered target not initialized. Dropping log entry");
                 }
-                
+
                 return;
             }
 
@@ -324,6 +336,23 @@ namespace SumoLogic.Logging.NLog
                 this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
+            }
+        }
+
+        protected override void FlushAsync(global::NLog.Common.AsyncContinuation asyncContinuation)
+        {
+            try
+            {
+                var flushBufferTask = this.flushBufferTask;
+                if (flushBufferTask != null)
+                {
+                    flushBufferTask.FlushAndSend();
+                }
+                asyncContinuation(null);
+            }
+            catch (Exception ex)
+            {
+                asyncContinuation(ex);
             }
         }
     }
