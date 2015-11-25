@@ -261,7 +261,7 @@ namespace SumoLogic.Logging.NLog
             // Ensure any existing buffer is flushed
             if (this.flushBufferTask != null)
             {
-                flushBufferTask.FlushAndSend();
+                this.flushBufferTask.FlushAndSend();
             }
 
             this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
@@ -273,7 +273,7 @@ namespace SumoLogic.Logging.NLog
                 this.LogLog);
 
             this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => flushBufferTask.Run();
+            this.flushBufferTimer.Elapsed += (s, e) => this.flushBufferTask.Run();
 
             this.flushBufferTimer.Start();
         }
@@ -338,6 +338,10 @@ namespace SumoLogic.Logging.NLog
             }
         }
 
+        /// <summary>
+        /// Flush any pending log messages asynchronously (in case of asynchronous targets).
+        /// </summary>
+        /// <param name="asyncContinuation">The asynchronous continuation.</param>
         protected override void FlushAsync(global::NLog.Common.AsyncContinuation asyncContinuation)
         {
             try
@@ -347,6 +351,7 @@ namespace SumoLogic.Logging.NLog
                 {
                     flushBufferTask.FlushAndSend();
                 }
+
                 asyncContinuation(null);
             }
             catch (Exception ex)

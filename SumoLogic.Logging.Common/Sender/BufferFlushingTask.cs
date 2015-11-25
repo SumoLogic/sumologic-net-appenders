@@ -116,6 +116,28 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
+        /// Flush and send all messages from the queue of messages.
+        /// </summary>
+        public void FlushAndSend()
+        {
+            var messages = new List<TBufferItem>();
+            this.MessageQueue.DrainTo(messages);
+
+            if (messages.Count > 0)
+            {
+                if (this.Log.IsDebugEnabled)
+                {
+                    this.Log.Debug(string.Format(CultureInfo.InvariantCulture, "{0} - Flushing and sending out {1} messages ({2} messages left)", DateTime.Now, messages.Count, this.MessageQueue.Count));
+                }
+
+                TMessage body = this.Aggregate(messages);
+                this.SendOut(body, this.MessagesName);
+            }
+
+            this.LastFlushedOn = DateTime.UtcNow;
+        }
+
+        /// <summary>
         /// Given the list of messages, aggregate them into a single Out object
         /// </summary>
         /// <param name="messages">List of messages to aggregate.</param>
@@ -136,28 +158,6 @@ namespace SumoLogic.Logging.Common.Sender
         private bool NeedsFlushing()
         {
             return this.MessageQueue.Count >= this.MessagesPerRequest || DateTime.UtcNow.Ticks - this.MaxFlushInterval.Ticks >= this.LastFlushedOn.Ticks || this.IsFlushing;
-        }
-
-        /// <summary>
-        /// Flush and send all messages from the queue of messages.
-        /// </summary>
-        public void FlushAndSend()
-        {
-            var messages = new List<TBufferItem>();
-            this.MessageQueue.DrainTo(messages);
-
-            if (messages.Count > 0)
-            {
-                if (this.Log.IsDebugEnabled)
-                {
-                    this.Log.Debug(string.Format(CultureInfo.InvariantCulture, "{0} - Flushing and sending out {1} messages ({2} messages left)", DateTime.Now, messages.Count, this.MessageQueue.Count));
-                }
-                
-                TMessage body = this.Aggregate(messages);
-                this.SendOut(body, this.MessagesName);
-            }
-
-            this.LastFlushedOn = DateTime.UtcNow;
-        }
+        }        
     }
 }
