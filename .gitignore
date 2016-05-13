@@ -26,4 +26,5 @@ SumoLogic.Logging.EnterpriseLibrary.Tests/obj
 SumoLogic.Logging.NLog.Example/bin
 SumoLogic.Logging.NLog.Example/obj
 SumoLogic.Logging.Nuget/
-
+packages/
+!packages/repositories.config
