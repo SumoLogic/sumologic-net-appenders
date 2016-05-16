@@ -346,10 +346,10 @@ namespace SumoLogic.Logging.NLog
         {
             try
             {
-                var flushBufferTask = this.flushBufferTask;
-                if (flushBufferTask != null)
+                var task = this.flushBufferTask;
+                if (task != null)
                 {
-                    flushBufferTask.FlushAndSend();
+                    task.FlushAndSend();
                 }
 
                 asyncContinuation(null);
