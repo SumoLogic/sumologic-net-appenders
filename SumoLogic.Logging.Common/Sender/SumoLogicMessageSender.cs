@@ -128,8 +128,14 @@ namespace SumoLogic.Logging.Common.Sender
                     this.TrySend(body, name);
                     success = true;
                 }
-                catch (IOException ex)
+                catch (Exception ex)
                 {
+                    // only retry if we have a reasonable hope that the issue is transient
+                    if(!(ex is IOException || ex is HttpRequestException || ex is WebException))
+                    {
+                        throw;
+                    }
+
                     if (this.Log.IsErrorEnabled)
                     {
                         this.Log.Error("Error trying send messages. Exception: " + ex.Message);
