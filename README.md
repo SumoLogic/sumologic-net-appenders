@@ -31,14 +31,13 @@ PM> Install-Package SumoLogic.Logging.NLog
 		<add assembly="SumoLogic.Logging.NLog"/>
 	</extensions>
 	<targets>
-		<target name="sumoLogic" type="SumoLogicTarget"
-		layout="${LEVEL}, ${message}">
+		<target name="sumoLogic" type="SumoLogicTarget"	layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff ${LEVEL}, ${message}">
 			<Url>https://collectors.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV2dpl93h4mEkdCBwxHuX5fI1Yh_75Lhk8GtiMxsATMRTuebaZTDknk5dlFvjvYI7ZvraaHaA2NPq-O4v9bKZSTaMEZ_qHYxQ_ICBlWAonxtGA==</Url>
 			<ConnectionTimeout>30000</ConnectionTimeout>
 			<SourceName>ExampleNameNLogTarget</SourceName>
 			<UseConsoleLog>true</UseConsoleLog>
 		</target>
-		<target name="bufferedSumoLogic" type="BufferedSumoLogicTarget" layout="${LEVEL}, ${message}">
+		<target name="bufferedSumoLogic" type="BufferedSumoLogicTarget" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff ${LEVEL}, ${message}">
 			<Url>https://collectors.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV2dpl93h4mEkdCBwxHuX5fI1Yh_75Lhk8GtiMxsATMRTuebaZTDknk5dlFvjvYI7ZvraaHaA2NPq-O4v9bKZSTaMEZ_qHYxQ_ICBlWAonxtGA==</Url>
 			<SourceName>ExampleNameNLogBufferedTarget</SourceName>
 			<ConnectionTimeout>30000</ConnectionTimeout>
