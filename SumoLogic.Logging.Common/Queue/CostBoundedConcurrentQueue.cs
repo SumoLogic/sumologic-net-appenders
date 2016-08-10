@@ -88,29 +88,31 @@ namespace SumoLogic.Logging.Common.Queue
         }
 
         /// <summary>
-        /// Removes all available elements from this queue and adds them to the given collection.
+        /// Removes all available elements from this queue and adds them to the given collection,
+        /// up to a maximum total cost of <see cref="capacity"/>.
         /// </summary>
         /// <param name="collection">Destination collection.</param>
         /// <returns>The number of elements transferred.</returns>
         public int DrainTo(ICollection<T> collection)
         {
             int elementsDrained = 0;
+            long drainedCapacity = 0L;
 
             if (collection == null)
             {
                 throw new InvalidOperationException();
             }
-            else
+
+            while (!this.queue.IsEmpty && drainedCapacity < this.capacity)
             {
-                while (this.queue.IsEmpty != true)
+                T e;
+                if (this.queue.TryDequeue(out e))
                 {
-                    T e;
-                    if (this.queue.TryDequeue(out e) && collection != null)
-                    {
-                        collection.Add(e);
-                        Interlocked.Add(ref this.cost, -this.costAssigner.Cost(e));
-                        elementsDrained++;
-                    }
+                    collection.Add(e);
+                    long elementCost = this.costAssigner.Cost(e);
+                    Interlocked.Add(ref this.cost, -elementCost);
+                    drainedCapacity += elementCost;
+                    elementsDrained++;
                 }
             }
 
