@@ -131,7 +131,7 @@ namespace SumoLogic.Logging.Common.Sender
                 catch (Exception ex)
                 {
                     // only retry if we have a reasonable hope that the issue is transient
-                    if(!(ex is IOException || ex is HttpRequestException || ex is WebException))
+                    if (!(ex is IOException || ex is HttpRequestException || ex is WebException))
                     {
                         throw;
                     }
