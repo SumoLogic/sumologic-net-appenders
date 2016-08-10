@@ -35,6 +35,7 @@ namespace SumoLogic.Logging.NLog.Tests
     /// <summary>
     /// Sumo logic target test implementation.   
     /// </summary>
+    [Collection("NLog tests")]
     public class SumoLogicTargetTest : IDisposable
     {
         /// <summary>
