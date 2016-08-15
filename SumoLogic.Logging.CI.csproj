@@ -41,7 +41,7 @@
 		<PropertyGroup>
             <NugetFile>.nuget\nuget.exe</NugetFile>
 		</PropertyGroup>
-		<Exec Command='"$(NugetFile)" restore $([System.Text.RegularExpressions.Regex]::Replace($(SolutionsToBuild), ";", " "))"' ContinueOnError="false"/>
+		<Exec Command='"$(NugetFile)" restore' ContinueOnError="false"/>
 	</Target>
  
 	<Target Name="BeforeResolveReferences">
