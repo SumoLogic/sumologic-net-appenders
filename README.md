@@ -58,7 +58,7 @@ PM> Install-Package SumoLogic.Logging.NLog
 ```
 
 ### Example Code
-```java
+```csharp
 public static class Program
 {
   /// <summary>
@@ -70,6 +70,57 @@ public static class Program
     logger.Debug("Log message");
     Console.Read();
   }
+}
+```
+
+### Internal Logging
+
+The Sumo Logic NLog appender can log internal status information and error messages for diagnostic purposes if needed. The
+simplest way to enable this is to set `UseConsoleLog = true` through the configuration XML. Internal logging will then be printed to
+the console.
+
+If an alternative internal logging method is required, you can optionally specify a custom logger. Implement the interface 
+`SumoLogic.Logging.Common.Log.ILog` and reconfigure targets at runtime per below:
+
+```csharp
+static void ReconfigureSumoTargets()
+{
+    foreach (var target in LogManager.Configuration.AllTargets)
+    {
+        if (!(target is SumoLogicTarget))
+            continue;
+
+        var originalTarget = target as SumoLogicTarget;
+
+        var customTargetLogger = new ILogImpl();  // custom implementation of ILog goes here
+
+        var newTarget = new SumoLogicTarget(customTargetLogger, null)
+        {
+            AppendException = originalTarget.AppendException,
+            ConnectionTimeout = originalTarget.ConnectionTimeout,
+            Layout = originalTarget.Layout,
+            Name = originalTarget.Name,
+            SourceName = originalTarget.SourceName,
+            Url = originalTarget.Url,
+            UseConsoleLog = false
+        };
+
+        if (originalTarget.Name != null)
+        {
+            LogManager.Configuration.RemoveTarget(originalTarget.Name);
+            LogManager.Configuration.AddTarget(newTarget.Name, newTarget);
+        }
+
+        foreach (var rule in LogManager.Configuration.LoggingRules)
+        {
+            if (rule.Targets.Remove(originalTarget))
+            {
+                rule.Targets.Add(newTarget);
+            }
+        }
+    }
+
+    LogManager.ReconfigExistingLoggers();
 }
 ```
 
@@ -129,7 +180,7 @@ PM> Install-Package SumoLogic.Logging.Log4Net
 ```
 
 ### Example Code
-```c#
+```csharp
 public static class Program
 {
   /// <summary>
