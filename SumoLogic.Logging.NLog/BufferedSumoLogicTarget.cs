@@ -342,8 +342,14 @@ namespace SumoLogic.Logging.NLog
         /// Flush any pending log messages asynchronously (in case of asynchronous targets).
         /// </summary>
         /// <param name="asyncContinuation">The asynchronous continuation.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is passed to async continuation for proper handling.")]
         protected override void FlushAsync(global::NLog.Common.AsyncContinuation asyncContinuation)
         {
+            if (asyncContinuation == null)
+            {
+                throw new ArgumentNullException("asyncContinuation");
+            }
+
             try
             {
                 var task = this.flushBufferTask;
