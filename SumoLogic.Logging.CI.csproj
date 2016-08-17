@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Root" ToolsVersion="4.0">
 	
 	<PropertyGroup>
-		<Configuration>DebugCA</Configuration>
+		<Configuration Condition=" '$(Configuration)' == '' ">DebugCA</Configuration>
 		<TestsResultsDirectory>.\TestsResults</TestsResultsDirectory>
 		<TestsRunner>.\packages\xunit.runner.console.2.0.0\tools\xunit.console.exe</TestsRunner>
 		<!--<VSCoverageRunner>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe</VSCoverageRunner>-->
@@ -41,7 +41,7 @@
 		<PropertyGroup>
             <NugetFile>.nuget\nuget.exe</NugetFile>
 		</PropertyGroup>
-		<Exec Command='"$(NugetFile)" restore $([System.Text.RegularExpressions.Regex]::Replace($(SolutionsToBuild), ";", " "))"' ContinueOnError="false"/>
+		<Exec Command='"$(NugetFile)" restore' ContinueOnError="false"/>
 	</Target>
  
 	<Target Name="BeforeResolveReferences">
@@ -109,8 +109,8 @@
 		</PropertyGroup>
 		<Message Text="Making nuget packages."/>
 		<MakeDir Directories="$(OutputNuget)"/>
-		<Exec Command='$(NugetFile) &quot;pack&quot; &quot;-OutputDirectory&quot; &quot;$(OutputNuget)&quot; &quot;SumoLogic.Logging.Log4Net/SumoLogic.Logging.Log4Net.csproj&quot; &quot;-IncludeReferencedProjects&quot; ' ContinueOnError="true"/>
-		<Exec Command='$(NugetFile) &quot;pack&quot; &quot;-OutputDirectory&quot; &quot;$(OutputNuget)&quot; &quot;SumoLogic.Logging.Nlog/SumoLogic.Logging.Nlog.csproj&quot; &quot;-IncludeReferencedProjects&quot; ' ContinueOnError="true"/>
+		<Exec Command='$(NugetFile) pack -OutputDirectory $(OutputNuget) SumoLogic.Logging.Log4Net/SumoLogic.Logging.Log4Net.csproj -IncludeReferencedProjects -Prop Configuration=Release' ContinueOnError="true"/>
+		<Exec Command='$(NugetFile) pack -OutputDirectory $(OutputNuget) SumoLogic.Logging.Nlog/SumoLogic.Logging.Nlog.csproj -IncludeReferencedProjects -Prop Configuration=Release' ContinueOnError="true"/>
 	</Target>
 	
 </Project>
