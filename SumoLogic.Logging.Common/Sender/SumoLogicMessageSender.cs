@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.Common.Sender
     using System.IO;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Mime;
     using System.Text;
     using System.Threading;
     using SumoLogic.Logging.Common.Log;
@@ -131,7 +130,8 @@ namespace SumoLogic.Logging.Common.Sender
                 catch (Exception ex)
                 {
                     // only retry if we have a reasonable hope that the issue is transient
-                    if (!(ex is IOException || ex is HttpRequestException || ex is WebException))
+                    // if (!(ex is IOException || ex is HttpRequestException || ex is WebException))
+                    if (!(ex is IOException || ex is HttpRequestException))
                     {
                         throw;
                     }
@@ -145,7 +145,7 @@ namespace SumoLogic.Logging.Common.Sender
                     {
                         Thread.Sleep(this.RetryInterval);
                     }
-                    catch (ThreadInterruptedException ex2)
+                    catch (Exception ex2)
                     {
                         if (this.Log.IsErrorEnabled)
                         {
@@ -176,7 +176,7 @@ namespace SumoLogic.Logging.Common.Sender
                 return;
             }
 
-            using (var httpContent = new StringContent(body, Encoding.UTF8, MediaTypeNames.Text.Plain))
+            using (var httpContent = new StringContent(body, Encoding.UTF8, "text/plain"))
             {
                 httpContent.Headers.Add("X-Sumo-Name", name);
                 try

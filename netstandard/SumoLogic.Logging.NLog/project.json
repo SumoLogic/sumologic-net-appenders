@@ -1,0 +1,26 @@
+﻿{
+  "name": "SumoLogic.Logging.NLog",
+  "version": "2.0.0",
+  "description": "SumoLogic provides an interface between NLog and remote service Logging.",
+  "authors": [ "SumoLogic" ],
+
+  "dependencies": {
+    "SumoLogic.Logging.Common": "2.0.0-*"
+  },
+
+  "buildOptions": {
+    "compile": {
+      "include": [ "*.cs", "../../SumoLogic.Logging.NLog/**/*.cs" ]
+    },
+    "outputName": "SumoLogic.Logging.NLog"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": "dnxcore50",
+      "dependencies": {
+        "NLog": "5.0.0-beta04"
+      }
+    }
+  }
+}

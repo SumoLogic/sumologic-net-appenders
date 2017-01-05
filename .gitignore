@@ -28,3 +28,6 @@ SumoLogic.Logging.NLog.Example/obj
 SumoLogic.Logging.Nuget/
 packages/
 !packages/repositories.config
+obj/
+bin/
+.vs/

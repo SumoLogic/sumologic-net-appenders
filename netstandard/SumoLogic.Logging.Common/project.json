@@ -1,0 +1,23 @@
+﻿{
+  "version": "2.0.0-*",
+
+  "dependencies": {
+  },
+
+  "buildOptions": {
+    "compile": {
+      "include": [ "*.cs", "../../SumoLogic.Logging.Common/**/*.cs" ]
+    },
+    "outputName": "SumoLogic.Logging.Common"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "NETStandard.Library": "1.6.1",
+        "System.Net.Http": "4.3.0",
+        "System.Threading.Thread": "4.3.0"
+      }
+    }
+  }
+}
