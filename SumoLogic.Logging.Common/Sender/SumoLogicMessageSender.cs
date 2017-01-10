@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.Common.Sender
     using System.IO;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Mime;
     using System.Text;
     using System.Threading;
     using SumoLogic.Logging.Common.Log;
@@ -39,6 +38,11 @@ namespace SumoLogic.Logging.Common.Sender
     /// </summary>
     public class SumoLogicMessageSender : IDisposable
     {
+        /// <summary>
+        /// text/plain media type
+        /// </summary>
+        private const string TextPlainMediaType = "text/plain";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
         /// </summary>
@@ -176,7 +180,7 @@ namespace SumoLogic.Logging.Common.Sender
                 return;
             }
 
-            using (var httpContent = new StringContent(body, Encoding.UTF8, MediaTypeNames.Text.Plain))
+            using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
                 httpContent.Headers.Add("X-Sumo-Name", name);
                 try
