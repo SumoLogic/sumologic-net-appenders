@@ -39,6 +39,12 @@ namespace SumoLogic.Logging.Common.Queue
     public class CostBoundedConcurrentQueue<T>
     {
         /// <summary>
+        /// Lock object used when adding 
+        /// an element to the queue
+        /// </summary>
+        private readonly object enqueueLock = new object();
+
+        /// <summary>
         /// Concurrent queue.
         /// </summary>
         private ConcurrentQueue<T> queue;
@@ -132,7 +138,7 @@ namespace SumoLogic.Logging.Common.Queue
             long auxCost = this.costAssigner.Cost(element);
 
             // Atomically check capacity and optimistically increase usage
-            lock (this)
+            lock (this.enqueueLock)
             {
                 if (auxCost + this.Cost > this.capacity)
                 {

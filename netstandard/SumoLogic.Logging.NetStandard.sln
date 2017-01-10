@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SumoLogic.Logging.Common", "SumoLogic.Logging.Common\SumoLogic.Logging.Common.xproj", "{8504CABE-5F2B-45C5-9327-1C8CA54682ED}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SumoLogic.Logging.Log4Net", "SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.xproj", "{7FE6A13F-FE35-4115-AD34-A14F1D6968C1}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SumoLogic.Logging.NLog", "SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.xproj", "{C1C504B4-42A8-4C95-8A10-8B50A582875D}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SumoLogic.Logging.NLog.Examples.AspNetCore", "SumoLogic.Logging.NLog.Examples.AspNetCore\SumoLogic.Logging.NLog.Examples.AspNetCore.xproj", "{797744A8-8538-4414-A3B2-550A30B2B17D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8504CABE-5F2B-45C5-9327-1C8CA54682ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8504CABE-5F2B-45C5-9327-1C8CA54682ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8504CABE-5F2B-45C5-9327-1C8CA54682ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8504CABE-5F2B-45C5-9327-1C8CA54682ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FE6A13F-FE35-4115-AD34-A14F1D6968C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE6A13F-FE35-4115-AD34-A14F1D6968C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE6A13F-FE35-4115-AD34-A14F1D6968C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE6A13F-FE35-4115-AD34-A14F1D6968C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C504B4-42A8-4C95-8A10-8B50A582875D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C504B4-42A8-4C95-8A10-8B50A582875D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C504B4-42A8-4C95-8A10-8B50A582875D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C504B4-42A8-4C95-8A10-8B50A582875D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{797744A8-8538-4414-A3B2-550A30B2B17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{797744A8-8538-4414-A3B2-550A30B2B17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{797744A8-8538-4414-A3B2-550A30B2B17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{797744A8-8538-4414-A3B2-550A30B2B17D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

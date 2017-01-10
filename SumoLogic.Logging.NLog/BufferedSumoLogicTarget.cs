@@ -23,6 +23,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+ 
 namespace SumoLogic.Logging.NLog
 {
     using System;
@@ -31,7 +32,7 @@ namespace SumoLogic.Logging.NLog
     using System.IO;
     using System.Net.Http;
     using System.Text;
-    using System.Timers;
+    using System.Threading;
     using global::NLog;
     using global::NLog.Targets;
     using SumoLogic.Logging.Common.Log;
@@ -125,7 +126,7 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets how often the messages queue is checked for messages to send, in milliseconds.
         /// </summary>
-        public long FlushingAccuracy
+        public int FlushingAccuracy
         {
             get;
             set;
@@ -254,7 +255,6 @@ namespace SumoLogic.Logging.NLog
             // Initialize flusher
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
             }
 
@@ -272,10 +272,12 @@ namespace SumoLogic.Logging.NLog
                 this.SourceName,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => this.flushBufferTask.Run();
+            TimerCallback timerCallback = state =>
+            {
+                flushBufferTask.Run();
+            };
 
-            this.flushBufferTimer.Start();
+            this.flushBufferTimer = new Timer(timerCallback, null, 0, this.FlushingAccuracy);
         }
 
         /// <summary>
@@ -332,7 +334,6 @@ namespace SumoLogic.Logging.NLog
 
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
             }

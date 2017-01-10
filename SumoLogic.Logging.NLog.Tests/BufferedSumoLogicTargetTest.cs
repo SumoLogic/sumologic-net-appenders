@@ -164,7 +164,7 @@ namespace SumoLogic.Logging.NLog.Tests
         /// <param name="maxFlushInterval">The maximum flush interval, in milliseconds.</param>
         /// <param name="flushingAccuracy">The flushing accuracy, in milliseconds.</param>
         /// <param name="retryInterval">The retry interval, in milliseconds.</param>
-        private void SetUpLogger(long messagesPerRequest, long maxFlushInterval, long flushingAccuracy, long retryInterval = 10000)
+        private void SetUpLogger(long messagesPerRequest, long maxFlushInterval, int flushingAccuracy, long retryInterval = 10000)
         {
             this.messagesHandler = new MockHttpMessageHandler();
             this.bufferedSumoLogicTarget = new BufferedSumoLogicTarget(null, this.messagesHandler);
