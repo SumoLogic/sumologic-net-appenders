@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "2.0.0-*",
 
   "dependencies": {
@@ -16,7 +16,8 @@
       "dependencies": {
         "NETStandard.Library": "1.6.1",
         "System.Net.Http": "4.3.0",
-        "System.Threading.Thread": "4.3.0"
+        "System.Threading.Thread": "4.3.0",
+        "System.Net.Requests": "4.3.0"
       }
     }
   }
