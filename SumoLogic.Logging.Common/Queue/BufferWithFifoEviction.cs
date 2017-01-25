@@ -37,6 +37,12 @@ namespace SumoLogic.Logging.Common.Queue
     public class BufferWithFifoEviction<T> : BufferWithEviction<T>
     {
         /// <summary>
+        /// Lock object used when adding 
+        /// an element to the queue
+        /// </summary>
+        private readonly object queueAddLock = new object();
+
+        /// <summary>
         /// Cost bounded concurrent queue.
         /// </summary>
         private CostBoundedConcurrentQueue<T> queue;
@@ -104,17 +110,19 @@ namespace SumoLogic.Logging.Common.Queue
         /// </summary>
         /// <param name="element">Element to add in queue.</param>
         /// <returns>If it add was successful.</returns>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public override bool Add(T element)
         {
-            bool success = this.queue.Enqueue(element);
-            if (success == false)
+            lock (this.queueAddLock)
             {
-                this.Evict(this.costAssigner.Cost(element));
-                return this.queue.Enqueue(element);
-            }
+                bool success = this.queue.Enqueue(element);
+                if (success == false)
+                {
+                    this.Evict(this.costAssigner.Cost(element));
+                    return this.queue.Enqueue(element);
+                }
 
-            return true;
+                return true;
+            }
         }
 
         /// <summary>
