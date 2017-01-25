@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.Common.Sender
     using System.IO;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Mime;
     using System.Text;
     using System.Threading;
     using SumoLogic.Logging.Common.Log;
@@ -39,6 +38,11 @@ namespace SumoLogic.Logging.Common.Sender
     /// </summary>
     public class SumoLogicMessageSender : IDisposable
     {
+        /// <summary>
+        /// text/plain media type
+        /// </summary>
+        private const string TextPlainMediaType = "text/plain";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
         /// </summary>
@@ -140,7 +144,7 @@ namespace SumoLogic.Logging.Common.Sender
                     {
                         this.Log.Error("Error trying send messages. Exception: " + ex.Message);
                     }
-                    
+
                     try
                     {
                         Thread.Sleep(this.RetryInterval);
@@ -151,7 +155,7 @@ namespace SumoLogic.Logging.Common.Sender
                         {
                             this.Log.Error(ex2.Message);
                         }
-                        
+
                         break;
                     }
                 }
@@ -172,11 +176,11 @@ namespace SumoLogic.Logging.Common.Sender
                 {
                     this.Log.Warn("Could not send log to Sumo Logic (null Url)");
                 }
-                
+
                 return;
             }
 
-            using (var httpContent = new StringContent(body, Encoding.UTF8, MediaTypeNames.Text.Plain))
+            using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
                 httpContent.Headers.Add("X-Sumo-Name", name);
                 try
@@ -188,7 +192,7 @@ namespace SumoLogic.Logging.Common.Sender
                         {
                             this.Log.Warn("Received HTTP error from Sumo Service: " + response.StatusCode);
                         }
-                        
+
                         if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
                         {
                             throw new IOException("The service is unavailable");
@@ -198,7 +202,7 @@ namespace SumoLogic.Logging.Common.Sender
                     if (this.Log.IsDebugEnabled)
                     {
                         this.Log.Debug("Successfully sent log request to Sumo Logic");
-                    } 
+                    }
                 }
                 catch (AggregateException ex)
                 {
@@ -211,21 +215,21 @@ namespace SumoLogic.Logging.Common.Sender
                     {
                         this.Log.Debug("Reason: " + ex.InnerException.Message);
                     }
-                    
+
                     throw ex.InnerException;
                 }
                 catch (IOException ex)
                 {
                     if (this.Log.IsWarnEnabled)
                     {
-                       this.Log.Warn("Could not send log to Sumo Logic");
+                        this.Log.Warn("Could not send log to Sumo Logic");
                     }
 
                     if (this.Log.IsDebugEnabled)
                     {
                         this.Log.Debug("Reason: " + ex.Message);
-                    }             
-                                      
+                    }
+
                     throw;
                 }
             }
