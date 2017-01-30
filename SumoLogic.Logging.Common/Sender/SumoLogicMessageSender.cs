@@ -145,7 +145,7 @@ namespace SumoLogic.Logging.Common.Sender
                     {
                         Thread.Sleep(this.RetryInterval);
                     }
-                    catch (ThreadInterruptedException ex2)
+                    catch (Exception ex2)
                     {
                         if (this.Log.IsErrorEnabled)
                         {
