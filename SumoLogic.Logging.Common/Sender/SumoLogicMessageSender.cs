@@ -41,7 +41,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <summary>
         /// text/plain media type
         /// </summary>
-        private const string TextPlainMediaType = "text/plain";
+        private static readonly string TextPlainMediaType = "text/plain";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
