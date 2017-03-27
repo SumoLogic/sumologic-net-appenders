@@ -30,7 +30,7 @@ namespace SumoLogic.Logging.Common.Sender
     using System.Net;
     using System.Net.Http;
     using System.Text;
-    using System.Threading;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Log;
 
     /// <summary>
@@ -147,7 +147,7 @@ namespace SumoLogic.Logging.Common.Sender
 
                     try
                     {
-                        Thread.Sleep(this.RetryInterval);
+                        Task.Delay(this.RetryInterval).GetAwaiter().GetResult();
                     }
                     catch (Exception ex2)
                     {
