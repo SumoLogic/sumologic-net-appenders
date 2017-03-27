@@ -157,7 +157,7 @@ namespace SumoLogic.Logging.Common.Queue
             }
 
             if (numEvicted > 0 && this.log.IsWarnEnabled)
-            {              
+            {
                 this.log.Warn("Evicted " + numEvicted + " messages from buffer");
             }
 
