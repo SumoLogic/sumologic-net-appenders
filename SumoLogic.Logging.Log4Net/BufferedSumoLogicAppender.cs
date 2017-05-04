@@ -36,7 +36,7 @@ namespace SumoLogic.Logging.Log4Net
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
-    using Timer = System.Timers.Timer;
+    using Timer = System.Threading.Timer;
 
     /// <summary>
     /// Buffered SumoLogic Appender implementation.
@@ -60,7 +60,7 @@ namespace SumoLogic.Logging.Log4Net
         public BufferedSumoLogicAppender()
             : this(null, null)
         {
-        }
+		}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferedSumoLogicAppender"/> class.
@@ -233,7 +233,6 @@ namespace SumoLogic.Logging.Log4Net
             // Initialize flusher
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
             }
 
@@ -245,10 +244,7 @@ namespace SumoLogic.Logging.Log4Net
                 this.SourceName,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => flushBufferTask.Run();
-
-            this.flushBufferTimer.Start();
+            this.flushBufferTimer = new Timer((s)=>flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -306,7 +302,6 @@ namespace SumoLogic.Logging.Log4Net
 
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
             }
@@ -317,7 +312,12 @@ namespace SumoLogic.Logging.Log4Net
         /// </summary>
         private void ActivateConsoleLog()
         {
-            this.LogLog = new ConsoleLog();
-        }
+#if netfull
+			this.LogLog = new ConsoleLog();
+#else
+			this.LogLog = new DummyLog();
+#endif
+
+		}
     }
 }

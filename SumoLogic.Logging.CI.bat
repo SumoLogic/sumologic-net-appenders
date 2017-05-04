@@ -24,11 +24,10 @@ set SCRIPT_PATH=%~dp0
 chdir /d "%SCRIPT_PATH:~0,-1%"
 echo DONE SETTING PATH AND CHANGING DIRECTORY
 echo.
-
 :updatepackages
 echo UPDATING NUGET PACKAGES ...
 echo ===========================
-msbuild SumoLogic.Logging.CI.csproj "/t:UpdateNugetPackages" "/v:m" 
+dotnet restore SumoLogic.Logging.sln
 set LASTEXITCODE=%ERRORLEVEL%
 if NOT "%LASTEXITCODE%"=="0" (
    echo ERROR UPDATING NUGET PACKAGES
@@ -40,7 +39,7 @@ echo.
 :build
 echo BUILDING SOLUTION ...
 echo =====================
-msbuild SumoLogic.Logging.CI.csproj "/v:m"
+dotnet msbuild SumoLogic.Logging.CI.csproj "/v:m"
 set LASTEXITCODE=%ERRORLEVEL%
 if NOT "%LASTEXITCODE%"=="0" (
    echo ERROR BUILDING SOLUTION
@@ -52,7 +51,7 @@ echo.
 :runtests
 echo RUNNING TESTS ...
 echo =================
-msbuild SumoLogic.Logging.CI.csproj "/t:RunTestsWithCoverage" "/v:m"
+dotnet msbuild SumoLogic.Logging.CI.csproj "/t:RunTestsWithCoverage" "/v:m"
 set LASTEXITCODE=%ERRORLEVEL%
 if NOT "%LASTEXITCODE%"=="0" (
    echo ERROR RUNNING TESTS

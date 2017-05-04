@@ -216,7 +216,11 @@ namespace SumoLogic.Logging.Log4Net
         /// </summary>
         private void ActivateConsoleLog()
         {
-            this.LogLog = new ConsoleLog();
-        }
+#if netfull
+			this.LogLog = new ConsoleLog();
+#else
+			this.LogLog = new DummyLog();
+#endif
+		}
     }
 }

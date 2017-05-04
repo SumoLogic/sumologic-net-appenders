@@ -1,6 +1,4 @@
 @echo off
-echo "Building Libraries"
-msbuild /p:Configuration=Release SumoLogic.Logging.CI.csproj 
-echo CREATING NUGET PACKAGES ...
-echo ======================================
-msbuild SumoLogic.Logging.CI.csproj /t:MakeNugetPackages /v:m /p:Configuration=Release
+dotnet pack --output %~dp0SumoLogic.Logging.Nuget --configuration Release SumoLogic.Logging.Common/SumoLogic.Logging.Common.csproj
+dotnet pack --output %~dp0SumoLogic.Logging.Nuget --configuration Release SumoLogic.Logging.Log4Net/SumoLogic.Logging.Log4Net.csproj
+dotnet pack --output %~dp0SumoLogic.Logging.Nuget --configuration Release SumoLogic.Logging.Nlog/SumoLogic.Logging.Nlog.csproj

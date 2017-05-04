@@ -30,7 +30,7 @@ namespace SumoLogic.Logging.Common.Sender
     using System.Net;
     using System.Net.Http;
     using System.Text;
-    using System.Threading;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Log;
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <summary>
         /// text/plain media type
         /// </summary>
-        private static readonly string TextPlainMediaType = "text/plain";
+        private const string TextPlainMediaType = "text/plain";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
@@ -122,6 +122,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void Send(string body, string name)
         {
             bool success = false;
@@ -134,7 +135,6 @@ namespace SumoLogic.Logging.Common.Sender
                 }
                 catch (Exception ex)
                 {
-                    // only retry if we have a reasonable hope that the issue is transient
                     if (!(ex is IOException || ex is HttpRequestException || ex is WebException))
                     {
                         throw;
@@ -147,7 +147,7 @@ namespace SumoLogic.Logging.Common.Sender
 
                     try
                     {
-                        Thread.Sleep(this.RetryInterval);
+                        Task.Delay(this.RetryInterval).GetAwaiter().GetResult();
                     }
                     catch (Exception ex2)
                     {

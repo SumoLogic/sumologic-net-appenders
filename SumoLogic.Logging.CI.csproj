@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Root" ToolsVersion="4.0">
+<Project DefaultTargets="Root" ToolsVersion="4.0">
 	
 	<PropertyGroup>
 		<Configuration Condition=" '$(Configuration)' == '' ">DebugCA</Configuration>
@@ -36,13 +35,6 @@
 		<CallTarget Targets="Clean" />
 		<CallTarget Targets="Compile" />
 	</Target>
-
-	<Target Name="UpdateNugetPackages" >
-		<PropertyGroup>
-            <NugetFile>.nuget\nuget.exe</NugetFile>
-		</PropertyGroup>
-		<Exec Command='"$(NugetFile)" restore' ContinueOnError="false"/>
-	</Target>
  
 	<Target Name="BeforeResolveReferences">
 		<RemoveDuplicates Inputs="@(BRSearchPathFiles->'%(RootDir)%(Directory)')">    
@@ -57,7 +49,7 @@
 		<MSBuild Projects="@(SolutionsToBuild)" ContinueOnError="false" Targets="Clean" Properties="Configuration= $(Configuration)" />
 	</Target>
 
-	<Target Name="Compile" DependsOnTargets="UpdateNugetPackages; BeforeResolveReferences">
+	<Target Name="Compile" DependsOnTargets="BeforeResolveReferences">
 		<MSBuild Projects="@(SolutionsToBuild)" ContinueOnError="false" Targets="Build" Properties="Configuration=$(Configuration)">
 			<Output ItemName="BuildOutput" TaskParameter="TargetOutputs"/>
 		</MSBuild>
@@ -72,7 +64,8 @@
 		<!-- XUNIT/NUNIT/HTML RESULTS -->
 		<Exec Command="&quot;$(TestsRunner)&quot; &quot;@(DllToTest, '&quot; &quot;')&quot; -xml &quot;$(TestsResultsDirectory)\TestsResults.xUnit.v2.xml&quot; -xmlv1 &quot;$(TestsResultsDirectory)\TestsResults.xUnit.v1.xml&quot; -nunit &quot;$(TestsResultsDirectory)\TestsResults.NUnit.xml&quot; -html &quot;$(TestsResultsDirectory)\TestsResults.html&quot;" Condition="'@(UnitTestProjects)'!=''" ContinueOnError="true"/>
 		<!-- JUNIT TESTS RESULTS -->
-		<XslTransformation XslInputPath="$(TestsResultsDirectory)\nunit-to-junit.xsl" XmlInputPaths="$(TestsResultsDirectory)\TestsResults.NUnit.xml" OutputPaths="$(TestsResultsDirectory)\TestsResults.JUnit.xml" />
+		<!-- Commented out until dotnet core 2.0 which adds back xml features -->
+		<!--<XslTransformation XslInputPath="$(TestsResultsDirectory)\nunit-to-junit.xsl" XmlInputPaths="$(TestsResultsDirectory)\TestsResults.NUnit.xml" OutputPaths="$(TestsResultsDirectory)\TestsResults.JUnit.xml" />-->
 		<!--<XslTransformation XslInputPath="$(TestsResultsDirectory)\nunit-to-junit (2).xsl" XmlInputPaths="$(TestsResultsDirectory)\TestsResults.NUnit.xml" OutputPaths="$(TestsResultsDirectory)\TestsResults.JUnit.xml" />-->
 	</Target>
 	
@@ -102,15 +95,6 @@
 		<CallTarget Targets="RunTests"/>		
 	</Target>
 	
-	<Target Name="MakeNugetPackages">
-		<PropertyGroup>
-            <NugetFile>.nuget\nuget.exe</NugetFile>
-			<OutputNuget>SumoLogic.Logging.Nuget</OutputNuget>
-		</PropertyGroup>
-		<Message Text="Making nuget packages."/>
-		<MakeDir Directories="$(OutputNuget)"/>
-		<Exec Command='$(NugetFile) pack -OutputDirectory $(OutputNuget) SumoLogic.Logging.Log4Net/SumoLogic.Logging.Log4Net.csproj -IncludeReferencedProjects -Prop Configuration=Release' ContinueOnError="true"/>
-		<Exec Command='$(NugetFile) pack -OutputDirectory $(OutputNuget) SumoLogic.Logging.Nlog/SumoLogic.Logging.Nlog.csproj -IncludeReferencedProjects -Prop Configuration=Release' ContinueOnError="true"/>
-	</Target>
+
 	
 </Project>
