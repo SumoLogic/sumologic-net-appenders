@@ -27,7 +27,8 @@ echo.
 :updatepackages
 echo UPDATING NUGET PACKAGES ...
 echo ===========================
-.\.nuget\nuget.exe SumoLogic.Logging.sln
+.\.nuget\nuget.exe restore SumoLogic.Logging.sln
+dotnet restore SumoLogic.Logging.sln
 set LASTEXITCODE=%ERRORLEVEL%
 if NOT "%LASTEXITCODE%"=="0" (
    echo ERROR UPDATING NUGET PACKAGES
