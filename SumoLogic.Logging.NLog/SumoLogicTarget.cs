@@ -141,12 +141,12 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-#if netfull
-			this.LogLog = new ConsoleLog();
-#else
-			this.LogLog = new DummyLog();
-#endif
-		}
+        #if netfull
+            this.LogLog = new ConsoleLog();
+        #else
+            this.LogLog = new DummyLog();
+        #endif
+        }
   
         /// <summary>
         /// Initialize the target based on the options set
