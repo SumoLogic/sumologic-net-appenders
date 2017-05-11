@@ -31,7 +31,7 @@ namespace SumoLogic.Logging.NLog
     using System.IO;
     using System.Net.Http;
     using System.Text;
-    using System.Timers;
+    using System.Threading;
     using global::NLog;
     using global::NLog.Targets;
     using SumoLogic.Logging.Common.Log;
@@ -209,8 +209,12 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-            this.LogLog = new ConsoleLog();
-        }
+#if netfull
+			this.LogLog = new ConsoleLog();
+#else
+			this.LogLog = new DummyLog();
+#endif
+		}
 
         /// <summary>
         /// Initialize the target based on the options set
@@ -254,7 +258,6 @@ namespace SumoLogic.Logging.NLog
             // Initialize flusher
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
             }
 
@@ -272,10 +275,7 @@ namespace SumoLogic.Logging.NLog
                 this.SourceName,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => this.flushBufferTask.Run();
-
-            this.flushBufferTimer.Start();
+            this.flushBufferTimer = new Timer((s)=> this.flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace SumoLogic.Logging.NLog
 
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
+
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
             }
