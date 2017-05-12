@@ -1,24 +1,27 @@
-# Sumo-net-loggers
+# Sumo Logic .NET Appenders
 
-Several appenders for .NET developers to use that send logs straight to SumoLogic.
+Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources.
 
 # Prerequisites
-* .NET 4.0 or later
-* A SumoLogic Account, trial can be started [here](https://www.sumologic.com/)
+* .NET 4.5 or later or .NET Standard 1.5
+* A Sumo Logic Account (trial can be started [here](https://www.sumologic.com/))
 
 # Appenders
 
-There are two appenders which are contained in this project.
-* NLog
-* Log4net
+Appenders are provided for the following .NET logging frameworks
 
-Both appenders have two implementations a Buffering and non Buffering version.
-The non Buffering implementation will send each log to SumoLogic, the Buffering will queue them up and send it in batch.
+* NLog
+* Log4Net
+
+Both appenders have two implementations: a buffering and a non-buffering version.
+The non-buffering implementations will send each log message to Sumo Logic in a distinct HTTP request. The buffering
+implementations will queue messages until a size, count, or time threshold is met, then send in batch.
 
 # Nuget Installation
 
 ## NLog
-To install the NLog appender, follow the following steps
+
+To install the NLog appender, use the following steps
 ```
 PM> Install-Package SumoLogic.Logging.NLog
 ```
@@ -125,7 +128,9 @@ static void ReconfigureSumoTargets()
 ```
 
 ## Log4net
-To install the Log4Net appender, follow the following steps:
+
+To install the Log4Net appender, use the following steps:
+
 ```
 PM> Install-Package SumoLogic.Logging.Log4Net
 ```
@@ -202,11 +207,4 @@ public static class Program
 
 
 # License
-Apache 2.0
-
-# Info
-Please see the [wiki](https://github.com/mcplusa/sumologic-net-appenders/wiki)
-
-# Bugs
-Please create an [issue](https://github.com/mcplusa/sumologic-net-appenders/issues)
-
+[Apache 2.0](LICENSE)
