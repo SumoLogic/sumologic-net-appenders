@@ -12,10 +12,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>SumoLogic.Logging.NLog</PackageId>
-    <Version>1.0.0.3</Version>
-    <Description>SumoLogic provides an interface between NLog and remote sevice Logging.</Description>
-    <Authors>SumoLogic</Authors>
-    <Copyright>Copyright © 2015 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Version>1.0.0.4-beta1</Version>
+    <Description>NLog appender which sends logs to the Sumo Logic machine data platform.</Description>
+    <Authors>Sumo Logic</Authors>
+    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
