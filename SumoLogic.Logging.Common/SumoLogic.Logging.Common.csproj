@@ -13,9 +13,9 @@
   <PropertyGroup>
     <PackageId>SumoLogic.Logging.Common</PackageId>
     <PackageVersion>1.0.0.3</PackageVersion>
-    <Description>SumoLogic core library</Description>
-    <Authors>SumoLogic</Authors>
-    <Copyright>Copyright © 2015 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Description>Shared library used by .NET log appenders uploading to Sumo Logic.</Description>
+    <Authors>Sumo Logic</Authors>
+    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
