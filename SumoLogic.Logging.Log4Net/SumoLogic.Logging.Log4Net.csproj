@@ -15,7 +15,7 @@
     <Version>1.0.0.3</Version>
     <Description>SumoLogic provides an interface between log4Net and remote sevice Logging.</Description>
     <Authors>SumoLogic</Authors>
-    <Copyright>Copyright © 2015 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>

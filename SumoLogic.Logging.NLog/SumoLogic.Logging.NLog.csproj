@@ -15,7 +15,7 @@
     <Version>1.0.0.3-beta1</Version>
     <Description>SumoLogic provides an interface between NLog and remote sevice Logging.</Description>
     <Authors>SumoLogic</Authors>
-    <Copyright>Copyright © 2015 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
