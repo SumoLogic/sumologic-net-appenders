@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.Common", "SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj", "{E182AA49-AF0B-48A9-8C65-E0241DA8C623}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.Log4Net", "SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.csproj", "{75BD9161-A607-4C13-8F3A-6B4E5A04460D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.NLog", "SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj", "{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.EnterpriseLibrary", "SumoLogic.Logging.EnterpriseLibrary\SumoLogic.Logging.EnterpriseLibrary.csproj", "{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.EnterpriseLibrary.Tests", "SumoLogic.Logging.EnterpriseLibrary.Tests\SumoLogic.Logging.EnterpriseLibrary.Tests.csproj", "{B562286B-E259-4516-AA01-14A5DB00753E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.NLog.Tests", "SumoLogic.Logging.NLog.Tests\SumoLogic.Logging.NLog.Tests.csproj", "{A71BB234-A8E5-440F-BCCD-E7B50A696739}"
 EndProject
@@ -51,18 +49,6 @@ Global
 		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.DebugCA|Any CPU.Build.0 = DebugCA|Any CPU
 		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.DebugCA|Any CPU.ActiveCfg = DebugCA|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.DebugCA|Any CPU.Build.0 = DebugCA|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3313EDA4-9D01-4B11-AEF9-25D0F7A271A6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.DebugCA|Any CPU.ActiveCfg = DebugCA|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.DebugCA|Any CPU.Build.0 = DebugCA|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B562286B-E259-4516-AA01-14A5DB00753E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.DebugCA|Any CPU.ActiveCfg = DebugCA|Any CPU

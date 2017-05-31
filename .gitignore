@@ -19,10 +19,6 @@ SumoLogic.Logging.NLog/bin
 SumoLogic.Logging.NLog/obj
 SumoLogic.Logging.NLog.Tests/bin
 SumoLogic.Logging.NLog.Tests/obj
-SumoLogic.Logging.EnterpriseLibrary/bin
-SumoLogic.Logging.EnterpriseLibrary/obj
-SumoLogic.Logging.EnterpriseLibrary.Tests/bin
-SumoLogic.Logging.EnterpriseLibrary.Tests/obj
 SumoLogic.Logging.NLog.Example/bin
 SumoLogic.Logging.NLog.Example/obj
 SumoLogic.Logging.Nuget/
