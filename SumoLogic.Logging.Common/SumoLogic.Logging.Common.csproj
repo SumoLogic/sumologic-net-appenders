@@ -21,6 +21,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>netfull</DefineConstants>

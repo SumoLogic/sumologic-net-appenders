@@ -24,6 +24,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\SumoLogic.Logging.snk">
