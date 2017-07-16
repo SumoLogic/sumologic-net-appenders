@@ -1,5 +1,6 @@
 param (
-    [string]$Version = $null
+    [string]$Version = $null,
+    [bool]$forcePackage = $false
 
 )
 function GetRootPath {
@@ -38,13 +39,13 @@ if($env:APPVEYOR -ne "true"){
     Write-Output "Build not running in appveyor, executing tests"
     & .\SumoLogic.Logging.CI.Test.ps1
 }
-if($env:APPVEYOR_REPO_TAG -eq "true"){
+if(($env:APPVEYOR_REPO_TAG -eq "true") -or ($forcePackage -eq $true)) {
     Write-Output ======================================
     Write-Output PACK PHASE
     Write-Output ======================================
     dotnet pack .\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$fin_ver
     dotnet pack .\SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$fin_ver
-    dotnet pack .\SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$(fin_ver)-beta1
+    dotnet pack .\SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$fin_ver-beta1
 }
 else{
     Write-Warning "APPVEYOR_REPO_TAG value not set thus we are not making packages on tags, thus we are not making packages. If you wish to make packages set the APPVEYOR_REPO_TAG envionmental variable to the word true"
