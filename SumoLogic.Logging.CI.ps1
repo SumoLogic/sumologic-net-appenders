@@ -3,9 +3,6 @@ param (
     [bool]$forcePackage = $false
 
 )
-function GetRootPath {
-    return  Convert-Path .
-}
 # the "final version" aka the actual version we are going to use
 $fin_ver = $Version
 
