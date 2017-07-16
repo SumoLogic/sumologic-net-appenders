@@ -59,8 +59,8 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
             bufferFlushingTask.Run();
             Assert.Equal(1, bufferFlushingTask.SentOut.Count);
 
-            Assert.Equal(bufferFlushingTask.SentOut[0].Count, 3);
-            Assert.Equal(bufferFlushingTask.SentOut[0], new List<string>() { "msg1", "msg2", "msg3" });
+            Assert.Equal(3, bufferFlushingTask.SentOut[0].Count);
+            Assert.Equal(new List<string>() { "msg1", "msg2", "msg3" }, bufferFlushingTask.SentOut[0]);
         }
 
         /// <summary>
