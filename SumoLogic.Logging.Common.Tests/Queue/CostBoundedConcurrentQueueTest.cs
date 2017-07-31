@@ -28,6 +28,7 @@ namespace SumoLogic.Logging.Common.Tests.Queue
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Queue;
     using Xunit;
 
@@ -125,7 +126,8 @@ namespace SumoLogic.Logging.Common.Tests.Queue
 
             // start background writer that will attempt to enqueue
             // new messages while we drain
-            var writerThread = StartBackgroundWriter(queue, 1, 7000);
+            var token = new CancellationTokenSource();
+            var writerThread = StartBackgroundWriter(queue, 1, 7000, token);
             Thread.Sleep(100);
             var drainCollection = new List<string>();
             queue.DrainTo(drainCollection);
@@ -142,7 +144,7 @@ namespace SumoLogic.Logging.Common.Tests.Queue
 
             if (writerThread.IsAlive)
             {
-                writerThread.Abort();
+                token.Cancel();
             }
         }
 
@@ -169,7 +171,7 @@ namespace SumoLogic.Logging.Common.Tests.Queue
         /// <param name="elementCost">Cost of each element</param>
         /// <param name="howMany">How many total elements should be written</param>
         /// <returns>The resultant thread. The thread will already be started.</returns>
-        private static Thread StartBackgroundWriter(CostBoundedConcurrentQueue<string> queue, int elementCost, int howMany)
+        private static Thread StartBackgroundWriter(CostBoundedConcurrentQueue<string> queue, int elementCost, int howMany, CancellationTokenSource token)
         {
             Thread t = new Thread(new ThreadStart(() =>
             {
@@ -180,12 +182,15 @@ namespace SumoLogic.Logging.Common.Tests.Queue
                 {
                     while (!queue.Enqueue(str))
                     {
+                        if(token.IsCancellationRequested)
+                        {
+                            return;
+                        }
                     }
                 }
             }));
 
             t.Start();
-
             return t;
         }
     }
