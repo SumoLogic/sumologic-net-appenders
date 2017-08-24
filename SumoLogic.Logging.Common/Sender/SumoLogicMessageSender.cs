@@ -42,6 +42,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// text/plain media type
         /// </summary>
         private const string TextPlainMediaType = "text/plain";
+        private const string SUMO_SOURCE_NAME_HEADER = "X-Sumo-Name";
+        private const string SUMO_SOURCE_CATEGORY_HEADER = "X-Sumo-Cateory";
+        private const string SUMO_SOURCE_HOST_HEADER = "X-Sumo-Host";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
@@ -58,6 +61,33 @@ namespace SumoLogic.Logging.Common.Sender
         /// Gets or sets the destination URL.
         /// </summary>
         public Uri Url
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source name 
+        /// </summary>
+        public string SourceName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source category
+        /// </summary>
+        public string SourceCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source host
+        /// </summary>
+        public string SourceHost
         {
             get;
             set;
@@ -123,7 +153,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, string name)
+        public void Send(string body, String name)
         {
             bool success = false;
             do
@@ -182,7 +212,9 @@ namespace SumoLogic.Logging.Common.Sender
 
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
-                httpContent.Headers.Add("X-Sumo-Name", name);
+                httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
+                httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
+                httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, SourceHost);
                 try
                 {
                     var response = this.HttpClient.PostAsync(this.Url, httpContent).Result;

@@ -83,6 +83,24 @@ namespace SumoLogic.Logging.Log4Net
         }
 
         /// <summary>
+        /// Gets or sets the source category for messages sent to SumoLogic server
+        /// </summary>
+        public string SourceCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source host for messages sent to SumoLogic Server
+        /// </summary>
+        public string SourceHost
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the connection timeout, in milliseconds.
         /// </summary>
         public long ConnectionTimeout
@@ -155,6 +173,8 @@ namespace SumoLogic.Logging.Log4Net
 
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
             this.SumoLogicMessageSender.Url = new Uri(this.Url);
+            this.SumoLogicMessageSender.SourceCategory = this.SourceCategory;
+            this.SumoLogicMessageSender.SourceHost = this.SourceHost;
         }
 
         /// <summary>

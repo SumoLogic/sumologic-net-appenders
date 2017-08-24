@@ -63,6 +63,9 @@ namespace SumoLogic.Logging.NLog.Tests
             this.sumoLogicTarget.Url = "http://www.fakeadress.com";
             this.sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}";
             this.sumoLogicTarget.SourceName = "SumoLogicTargetTest";
+            this.sumoLogicTarget.SourceCategory = "SumoLogicTargetSourceCategory";
+            this.sumoLogicTarget.SourceHost = "SumoLogicTargetSourceHost";
+            this.sumoLogicTarget.SourceHost = "FakeTargetSourceHost";
             this.sumoLogicTarget.Name = "SumoLogicTargetTest";           
             if (LogManager.Configuration == null)
             {

@@ -68,6 +68,8 @@ namespace SumoLogic.Logging.Log4Net.Tests
 
             this.sumoLogicAppender = new SumoLogicAppender(null, this.messagesHandler);
             this.sumoLogicAppender.Url = "http://www.fakeadress.com";
+            this.sumoLogicAppender.SourceCategory = "SumoLogicAppenderSourceCategory";
+            this.sumoLogicAppender.SourceHost = "SumoLogicAppenderSourceHost";
             this.sumoLogicAppender.Layout = new PatternLayout("-- %m%n");
             this.sumoLogicAppender.ActivateOptions();
 

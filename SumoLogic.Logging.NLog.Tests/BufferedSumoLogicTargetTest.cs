@@ -171,7 +171,8 @@ namespace SumoLogic.Logging.NLog.Tests
             this.bufferedSumoLogicTarget.Url = "http://www.fakeadress.com";
             this.bufferedSumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}";
             this.bufferedSumoLogicTarget.SourceName = "BufferedSumoLogicTargetTest";
-            this.bufferedSumoLogicTarget.SourceName = "BufferedSumoLogicTargetTest";
+            this.bufferedSumoLogicTarget.SourceCategory = "BufferedSumoLogicTargetSourceCategory";
+            this.bufferedSumoLogicTarget.SourceHost = "BufferedSumoLogicTargetSourceHost";
             this.bufferedSumoLogicTarget.MessagesPerRequest = messagesPerRequest;
             this.bufferedSumoLogicTarget.MaxFlushInterval = maxFlushInterval;
             this.bufferedSumoLogicTarget.FlushingAccuracy = flushingAccuracy;
