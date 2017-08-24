@@ -206,11 +206,11 @@ namespace SumoLogic.Logging.Common.Sender
                 httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
                 // set headers for the source category and the source host
                 // when they are not null nor empty strings
-                if(SourceCategory != null || !SourceCategory.Trim().Equals(""))
+                if(!String.IsNullOrWhiteSpace(SourceCategory))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
                 }
-                if (SourceHost != null || !SourceHost.Trim().Equals(""))
+                if (!String.IsNullOrWhiteSpace(SourceHost))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, SourceHost);
                 }
