@@ -153,14 +153,14 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body)
+        public void Send(string body, string name)
         {
             bool success = false;
             do
             {
                 try
                 {
-                    this.TrySend(body);
+                    this.TrySend(body, name);
                     success = true;
                 }
                 catch (Exception ex)
@@ -194,11 +194,20 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
+        /// Blocks while sending a message to the SumoLogic server, retrying as many time as needed.
+        /// </summary>
+        /// <param name="body">The message body.</param>
+        public void Send(string body)
+        {
+            Send(body, this.SourceName);
+        }
+
+        /// <summary>
         /// Blocks while sending a message to the SumoLogic server, no retries are performed.
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        public void TrySend(string body)
+        public void TrySend(string body, string name)
         {
             if (this.Url == null)
             {
@@ -212,11 +221,11 @@ namespace SumoLogic.Logging.Common.Sender
 
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
-                if (!string.IsNullOrWhiteSpace(SourceName))
+                if (!string.IsNullOrWhiteSpace(name))
                 {
-                    httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, SourceName);
+                    httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
                 }
-                if(!String.IsNullOrWhiteSpace(SourceCategory))
+                if (!String.IsNullOrWhiteSpace(SourceCategory))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
                 }
@@ -274,6 +283,15 @@ namespace SumoLogic.Logging.Common.Sender
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Blocks while sending a message to the SumoLogic server, no retries are performed.
+        /// </summary>
+        /// <param name="body">The message body.</param>
+        public void TrySend(string body)
+        {
+            TrySend(body, this.SourceName);
         }
 
         /// <summary>
