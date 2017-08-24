@@ -51,6 +51,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
         private SumoLogicMessageSender sumoLogicMessageSender;
 
         private const string SOURCE_NAME = "name";
+        private const string SOURCE_CATEGORY = "category";
+        private const string SOURCE_HOST = "host";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSenderTest"/> class.
@@ -61,6 +63,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
             this.sumoLogicMessageSender = new SumoLogicMessageSender(this.messagesHandler, null);
             this.sumoLogicMessageSender.Url = new Uri("http://www.fakeadress.com");
             this.sumoLogicMessageSender.SourceName = SOURCE_NAME;
+            this.sumoLogicMessageSender.SourceCategory = SOURCE_CATEGORY;
+            this.sumoLogicMessageSender.SourceHost = SOURCE_HOST;
             this.sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(30);
         }
 
@@ -86,6 +90,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
             string body = "body";
            this.sumoLogicMessageSender.Send(body);
             Assert.Equal(SOURCE_NAME, this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
+            Assert.Equal(SOURCE_CATEGORY, this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Category").First<string>());
+            Assert.Equal(SOURCE_HOST, this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Host").First<string>());
         }
 
         /// <summary>
