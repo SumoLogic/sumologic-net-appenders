@@ -81,7 +81,7 @@ namespace SumoLogic.Logging.NLog.Tests
             for (int i = 0; i < numMessages; i++)
             {
                 this.logger.Info(i);
-                Thread.Sleep(TimeSpan.FromMilliseconds(10));
+                Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
 
             Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);

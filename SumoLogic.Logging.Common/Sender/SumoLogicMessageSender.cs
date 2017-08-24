@@ -43,7 +43,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         private const string TextPlainMediaType = "text/plain";
         private const string SUMO_SOURCE_NAME_HEADER = "X-Sumo-Name";
-        private const string SUMO_SOURCE_CATEGORY_HEADER = "X-Sumo-Cateory";
+        private const string SUMO_SOURCE_CATEGORY_HEADER = "X-Sumo-Category";
         private const string SUMO_SOURCE_HOST_HEADER = "X-Sumo-Host";
 
         /// <summary>
