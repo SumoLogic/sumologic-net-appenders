@@ -197,6 +197,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// Blocks while sending a message to the SumoLogic server, retrying as many time as needed.
         /// </summary>
         /// <param name="body">The message body.</param>
+        [Obsolete("Set the SourceName property and use Send(string body)")]
         public void Send(string body)
         {
             Send(body, this.SourceName);
@@ -289,6 +290,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// Blocks while sending a message to the SumoLogic server, no retries are performed.
         /// </summary>
         /// <param name="body">The message body.</param>
+        [Obsolete("Set the SourceName property and use TrySend(string body)")]
         public void TrySend(string body)
         {
             TrySend(body, this.SourceName);
