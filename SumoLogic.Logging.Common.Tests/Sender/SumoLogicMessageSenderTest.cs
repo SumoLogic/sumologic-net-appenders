@@ -76,7 +76,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public void HttpClientCallWith200ResponseTest()
         {
             Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            this.sumoLogicMessageSender.Send("name");
+            this.sumoLogicMessageSender.Send("body");
             Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
         }      
 
@@ -125,7 +125,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         {
             Assert.True(this.sumoLogicMessageSender.CanSend);
             Assert.True(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("name");
+            this.sumoLogicMessageSender.Send("body");
             Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
         }
 
@@ -139,7 +139,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
             this.sumoLogicMessageSender.Url = null;
             Assert.False(this.sumoLogicMessageSender.CanSend);
             Assert.False(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("name");
+            this.sumoLogicMessageSender.Send("body");
             Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);          
         }
 
@@ -160,7 +160,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
                 requestBeforeSuccess = this.messagesHandler.ReceivedRequests.Count;
                 this.messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
             });
-            this.sumoLogicMessageSender.Send("name");
+            this.sumoLogicMessageSender.Send("body");
             changeResponseTask.Wait();
             Assert.True(requestBeforeSuccess < this.messagesHandler.ReceivedRequests.Count);
             Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
