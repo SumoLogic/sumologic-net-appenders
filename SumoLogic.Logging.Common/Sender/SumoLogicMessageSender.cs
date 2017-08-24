@@ -213,8 +213,16 @@ namespace SumoLogic.Logging.Common.Sender
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
                 httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
-                httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
-                httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, SourceHost);
+                // set headers for the source category and the source host
+                // when they are not null nor empty strings
+                if(SourceCategory != null || !SourceCategory.Trim().Equals(""))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
+                }
+                if (SourceHost != null || !SourceHost.Trim().Equals(""))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, SourceHost);
+                }
                 try
                 {
                     var response = this.HttpClient.PostAsync(this.Url, httpContent).Result;
