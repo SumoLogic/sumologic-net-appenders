@@ -67,15 +67,6 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
-        /// Gets or sets the source name 
-        /// </summary>
-        public string SourceName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the source category
         /// </summary>
         public string SourceCategory
@@ -153,7 +144,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, String name)
+        public void Send(string body, string name)
         {
             bool success = false;
             do
