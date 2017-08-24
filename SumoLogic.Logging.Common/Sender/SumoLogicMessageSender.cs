@@ -67,6 +67,15 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
+        /// Gets or ses the source name
+        /// </summary>
+        public string SourceName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the source category
         /// </summary>
         public string SourceCategory
@@ -144,14 +153,14 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, string name)
+        public void Send(string body)
         {
             bool success = false;
             do
             {
                 try
                 {
-                    this.TrySend(body, name);
+                    this.TrySend(body);
                     success = true;
                 }
                 catch (Exception ex)
@@ -189,7 +198,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        public void TrySend(string body, string name)
+        public void TrySend(string body)
         {
             if (this.Url == null)
             {
@@ -203,9 +212,10 @@ namespace SumoLogic.Logging.Common.Sender
 
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
-                httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
-                // set headers for the source category and the source host
-                // when they are not null nor empty strings
+                if (!string.IsNullOrWhiteSpace(SourceName))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, SourceName);
+                }
                 if(!String.IsNullOrWhiteSpace(SourceCategory))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);

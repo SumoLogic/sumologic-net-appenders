@@ -94,8 +94,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// This sends out a message.
         /// </summary>
         /// <param name="body">Message body.</param>
-        /// <param name="name">Message name.</param>
-        protected override void SendOut(string body, string name)
+        protected override void SendOut(string body, String name)
         {
             if (!this.MessageSender.CanSend)
             {
@@ -106,8 +105,8 @@ namespace SumoLogic.Logging.Common.Sender
                 
                 return;
             }
-
-            this.MessageSender.Send(body, name);
+            this.MessageSender.SourceName = name;
+            this.MessageSender.Send(body);
         }
     }
 }

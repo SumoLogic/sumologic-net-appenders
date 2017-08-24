@@ -50,6 +50,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
         /// </summary>
         private SumoLogicMessageSender sumoLogicMessageSender;
 
+        private const string SOURCE_NAME = "name";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSenderTest"/> class.
         /// </summary>
@@ -58,6 +60,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
             this.messagesHandler = new MockHttpMessageHandler();
             this.sumoLogicMessageSender = new SumoLogicMessageSender(this.messagesHandler, null);
             this.sumoLogicMessageSender.Url = new Uri("http://www.fakeadress.com");
+            this.sumoLogicMessageSender.SourceName = SOURCE_NAME;
             this.sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(30);
         }
 
@@ -69,7 +72,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public void HttpClientCallWith200ResponseTest()
         {
             Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            this.sumoLogicMessageSender.Send("name", "body");
+            this.sumoLogicMessageSender.Send("name");
             Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
         }      
 
@@ -80,10 +83,9 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void RequestHeaderTest()
         {
-            string name = "name";
             string body = "body";
-           this.sumoLogicMessageSender.Send(body, name);
-            Assert.Equal(name, this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
+           this.sumoLogicMessageSender.Send(body);
+            Assert.Equal(SOURCE_NAME, this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
         }
 
         /// <summary>
@@ -93,9 +95,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void RequestContentTest()
         {
-            string name = "name";
             string body = "ContentBody";
-            this.sumoLogicMessageSender.Send(body, name);
+            this.sumoLogicMessageSender.Send(body);
             var contentInString = this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result;
             Assert.Equal(body, contentInString);
         }
@@ -118,7 +119,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         {
             Assert.True(this.sumoLogicMessageSender.CanSend);
             Assert.True(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("name", "body");
+            this.sumoLogicMessageSender.Send("name");
             Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
         }
 
@@ -132,7 +133,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
             this.sumoLogicMessageSender.Url = null;
             Assert.False(this.sumoLogicMessageSender.CanSend);
             Assert.False(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("name", "body");
+            this.sumoLogicMessageSender.Send("name");
             Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);          
         }
 
@@ -153,7 +154,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
                 requestBeforeSuccess = this.messagesHandler.ReceivedRequests.Count;
                 this.messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
             });
-            this.sumoLogicMessageSender.Send("name", "body");
+            this.sumoLogicMessageSender.Send("name");
             changeResponseTask.Wait();
             Assert.True(requestBeforeSuccess < this.messagesHandler.ReceivedRequests.Count);
             Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);

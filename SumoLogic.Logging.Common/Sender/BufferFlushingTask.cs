@@ -148,7 +148,6 @@ namespace SumoLogic.Logging.Common.Sender
         /// Sends aggregated message out. Block until we've successfully sent it.
         /// </summary>
         /// <param name="body">The body.</param>
-        /// <param name="name">The name.</param>
         protected abstract void SendOut(TMessage body, string name);
 
         /// <summary>
