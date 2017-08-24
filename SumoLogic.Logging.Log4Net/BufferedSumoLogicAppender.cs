@@ -271,7 +271,7 @@ namespace SumoLogic.Logging.Log4Net
 
             if(Layout == null)
             {
-                this.LogLog.Warn("No Layout was defined. Falling back to default.");
+                this.LogLog.Warn("No Layout was defined for BufferedSumoLogicAppender. Falling back to default layout.");
                 Layout = new PatternLayout("%date [%property{log4net:HostName}] [%thread] %-5level %logger - %message%newline");
             }
 
