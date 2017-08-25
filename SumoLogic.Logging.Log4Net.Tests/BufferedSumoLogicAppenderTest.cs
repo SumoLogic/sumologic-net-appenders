@@ -177,6 +177,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
 
             this.bufferedSumoLogicAppender = new BufferedSumoLogicAppender(null, this.messagesHandler);
             this.bufferedSumoLogicAppender.Url = "http://www.fakeadress.com";
+            this.bufferedSumoLogicAppender.SourceName = "BufferedSumoLogicAppenderSourceName";
             this.bufferedSumoLogicAppender.SourceCategory = "BufferedSumoLogicAppenderSourceCategory";
             this.bufferedSumoLogicAppender.SourceHost = "BufferedSumoLogicAppenderSourceHost";
             this.bufferedSumoLogicAppender.MessagesPerRequest = messagesPerRequest;

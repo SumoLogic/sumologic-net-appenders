@@ -200,7 +200,7 @@ namespace SumoLogic.Logging.Common.Sender
 
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
-                if (!string.IsNullOrWhiteSpace(name))
+                if (!String.IsNullOrWhiteSpace(name))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
                 }
