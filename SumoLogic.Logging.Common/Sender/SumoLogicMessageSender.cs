@@ -127,6 +127,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="name">The message name.</param>
         /// <param name="category">The message category.</param>
         /// <param name="host">The message host.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void Send(string body, string name, string category, string host)
         {
             bool success = false;
@@ -172,7 +173,6 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [Obsolete("use Send(string body, string name, string category, string host)")]
         public void Send(string body, string name)
         {

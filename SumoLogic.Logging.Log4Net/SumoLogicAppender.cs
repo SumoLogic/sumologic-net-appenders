@@ -83,7 +83,7 @@ namespace SumoLogic.Logging.Log4Net
         }
 
         /// <summary>
-        /// Gets or sets the source category for messages sent to SumoLogic server
+        /// Gets or sets the source category for messages sent to SumoLogic server (sent as X-Sumo-Category header).
         /// </summary>
         public string SourceCategory
         {
@@ -92,7 +92,7 @@ namespace SumoLogic.Logging.Log4Net
         }
 
         /// <summary>
-        /// Gets or sets the source host for messages sent to SumoLogic Server
+        /// Gets or sets the source host for messages sent to SumoLogic Server (sent as X-Sumo-Host header).
         /// </summary>
         public string SourceHost
         {

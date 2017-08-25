@@ -45,7 +45,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="messagesPerRequest">The maximum messages per request.</param>
         /// <param name="messagesName">The messages name.</param>
         /// <param name="log">The log service.</param>
-        [Obsolete("")]
+        [Obsolete()]
         public SumoLogicMessageSenderBufferFlushingTask(
             BufferWithEviction<string> messagesQueue,
             SumoLogicMessageSender messageSender,
@@ -72,6 +72,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="maxFlushInterval">The maximum interval for flushing.</param>
         /// <param name="messagesPerRequest">The maximum messages per request.</param>
         /// <param name="messagesName">The messages name.</param>
+        /// <param name="messagesCategory">The messages category.</param>
+        /// <param name="messagesHost">The messages host.</param>
         /// <param name="log">The log service.</param>
         public SumoLogicMessageSenderBufferFlushingTask(
             BufferWithEviction<string> messagesQueue,
