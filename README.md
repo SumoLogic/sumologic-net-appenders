@@ -38,11 +38,15 @@ PM> Install-Package SumoLogic.Logging.NLog
 			<Url>https://collectors.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV2dpl93h4mEkdCBwxHuX5fI1Yh_75Lhk8GtiMxsATMRTuebaZTDknk5dlFvjvYI7ZvraaHaA2NPq-O4v9bKZSTaMEZ_qHYxQ_ICBlWAonxtGA==</Url>
 			<ConnectionTimeout>30000</ConnectionTimeout>
 			<SourceName>ExampleNameNLogTarget</SourceName>
+			<SourceCategory>ExampleCategoryNLogTarget</SourceCategory>
+			<SourceHost>ExampleHostNLogTarget</SourceHost>
 			<UseConsoleLog>true</UseConsoleLog>
 		</target>
 		<target name="bufferedSumoLogic" type="BufferedSumoLogicTarget" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}">
 			<Url>https://collectors.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV2dpl93h4mEkdCBwxHuX5fI1Yh_75Lhk8GtiMxsATMRTuebaZTDknk5dlFvjvYI7ZvraaHaA2NPq-O4v9bKZSTaMEZ_qHYxQ_ICBlWAonxtGA==</Url>
 			<SourceName>ExampleNameNLogBufferedTarget</SourceName>
+			<SourceCategory>ExampleCategoryNLogBufferedTarget</SourceCategory>
+			<SourceHost>ExampleHostNLogBufferedTarget</SourceHost>
 			<ConnectionTimeout>30000</ConnectionTimeout>
 			<RetryInterval>5000</RetryInterval>
 			<MessagesPerRequest>10</MessagesPerRequest>
@@ -104,6 +108,8 @@ static void ReconfigureSumoTargets()
             Layout = originalTarget.Layout,
             Name = originalTarget.Name,
             SourceName = originalTarget.SourceName,
+            SourceCategory = originalTarget.SourceCategory,
+            SourceHost = originalTarget.SourceHost,
             Url = originalTarget.Url,
             UseConsoleLog = false
         };
@@ -149,6 +155,8 @@ PM> Install-Package SumoLogic.Logging.Log4Net
 	  <Url value="https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==" />
 	  <ConnectionTimeout value="30000" /> <!-- in milliseconds -->
 	  <SourceName value="ExampleNameLog4NetAppender" />
+	  <SourceCategory value="ExampleCategoryLog4NetAppender" />
+	  <SourceHost value="ExampleHostLog4NetAppender" />
 	  <UseConsoleLog value="true" />
     </appender>
 	<appender name="BufferedSumoLogicAppender" type="SumoLogic.Logging.Log4Net.BufferedSumoLogicAppender, SumoLogic.Logging.Log4Net">
@@ -157,6 +165,8 @@ PM> Install-Package SumoLogic.Logging.Log4Net
       </layout>
 	  <Url value="https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==" />
 	  <SourceName value="ExampleNameLog4NetBufferedAppender" />
+	  <SourceCategory value="ExampleCategoryLog4NetBufferedAppender" />
+	  <SourceHost value="ExampleHostLog4NetBufferedAppender" />
       <ConnectionTimeout value="30000" />
       <RetryInterval value="5000" />
       <MessagesPerRequest value="10" />
