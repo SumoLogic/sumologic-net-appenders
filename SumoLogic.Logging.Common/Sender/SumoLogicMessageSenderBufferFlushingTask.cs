@@ -122,6 +122,12 @@ namespace SumoLogic.Logging.Common.Sender
             return builder.ToString();
         }
 
+        /// <summary>
+        /// This sends out a message.
+        /// </summary>
+        /// <param name="body">Message body.</param>
+        /// <param name="name">Message name.</param>
+        [Obsolete("use SendOut(string body, string name, string category, string host)")]
         protected override void SendOut(string body, String name)
         {
             SendOut(body, name, null, null);
@@ -131,7 +137,10 @@ namespace SumoLogic.Logging.Common.Sender
         /// This sends out a message.
         /// </summary>
         /// <param name="body">Message body.</param>
-        protected override void SendOut(string body, String name, string category, string host)
+        /// <param name="name">Message name.</param>
+        /// <param name="category">Message category.</param>
+        /// <param name="host">Message host.</param>
+        protected override void SendOut(string body, string name, string category, string host)
         {
             if (!this.MessageSender.CanSend)
             {

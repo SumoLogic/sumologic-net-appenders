@@ -85,7 +85,20 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// </summary>
         /// <param name="body">Message body.</param>
         /// <param name="name">Message name.</param>
+        [Obsolete("use SendOut(IList<string> body, string name, string category, string host)")]
         protected override void SendOut(IList<string> body, string name)
+        {
+            this.SentOut.Add(new List<string>(body));
+        }
+
+        /// <summary>
+        /// This sends out a message.
+        /// </summary>
+        /// <param name="body">Message body.</param>
+        /// <param name="name">Message name.</param>
+        /// <param name="category">Message category.</param>
+        /// <param name="host">Message host.</param>
+        protected override void SendOut(IList<string> body, string name, string category, string host)
         {
             this.SentOut.Add(new List<string>(body));
         }

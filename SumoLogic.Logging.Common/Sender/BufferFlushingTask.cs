@@ -159,7 +159,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The body.</param>
         /// <param name="name">The name.</param>
-        [Obsolete("")]
+        [Obsolete("use SendOut(TMessage body, string name, string category, string host)")]
         protected abstract void SendOut(TMessage body, string name);
 
         /// <summary>
@@ -167,6 +167,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The body.</param>
         /// <param name="name">The name.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="host">The host.</param>
         protected abstract void SendOut(TMessage body, string name, string category, string host);
 
         /// <summary>

@@ -125,7 +125,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        /// <param name="category">The message category.</param>
+        /// <param name="host">The message host.</param>
         public void Send(string body, string name, string category, string host)
         {
             bool success = false;
@@ -170,7 +171,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// Blocks while sending a message to the SumoLogic server, retrying as many time as needed.
         /// </summary>
         /// <param name="body">The message body.</param>
-        [Obsolete("Set the SourceName property and use Send(string body)")]
+        /// <param name="name">The message name.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [Obsolete("use Send(string body, string name, string category, string host)")]
         public void Send(string body, string name)
         {
             Send(body, name, null, null);
@@ -181,6 +184,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
+        /// <param name="category">The message category.</param>
+        /// <param name="host">The message host.</param>
         public void TrySend(string body, string name, string category, string host)
         {
             if (this.Url == null)
@@ -263,7 +268,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// Blocks while sending a message to the SumoLogic server, no retries are performed.
         /// </summary>
         /// <param name="body">The message body.</param>
-        [Obsolete("")]
+        /// <param name="name">The message name.</param>
+        [Obsolete("use TrySend(string body, string name, string category, string host)")]
         public void TrySend(string body, string name)
         {
             TrySend(body, name, null, null);
