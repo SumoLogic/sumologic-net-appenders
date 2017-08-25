@@ -45,6 +45,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="messagesPerRequest">The maximum messages per request.</param>
         /// <param name="messagesName">The messages name.</param>
         /// <param name="log">The log service.</param>
+        [Obsolete("")]
         public SumoLogicMessageSenderBufferFlushingTask(
             BufferWithEviction<string> messagesQueue,
             SumoLogicMessageSender messageSender,
@@ -52,11 +53,42 @@ namespace SumoLogic.Logging.Common.Sender
             long messagesPerRequest,
             string messagesName,
             ILog log)
+            : this(messagesQueue,
+                  messageSender,
+                  maxFlushInterval,
+                  messagesPerRequest,
+                  messagesName,
+                  null,
+                  null,
+                  log)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SumoLogicMessageSenderBufferFlushingTask" /> class.
+        /// </summary>
+        /// <param name="messagesQueue">The queue message for the instance <see cref="BufferWithEviction{TIn}" /> </param>
+        /// <param name="messageSender">The http sender.</param>
+        /// <param name="maxFlushInterval">The maximum interval for flushing.</param>
+        /// <param name="messagesPerRequest">The maximum messages per request.</param>
+        /// <param name="messagesName">The messages name.</param>
+        /// <param name="log">The log service.</param>
+        public SumoLogicMessageSenderBufferFlushingTask(
+            BufferWithEviction<string> messagesQueue,
+            SumoLogicMessageSender messageSender,
+            TimeSpan maxFlushInterval,
+            long messagesPerRequest,
+            string messagesName,
+            string messagesCategory,
+            string messagesHost,
+            ILog log)
             : base(messagesQueue, log)
         {
             this.MaxFlushInterval = maxFlushInterval;
             this.MessagesPerRequest = messagesPerRequest;
             this.MessagesName = messagesName;
+            this.MessagesCategory = messagesCategory;
+            this.MessagesHost = messagesHost;
             this.MessageSender = messageSender;
         }
 
@@ -90,11 +122,16 @@ namespace SumoLogic.Logging.Common.Sender
             return builder.ToString();
         }
 
+        protected override void SendOut(string body, String name)
+        {
+            SendOut(body, name, null, null);
+        }
+
         /// <summary>
         /// This sends out a message.
         /// </summary>
         /// <param name="body">Message body.</param>
-        protected override void SendOut(string body, String name)
+        protected override void SendOut(string body, String name, string category, string host)
         {
             if (!this.MessageSender.CanSend)
             {
@@ -105,8 +142,8 @@ namespace SumoLogic.Logging.Common.Sender
                 
                 return;
             }
-            this.MessageSender.SourceName = name;
-            this.MessageSender.Send(body);
+
+            this.MessageSender.Send(body, name, category, host);
         }
     }
 }

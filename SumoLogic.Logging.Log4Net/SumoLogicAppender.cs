@@ -173,9 +173,6 @@ namespace SumoLogic.Logging.Log4Net
 
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
             this.SumoLogicMessageSender.Url = new Uri(this.Url);
-            this.SumoLogicMessageSender.SourceName = this.SourceName;
-            this.SumoLogicMessageSender.SourceCategory = this.SourceCategory;
-            this.SumoLogicMessageSender.SourceHost = this.SourceHost;
         }
 
         /// <summary>
@@ -211,7 +208,7 @@ namespace SumoLogic.Logging.Log4Net
                 }
             }
 
-            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString());
+            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost);
         }
 
         /// <summary>

@@ -272,8 +272,6 @@ namespace SumoLogic.Logging.NLog
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
             this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(this.Url) ? null : new Uri(this.Url);
-            this.SumoLogicMessageSender.SourceCategory = string.IsNullOrWhiteSpace(this.SourceCategory) ? null : this.SourceCategory;
-            this.SumoLogicMessageSender.SourceHost = string.IsNullOrWhiteSpace(this.SourceHost) ? null : this.SourceHost;
 
             // Initialize flusher
             if (this.flushBufferTimer != null)
@@ -293,6 +291,8 @@ namespace SumoLogic.Logging.NLog
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
                 this.MessagesPerRequest,
                 this.SourceName,
+                this.SourceCategory,
+                this.SourceHost,
                 this.LogLog);
 
             this.flushBufferTimer = new Timer((s)=> this.flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));

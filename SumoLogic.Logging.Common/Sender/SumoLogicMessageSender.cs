@@ -67,33 +67,6 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
-        /// Gets or ses the source name
-        /// </summary>
-        public string SourceName
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the source category
-        /// </summary>
-        public string SourceCategory
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the source host
-        /// </summary>
-        public string SourceHost
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the retry interval.
         /// </summary>
         public TimeSpan RetryInterval
@@ -153,14 +126,14 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, string name)
+        public void Send(string body, string name, string category, string host)
         {
             bool success = false;
             do
             {
                 try
                 {
-                    this.TrySend(body, name);
+                    this.TrySend(body, name, category, host);
                     success = true;
                 }
                 catch (Exception ex)
@@ -198,9 +171,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         [Obsolete("Set the SourceName property and use Send(string body)")]
-        public void Send(string body)
+        public void Send(string body, string name)
         {
-            Send(body, this.SourceName);
+            Send(body, name, null, null);
         }
 
         /// <summary>
@@ -208,7 +181,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        public void TrySend(string body, string name)
+        public void TrySend(string body, string name, string category, string host)
         {
             if (this.Url == null)
             {
@@ -226,13 +199,13 @@ namespace SumoLogic.Logging.Common.Sender
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
                 }
-                if (!String.IsNullOrWhiteSpace(SourceCategory))
+                if (!String.IsNullOrWhiteSpace(category))
                 {
-                    httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, SourceCategory);
+                    httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, category);
                 }
-                if (!String.IsNullOrWhiteSpace(SourceHost))
+                if (!String.IsNullOrWhiteSpace(host))
                 {
-                    httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, SourceHost);
+                    httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, host);
                 }
                 try
                 {
@@ -290,10 +263,10 @@ namespace SumoLogic.Logging.Common.Sender
         /// Blocks while sending a message to the SumoLogic server, no retries are performed.
         /// </summary>
         /// <param name="body">The message body.</param>
-        [Obsolete("Set the SourceName property and use TrySend(string body)")]
-        public void TrySend(string body)
+        [Obsolete("")]
+        public void TrySend(string body, string name)
         {
-            TrySend(body, this.SourceName);
+            TrySend(body, name, null, null);
         }
 
         /// <summary>
