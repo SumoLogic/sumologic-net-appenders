@@ -83,6 +83,24 @@ namespace SumoLogic.Logging.Log4Net
         }
 
         /// <summary>
+        /// Gets or sets the source category for messages sent to SumoLogic server (sent as X-Sumo-Category header).
+        /// </summary>
+        public string SourceCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source host for messages sent to SumoLogic Server (sent as X-Sumo-Host header).
+        /// </summary>
+        public string SourceHost
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the connection timeout, in milliseconds.
         /// </summary>
         public long ConnectionTimeout
@@ -190,7 +208,7 @@ namespace SumoLogic.Logging.Log4Net
                 }
             }
 
-            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName);
+            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost);
         }
 
         /// <summary>

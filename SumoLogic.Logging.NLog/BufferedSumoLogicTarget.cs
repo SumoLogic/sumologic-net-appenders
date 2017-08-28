@@ -105,6 +105,24 @@ namespace SumoLogic.Logging.NLog
         }
 
         /// <summary>
+        /// Gets or sets the source category for messages sent to SumoLogic server (sent as X-Sumo-Category header).
+        /// </summary>
+        public string SourceCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source host for messages sent to SumoLogic server (sent as X-Sumo-Host header).
+        /// </summary>
+        public string SourceHost
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the send message retry interval, in milliseconds.
         /// </summary>
         public long RetryInterval
@@ -273,6 +291,8 @@ namespace SumoLogic.Logging.NLog
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
                 this.MessagesPerRequest,
                 this.SourceName,
+                this.SourceCategory,
+                this.SourceHost,
                 this.LogLog);
 
             this.flushBufferTimer = new Timer((s)=> this.flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));

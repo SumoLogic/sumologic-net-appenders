@@ -21,12 +21,16 @@ Properties:
 
 		- Url: The http collector URL from SumoLogic.
 		- SourceName: The named used for messages sent to SumoLogic.
+		- SourceCategory: The category used for messages sent to SumoLogic.
+		- SourceHost: The host used for messages sent to SumoLogic.
 		- ConnectionTimeout: The connection timeout in milliseconds.
 	
 
 	BufferedSumoLogicTarget: 
 		- Url: The http collector URL from SumoLogic.				 
-		- SourceName: The named used for messages sent to SumoLogic
+		- SourceName: The named used for messages sent to SumoLogic.
+		- SourceCategory: The category used for messages sent to SumoLogic.
+		- SourceHost: The host used for messages sent to SumoLogic.
 		- ConnectionTimeout: The connection timeout in milliseconds.
 		- FlushingAccuracy: How often the messages queue is checked for messages to send, in milliseconds.
 		- MaxFlushInterval: The maximum interval between flushes, in milliseconds.	

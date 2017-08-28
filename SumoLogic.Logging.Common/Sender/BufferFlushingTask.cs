@@ -68,6 +68,16 @@ namespace SumoLogic.Logging.Common.Sender
         protected string MessagesName { get; set; }
 
         /// <summary>
+        /// Gets or sets the category used when sending messages.
+        /// </summary>
+        protected string MessagesCategory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the host used when sending messages.
+        /// </summary>
+        protected string MessagesHost { get; set; }
+
+        /// <summary>
         /// Gets or sets the Log service.
         /// </summary>
         protected ILog Log { get; set; }
@@ -131,7 +141,7 @@ namespace SumoLogic.Logging.Common.Sender
                 }
 
                 TMessage body = this.Aggregate(messages);
-                this.SendOut(body, this.MessagesName);
+                this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost);
             }
 
             this.LastFlushedOn = DateTime.UtcNow;
@@ -149,7 +159,17 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The body.</param>
         /// <param name="name">The name.</param>
+        [Obsolete("use SendOut(TMessage body, string name, string category, string host)")]
         protected abstract void SendOut(TMessage body, string name);
+
+        /// <summary>
+        /// Sends aggregated message out. Block until we've successfully sent it.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="host">The host.</param>
+        protected abstract void SendOut(TMessage body, string name, string category, string host);
 
         /// <summary>
         /// Returns if the queue needs to flushing messages.

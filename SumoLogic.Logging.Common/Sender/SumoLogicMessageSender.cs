@@ -42,6 +42,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// text/plain media type
         /// </summary>
         private const string TextPlainMediaType = "text/plain";
+        private const string SUMO_SOURCE_NAME_HEADER = "X-Sumo-Name";
+        private const string SUMO_SOURCE_CATEGORY_HEADER = "X-Sumo-Category";
+        private const string SUMO_SOURCE_HOST_HEADER = "X-Sumo-Host";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
@@ -122,15 +125,17 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
+        /// <param name="category">The message category.</param>
+        /// <param name="host">The message host.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, string name)
+        public void Send(string body, string name, string category, string host)
         {
             bool success = false;
             do
             {
                 try
                 {
-                    this.TrySend(body, name);
+                    this.TrySend(body, name, category, host);
                     success = true;
                 }
                 catch (Exception ex)
@@ -164,11 +169,24 @@ namespace SumoLogic.Logging.Common.Sender
         }
 
         /// <summary>
+        /// Blocks while sending a message to the SumoLogic server, retrying as many time as needed.
+        /// </summary>
+        /// <param name="body">The message body.</param>
+        /// <param name="name">The message name.</param>
+        [Obsolete("use Send(string body, string name, string category, string host)")]
+        public void Send(string body, string name)
+        {
+            Send(body, name, null, null);
+        }
+
+        /// <summary>
         /// Blocks while sending a message to the SumoLogic server, no retries are performed.
         /// </summary>
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
-        public void TrySend(string body, string name)
+        /// <param name="category">The message category.</param>
+        /// <param name="host">The message host.</param>
+        public void TrySend(string body, string name, string category, string host)
         {
             if (this.Url == null)
             {
@@ -182,7 +200,18 @@ namespace SumoLogic.Logging.Common.Sender
 
             using (var httpContent = new StringContent(body, Encoding.UTF8, TextPlainMediaType))
             {
-                httpContent.Headers.Add("X-Sumo-Name", name);
+                if (!String.IsNullOrWhiteSpace(name))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_NAME_HEADER, name);
+                }
+                if (!String.IsNullOrWhiteSpace(category))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_CATEGORY_HEADER, category);
+                }
+                if (!String.IsNullOrWhiteSpace(host))
+                {
+                    httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, host);
+                }
                 try
                 {
                     var response = this.HttpClient.PostAsync(this.Url, httpContent).Result;
@@ -233,6 +262,17 @@ namespace SumoLogic.Logging.Common.Sender
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// Blocks while sending a message to the SumoLogic server, no retries are performed.
+        /// </summary>
+        /// <param name="body">The message body.</param>
+        /// <param name="name">The message name.</param>
+        [Obsolete("use TrySend(string body, string name, string category, string host)")]
+        public void TrySend(string body, string name)
+        {
+            TrySend(body, name, null, null);
         }
 
         /// <summary>
