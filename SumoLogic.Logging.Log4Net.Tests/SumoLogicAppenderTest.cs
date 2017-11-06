@@ -24,12 +24,10 @@
  * under the License.
  */
 
-using System.IO;
-
 namespace SumoLogic.Logging.Log4Net.Tests
 {
     using System;
-    using System.Net.Http;
+    using System.IO;
     using log4net;
     using log4net.Core;
     using log4net.Layout;
