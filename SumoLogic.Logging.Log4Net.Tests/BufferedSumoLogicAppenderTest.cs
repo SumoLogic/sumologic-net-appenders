@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.IO;
+
 namespace SumoLogic.Logging.Log4Net.Tests
 {
     using System;
@@ -143,6 +146,23 @@ namespace SumoLogic.Logging.Log4Net.Tests
         }
 
         /// <summary>
+        /// Test that setting <see cref="BufferedSumoLogicAppender.UseConsoleLog"/> to true 
+        /// will cause the appender to log to the console.
+        /// </summary>
+        [Fact]
+        public void TestConsoleLogging()
+        {
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            this.SetUpLogger(10000, 500, 10);
+            this.log4netLog.Info("hello");
+
+            var consoleText = writer.GetStringBuilder().ToString();
+            Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -185,10 +205,11 @@ namespace SumoLogic.Logging.Log4Net.Tests
             this.bufferedSumoLogicAppender.FlushingAccuracy = flushingAccuracy;
             this.bufferedSumoLogicAppender.RetryInterval = retryInterval;
             this.bufferedSumoLogicAppender.Layout = new PatternLayout("%m%n");
+            this.bufferedSumoLogicAppender.UseConsoleLog = true;
             this.bufferedSumoLogicAppender.ActivateOptions();
 
             this.log4netLog = LogManager.GetLogger(typeof(BufferedSumoLogicAppenderTest));
-            this.log4netLogger = this.log4netLog.Logger as Logger;
+            this.log4netLogger = (Logger)this.log4netLog.Logger;
             this.log4netLogger.Additivity = false;
             this.log4netLogger.Level = Level.All;
             this.log4netLogger.RemoveAllAppenders();
