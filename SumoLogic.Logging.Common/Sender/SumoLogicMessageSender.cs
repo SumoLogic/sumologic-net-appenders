@@ -52,7 +52,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="httpMessageHandler">The HTTP message handler.</param>
         /// <param name="log">The log service.</param>
-        public SumoLogicMessageSender(HttpMessageHandler httpMessageHandler, ILog log) : this(httpMessageHandler, log, "net-message-sender")
+        public SumoLogicMessageSender(HttpMessageHandler httpMessageHandler, ILog log) : this(httpMessageHandler, log, "sumo-net-sender")
         {
         }
 

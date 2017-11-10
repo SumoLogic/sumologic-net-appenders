@@ -266,7 +266,7 @@ namespace SumoLogic.Logging.NLog
             // Initialize the sender
             if (this.SumoLogicMessageSender == null)
             {
-                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog);
+                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-nlog-buffered-sender");
             }
 
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);

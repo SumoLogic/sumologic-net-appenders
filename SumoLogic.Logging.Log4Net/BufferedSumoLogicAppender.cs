@@ -241,7 +241,7 @@ namespace SumoLogic.Logging.Log4Net
             // Initialize the sender
             if (this.SumoLogicMessageSender == null)
             {
-                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog);
+                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-log4net-buffered-sender");
             }
 
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);
