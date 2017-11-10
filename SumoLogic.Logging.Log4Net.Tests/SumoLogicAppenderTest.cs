@@ -23,10 +23,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 namespace SumoLogic.Logging.Log4Net.Tests
 {
     using System;
-    using System.Net.Http;
+    using System.IO;
     using log4net;
     using log4net.Core;
     using log4net.Layout;
@@ -72,10 +73,11 @@ namespace SumoLogic.Logging.Log4Net.Tests
             this.sumoLogicAppender.SourceCategory = "SumoLogicAppenderSourceCategory";
             this.sumoLogicAppender.SourceHost = "SumoLogicAppenderSourceHost";
             this.sumoLogicAppender.Layout = new PatternLayout("-- %m%n");
+            this.sumoLogicAppender.UseConsoleLog = true;
             this.sumoLogicAppender.ActivateOptions();
 
             this.log4netLog = LogManager.GetLogger(typeof(SumoLogicAppenderTest));
-            this.log4netLogger = this.log4netLog.Logger as Logger;
+            this.log4netLogger = (Logger)this.log4netLog.Logger;
             this.log4netLogger.Additivity = false;
             this.log4netLogger.Level = Level.All;
             this.log4netLogger.RemoveAllAppenders();
@@ -109,6 +111,22 @@ namespace SumoLogic.Logging.Log4Net.Tests
             }
 
             Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+        }
+
+        /// <summary>
+        /// Test that setting <see cref="SumoLogicAppender.UseConsoleLog"/> to true 
+        /// will cause the appender to log to the console.
+        /// </summary>
+        [Fact]
+        public void TestConsoleLogging()
+        {
+            var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            this.log4netLog.Info("hello");
+
+            var consoleText = writer.GetStringBuilder().ToString();
+            Assert.True(!string.IsNullOrWhiteSpace(consoleText));
         }
 
         /// <summary>
