@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.6
@@ -24,11 +24,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.Log4Net.E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.NLog.Example", "SumoLogic.Logging.Nlog.Example\SumoLogic.Logging.NLog.Example.csproj", "{72EFE60E-29A5-4DF9-95D1-2C9D5D887F6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.AspNetCoreLogging", "SumoLogic.Logging.AspNetCoreLogging\SumoLogic.Logging.AspNetCoreLogging.csproj", "{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		DebugCA|Any CPU = DebugCA|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E182AA49-AF0B-48A9-8C65-E0241DA8C623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -79,6 +85,18 @@ Global
 		{72EFE60E-29A5-4DF9-95D1-2C9D5D887F6A}.DebugCA|Any CPU.Build.0 = DebugCA|Any CPU
 		{72EFE60E-29A5-4DF9-95D1-2C9D5D887F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72EFE60E-29A5-4DF9-95D1-2C9D5D887F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|x64.ActiveCfg = Debug|x64
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|x64.Build.0 = Debug|x64
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|x86.ActiveCfg = Debug|x86
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Debug|x86.Build.0 = Debug|x86
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|x64.ActiveCfg = Release|x64
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|x64.Build.0 = Release|x64
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|x86.ActiveCfg = Release|x86
+		{BF4480D5-C79F-4EED-B93A-4B905FCA7D80}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

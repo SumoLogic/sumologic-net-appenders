@@ -25,3 +25,6 @@ SumoLogic.Logging.Nuget/
 packages/
 !packages/repositories.config
 .vscode
+.vs
+[Bb]in/
+[Oo]bj/
