@@ -33,6 +33,7 @@ namespace SumoLogic.Logging.Log4Net
     using System.Text;
     using log4net.Appender;
     using log4net.Core;
+    using log4net.Layout;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
@@ -286,6 +287,12 @@ namespace SumoLogic.Logging.Log4Net
                 }
                     
                 return;
+            }
+
+            if(Layout == null)
+            {
+                this.LogLog.Warn("No Layout was defined for BufferedSumoLogicAppender. Falling back to default layout.");
+                Layout = new PatternLayout("%date [%property{log4net:HostName}] [%thread] %-5level %logger - %message%newline");
             }
 
             var bodyBuilder = new StringBuilder();
