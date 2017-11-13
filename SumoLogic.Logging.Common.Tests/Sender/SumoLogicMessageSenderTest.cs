@@ -56,7 +56,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public SumoLogicMessageSenderTest()
         {
             this.messagesHandler = new MockHttpMessageHandler();
-            this.sumoLogicMessageSender = new SumoLogicMessageSender(this.messagesHandler, null);
+            this.sumoLogicMessageSender = new SumoLogicMessageSender(this.messagesHandler, null, "sumo-test");
             this.sumoLogicMessageSender.Url = new Uri("http://www.fakeadress.com");
             this.sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(30);
         }
@@ -84,6 +84,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
             Assert.Equal("name", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
             Assert.Equal("category", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Category").First<string>());
             Assert.Equal("host", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Host").First<string>());
+            Assert.Equal("sumo-test", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Client").First<string>());
         }
 
         /// <summary>

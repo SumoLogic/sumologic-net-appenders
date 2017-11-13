@@ -45,15 +45,27 @@ namespace SumoLogic.Logging.Common.Sender
         private const string SUMO_SOURCE_NAME_HEADER = "X-Sumo-Name";
         private const string SUMO_SOURCE_CATEGORY_HEADER = "X-Sumo-Category";
         private const string SUMO_SOURCE_HOST_HEADER = "X-Sumo-Host";
+        private const string SUMO_CLIENT_HEADER = "X-Sumo-Client";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
         /// </summary>
         /// <param name="httpMessageHandler">The HTTP message handler.</param>
         /// <param name="log">The log service.</param>
-        public SumoLogicMessageSender(HttpMessageHandler httpMessageHandler, ILog log)
+        public SumoLogicMessageSender(HttpMessageHandler httpMessageHandler, ILog log) : this(httpMessageHandler, log, "sumo-net-sender")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SumoLogicMessageSender" /> class.
+        /// </summary>
+        /// <param name="httpMessageHandler">The HTTP message handler.</param>
+        /// <param name="log">The log service.</param>
+        /// <param name="clientName">The name of the current client, for telemetry purposes.</param>
+        public SumoLogicMessageSender(HttpMessageHandler httpMessageHandler, ILog log, string clientName)
         {
             this.Log = log ?? new DummyLog();
+            this.ClientName = clientName;
             this.HttpClient = httpMessageHandler == null ? new HttpClient() : new HttpClient(httpMessageHandler);
         }
 
@@ -100,6 +112,15 @@ namespace SumoLogic.Logging.Common.Sender
         public bool CanSend
         {
             get { return this.Url != null && this.RetryInterval != TimeSpan.Zero && this.ConnectionTimeout != TimeSpan.Zero; }
+        }
+
+        /// <summary>
+        /// Gets or sets the client name value that is included in each request. This value is used for telemetry purposes to track usage of different clients.
+        /// </summary>
+        public string ClientName
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -211,6 +232,10 @@ namespace SumoLogic.Logging.Common.Sender
                 if (!String.IsNullOrWhiteSpace(host))
                 {
                     httpContent.Headers.Add(SUMO_SOURCE_HOST_HEADER, host);
+                }
+                if (!String.IsNullOrWhiteSpace(ClientName))
+                {
+                    httpContent.Headers.Add(SUMO_CLIENT_HEADER, ClientName);
                 }
                 try
                 {
