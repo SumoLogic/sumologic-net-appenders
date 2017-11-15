@@ -118,6 +118,8 @@ namespace SumoLogic.Logging.Log4Net
             set;
         }
 
+        protected override bool RequiresLayout { get { return true; } }
+
         /// <summary>
         /// Gets or sets the log service.
         /// </summary>
