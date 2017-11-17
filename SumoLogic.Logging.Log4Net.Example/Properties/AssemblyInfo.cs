@@ -14,4 +14,4 @@ using System.Runtime.InteropServices;
 // called [ThisApp].exe.config in the application base 
 // directory (i.e. the directory containing [ThisApp].exe) 
 // The config file will be watched for changes. 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
+[assembly: log4net.Config.XmlConfigurator(Watch = true, ConfigFile ="Log4Net.config")]
