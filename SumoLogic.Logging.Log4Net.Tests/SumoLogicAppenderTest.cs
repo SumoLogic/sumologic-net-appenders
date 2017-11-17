@@ -130,6 +130,31 @@ namespace SumoLogic.Logging.Log4Net.Tests
         }
 
         /// <summary>
+        /// Tests that an error is generated automatically if no format is provided.
+        /// </summary>
+        [Fact]
+        public void TestRequiresLayout()
+        {
+            var oldLayout = this.sumoLogicAppender.Layout;
+            var oldErrorHandler = this.sumoLogicAppender.ErrorHandler;
+            try
+            {
+                this.sumoLogicAppender.ErrorHandler = new TestErrorHandler();
+                this.sumoLogicAppender.Layout = null; // set to bogus null/missing value
+                this.log4netLog.Info("oops"); // push through a message
+
+                // nothing should be thrown, but an error should be generated
+                Assert.Equal(1, ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors.Count);
+                Assert.Contains("No layout set", ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors[0]);
+            }
+            finally
+            {
+                this.sumoLogicAppender.Layout = oldLayout;
+                this.sumoLogicAppender.ErrorHandler = oldErrorHandler;
+            }
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
@@ -149,6 +174,29 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLogger.RemoveAllAppenders();
                 this.messagesHandler.Dispose();
             }
+        }
+    }
+
+    /// <summary>
+    /// Simple test implementation of Log4Net error handler
+    /// </summary>
+    public class TestErrorHandler : IErrorHandler
+    {
+        public System.Collections.Generic.List<string> Errors { get; } = new System.Collections.Generic.List<string>();
+
+        public void Error(string message, Exception e, ErrorCode errorCode)
+        {
+            Errors.Add(String.Format("{0} {1} {2}", message, e, errorCode));
+        }
+
+        public void Error(string message, Exception e)
+        {
+            Errors.Add(String.Format("{0} {1}", message, e));
+        }
+
+        public void Error(string message)
+        {
+            Errors.Add(message);
         }
     }
 }
