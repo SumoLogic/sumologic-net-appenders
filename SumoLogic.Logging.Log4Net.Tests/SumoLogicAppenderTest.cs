@@ -94,7 +94,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
             this.log4netLog.Info("This is a message");
 
             Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("-- This is a message\r\n\r\n", this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal("-- This is a message" + Environment.NewLine + Environment.NewLine, this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -174,29 +174,6 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLogger.RemoveAllAppenders();
                 this.messagesHandler.Dispose();
             }
-        }
-    }
-
-    /// <summary>
-    /// Simple test implementation of Log4Net error handler
-    /// </summary>
-    public class TestErrorHandler : IErrorHandler
-    {
-        public System.Collections.Generic.List<string> Errors { get; } = new System.Collections.Generic.List<string>();
-
-        public void Error(string message, Exception e, ErrorCode errorCode)
-        {
-            Errors.Add(String.Format("{0} {1} {2}", message, e, errorCode));
-        }
-
-        public void Error(string message, Exception e)
-        {
-            Errors.Add(String.Format("{0} {1}", message, e));
-        }
-
-        public void Error(string message)
-        {
-            Errors.Add(message);
         }
     }
 }
