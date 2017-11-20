@@ -94,7 +94,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
             this.log4netLog.Info("This is a message");
 
             Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("-- This is a message\r\n\r\n", this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal("-- This is a message" + Environment.NewLine + Environment.NewLine, this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -127,6 +127,31 @@ namespace SumoLogic.Logging.Log4Net.Tests
 
             var consoleText = writer.GetStringBuilder().ToString();
             Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+        }
+
+        /// <summary>
+        /// Tests that an error is generated automatically if no format is provided.
+        /// </summary>
+        [Fact]
+        public void TestRequiresLayout()
+        {
+            var oldLayout = this.sumoLogicAppender.Layout;
+            var oldErrorHandler = this.sumoLogicAppender.ErrorHandler;
+            try
+            {
+                this.sumoLogicAppender.ErrorHandler = new TestErrorHandler();
+                this.sumoLogicAppender.Layout = null; // set to bogus null/missing value
+                this.log4netLog.Info("oops"); // push through a message
+
+                // nothing should be thrown, but an error should be generated
+                Assert.Equal(1, ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors.Count);
+                Assert.Contains("No layout set", ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors[0]);
+            }
+            finally
+            {
+                this.sumoLogicAppender.Layout = oldLayout;
+                this.sumoLogicAppender.ErrorHandler = oldErrorHandler;
+            }
         }
 
         /// <summary>
