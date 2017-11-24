@@ -19,6 +19,7 @@
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
     <SourceLinkServerType>GitHub</SourceLinkServerType>
     <DebugType>portable</DebugType>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludePDBsInPackage</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>netfull</DefineConstants>
