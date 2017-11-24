@@ -17,6 +17,8 @@
     <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>netstandard1.1;net45</TargetFrameworks>
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
+    <SourceLinkServerType>GitHub</SourceLinkServerType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
@@ -42,8 +44,15 @@
     <!--I added this because line 137 in SumoLogicMessageSender, checks for a WebException long term we shouldn't use this-->
     <!--The comments of the nuget package say Developers should prefer the classes in the System.Net.Http package. -->
     <PackageReference Include="System.Net.Requests" Version="4.3.0" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.4.0" PrivateAssets="All" /> 
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
+
+  <Target Name="IncludePDBsInPackage" Condition="'$(IncludeBuildOutput)' != 'false'">
+      <ItemGroup>
+        <TfmSpecificPackageFile Include="$(OutputPath)\$(AssemblyName).pdb" PackagePath="lib\$(TargetFramework)" />
+      </ItemGroup>
+  </Target>
 </Project>

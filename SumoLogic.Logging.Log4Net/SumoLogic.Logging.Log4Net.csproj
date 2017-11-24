@@ -17,6 +17,8 @@
     <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
+    <SourceLinkServerType>GitHub</SourceLinkServerType>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>netfull</DefineConstants>
@@ -41,6 +43,7 @@
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="System.Net.Http" Version="4.3.1" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.4.0" PrivateAssets="All" /> 
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -49,4 +52,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+
+  <Target Name="IncludePDBsInPackage" Condition="'$(IncludeBuildOutput)' != 'false'">
+      <ItemGroup>
+        <TfmSpecificPackageFile Include="$(OutputPath)\$(AssemblyName).pdb" PackagePath="lib\$(TargetFramework)" />
+      </ItemGroup>
+  </Target>
+
 </Project>
