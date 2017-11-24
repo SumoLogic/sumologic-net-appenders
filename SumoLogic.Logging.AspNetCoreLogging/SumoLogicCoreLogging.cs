@@ -1,5 +1,8 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Net.Http;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using SumoLogic.Logging.Common.Sender;
 
@@ -41,7 +44,34 @@ namespace SumoLogic.Logging.AspNetCoreLogging
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            
+            if (!IsEnabled(logLevel))
+            {
+                return;
+            }
+    
+            if (formatter == null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+    
+            var message = formatter(state, exception);
+
+            if (string.IsNullOrEmpty(message))
+            {
+                return;
+            }
+            var bodyBuilder = new StringBuilder();
+            using (var textWriter = new StringWriter(bodyBuilder, CultureInfo.InvariantCulture))
+            {
+                textWriter.Write(message);
+                if (exception != null && this.Options.AppendException)
+                {
+                    textWriter.Write(exception.ToString());
+                }
+
+                textWriter.WriteLine();            
+            }
+            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.Options.SourceName, this.Options.SourceCategory, this.Options.SourceHost);
         }
     }
 }
