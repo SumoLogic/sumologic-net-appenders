@@ -1,24 +1,47 @@
 using System;
+using System.Net.Http;
 using Microsoft.Extensions.Logging;
+using SumoLogic.Logging.Common.Sender;
 
 namespace SumoLogic.Logging.AspNetCoreLogging
 {
     public class SumoLogicCoreLogging : ILogger
     {
-        public SumoLogicCoreLogging()
+        public SumoLogicCoreLoggingOptions Options { get; }
+
+        /// <summary>
+        /// Gets or sets the HTTP message handler.
+        /// </summary>
+        private HttpMessageHandler HttpMessageHandler { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SumoLogic message sender.
+        /// </summary>
+        private SumoLogicMessageSender SumoLogicMessageSender { get; set; }
+
+        public SumoLogicCoreLogging(SumoLogicCoreLoggingOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+            this.Options = options;
+            this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, options.LogLog);
+            this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.Options.ConnectionTimeout);
+            this.SumoLogicMessageSender.Url = new Uri(this.Options.Url);
         }
 
-        public IDisposable BeginScope<TState>(TState state) => new NoopDisposable();
+        // for now lets not support scopes (i'll add it later)
+        public IDisposable BeginScope<TState>(TState state) => new NoopDisposable(); 
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            throw new NotImplementedException();
+            return this.Options.LogLevel >= logLevel;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
