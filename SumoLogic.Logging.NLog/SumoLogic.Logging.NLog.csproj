@@ -14,7 +14,7 @@
     <PackageId>SumoLogic.Logging.NLog</PackageId>
     <Description>NLog appender which sends logs to the Sumo Logic machine data platform.</Description>
     <Authors>Sumo Logic</Authors>
-    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
   </PropertyGroup>

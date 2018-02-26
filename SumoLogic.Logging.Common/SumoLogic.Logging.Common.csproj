@@ -14,7 +14,7 @@
     <PackageId>SumoLogic.Logging.Common</PackageId>
     <Description>Shared library used by .NET log appenders uploading to Sumo Logic.</Description>
     <Authors>Sumo Logic</Authors>
-    <Copyright>Copyright © 2017 Sumo Logic Inc. - All Rights Reserved</Copyright>
+    <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
     <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
   </PropertyGroup>
