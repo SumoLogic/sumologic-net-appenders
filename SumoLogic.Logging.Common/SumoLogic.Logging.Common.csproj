@@ -21,6 +21,13 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <PackageLicenseUrl>https://github.com/SumoLogic/sumologic-net-appenders/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
+    <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
+    <PackageReleaseNotes>- Update copyrights
+ - New model for nuget metadata</PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <DefineConstants>netfull</DefineConstants>
