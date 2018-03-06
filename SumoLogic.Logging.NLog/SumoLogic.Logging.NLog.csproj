@@ -30,6 +30,9 @@
  - Update copyrights
  - New model for nuget metadata</PackageReleaseNotes>
   </PropertyGroup>
+  <PropertyGroup>
+    <VersionSuffix>beta1</VersionSuffix>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="..\SumoLogic.Logging.snk">
       <Link>SumoLogic.Logging.snk</Link>
