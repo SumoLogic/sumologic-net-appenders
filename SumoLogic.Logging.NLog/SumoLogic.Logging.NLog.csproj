@@ -15,7 +15,7 @@
     <Description>NLog appender which sends logs to the Sumo Logic machine data platform.</Description>
     <Authors>Sumo Logic</Authors>
     <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
@@ -26,12 +26,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
     <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
-    <PackageReleaseNotes>- Update NLog dependency from 5.0.0-beta09 to 4.5.0-rc03
- - Update copyrights
- - New model for nuget metadata</PackageReleaseNotes>
-  </PropertyGroup>
-  <PropertyGroup>
-    <VersionSuffix>beta1</VersionSuffix>
+    <PackageReleaseNotes>- Updated to NLog ver. 4.5.0 RTM</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\SumoLogic.Logging.snk">
@@ -55,8 +50,8 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net45'">
     <PackageReference Include="NLog" Version="4.3.3" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.5'">
-    <PackageReference Include="NLog" Version="4.5.0-rc03" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+    <PackageReference Include="NLog" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Net.Http" Version="4.3.1" />
