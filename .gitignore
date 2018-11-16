@@ -1,28 +1,27 @@
 *.Cache
-*.suo
-*.user
 *.dbmdl
 *.schemaview
+
 /TestsResults/*
 !/TestsResults/*.xsl
-SumoLogic.Logging.Common/bin
-SumoLogic.Logging.Common/obj
-SumoLogic.Logging.Common.Tests/bin
-SumoLogic.Logging.Common.Tests/obj
-SumoLogic.Logging.Log4Net/bin
-SumoLogic.Logging.Log4Net/obj
-SumoLogic.Logging.Log4Net.Tests/bin
-SumoLogic.Logging.Log4Net.Tests/obj
-SumoLogic.Logging.Log4Net.Example/bin
-SumoLogic.Logging.Log4Net.Example/obj
-SumoLogic.Logging.NLog/bin
-SumoLogic.Logging.NLog/obj
-SumoLogic.Logging.NLog.Tests/bin
-SumoLogic.Logging.NLog.Tests/obj
-SumoLogic.Logging.NLog.Example/bin
-SumoLogic.Logging.NLog.Example/obj
+
 SumoLogic.Logging.Nuget/
+
 packages/
 !packages/repositories.config
-.vscode
-.vs
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Visual Studio Code
+.vscode/
