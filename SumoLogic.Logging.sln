@@ -42,6 +42,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		SumoLogic.Logging.CI.Test.ps1 = SumoLogic.Logging.CI.Test.ps1
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{1750CC42-F658-4E64-9FA2-0E634BE843B5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\sumologic.logging.serilog.md = docs\sumologic.logging.serilog.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -7,7 +7,8 @@ Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources
 | In keeping with industry standard security best practices, as of May 31, 2018, the Sumo Logic service will only support TLS version 1.2 going forward. Verify that all connections to Sumo Logic endpoints are made from software that supports TLS 1.2. |
 
 # Prerequisites
-* .NET 4.5 or later or .NET Standard 1.5
+* .NET 4.5 or later or .NET Standard 1.5 (for NLog and Log4Net)
+* .NET 4.6.1 or later or .NET Standard 2.0 (for Serilog)
 * A Sumo Logic Account (trial can be started [here](https://www.sumologic.com/))
 
 # Appenders
@@ -16,8 +17,9 @@ Appenders are provided for the following .NET logging frameworks
 
 * NLog
 * Log4Net
+* Serilog
 
-Both appenders have two implementations: a buffering and a non-buffering version.
+All appenders have two implementations: a buffering and a non-buffering version.
 The non-buffering implementations will send each log message to Sumo Logic in a distinct HTTP request. The buffering
 implementations will queue messages until a size, count, or time threshold is met, then send in batch.
 
@@ -215,6 +217,35 @@ public static class Program
     }
 }
 ```
+
+## Serilog
+
+To install the Serilog sink, use the following steps:
+
+```
+PM> Install-Package SumoLogic.Logging.Serilog
+```
+
+### Example Code (instantiation and configuration)
+```csharp
+Logger log = new LoggerConfiguration()
+    .WriteTo.BufferedSumoLogic(
+        new Uri("https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here=="),
+        sourceName: "ExampleNameSerilogBufferedSink",
+        sourceCategory: "ExampleCategorySerilogBufferedSink",
+        sourceHost: "ExampleHostSerilogBufferedSink",
+        connectionTimeout: 30000,
+        retryInterval: 5000,
+        messagesPerRequest: 10,
+        maxFlushInterval: 10000,
+        flushingAccuracy: 250,
+        maxQueueSizeBytes: 500000)
+    .CreateLogger();
+
+log.Information("Hello world!");
+```
+
+More about Serilog sink configuration: [SumoLogic.Logging.Serilog](docs/sumologic.logging.serilog.md)
 
 # License
 [Apache 2.0](LICENSE)
