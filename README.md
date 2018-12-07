@@ -7,8 +7,7 @@ Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources
 | In keeping with industry standard security best practices, as of May 31, 2018, the Sumo Logic service will only support TLS version 1.2 going forward. Verify that all connections to Sumo Logic endpoints are made from software that supports TLS 1.2. |
 
 # Prerequisites
-* .NET 4.5 or later or .NET Standard 1.5 (for NLog and Log4Net)
-* .NET 4.6.1 or later or .NET Standard 2.0 (for Serilog)
+* .NET 4.5 or later or .NET Standard 1.5 
 * A Sumo Logic Account (trial can be started [here](https://www.sumologic.com/))
 
 # Appenders
