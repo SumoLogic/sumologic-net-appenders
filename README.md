@@ -2,10 +2,6 @@
 
 Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources.
 
-| TLS Deprecation Notice |
-| --- |
-| In keeping with industry standard security best practices, as of May 31, 2018, the Sumo Logic service will only support TLS version 1.2 going forward. Verify that all connections to Sumo Logic endpoints are made from software that supports TLS 1.2. |
-
 # Prerequisites
 * .NET 4.5 or later or .NET Standard 1.5 
 * A Sumo Logic Account (trial can be started [here](https://www.sumologic.com/))
@@ -245,6 +241,10 @@ log.Information("Hello world!");
 ```
 
 More about Serilog sink configuration: [SumoLogic.Logging.Serilog](docs/sumologic.logging.serilog.md)
+
+# TLS 1.2 Requirement
+
+Sumo Logic only accepts connections from clients using TLS version 1.2 or greater. To utilize the content of this repo, ensure that it's running in an execution environment that is configured to use TLS 1.2 or greater.
 
 # License
 [Apache 2.0](LICENSE)
