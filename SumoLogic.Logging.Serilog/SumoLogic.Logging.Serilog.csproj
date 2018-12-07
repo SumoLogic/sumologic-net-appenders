@@ -15,7 +15,7 @@
     <Description>Serilog sink which sends logs to the Sumo Logic machine data analytics platform.</Description>
     <Authors>Sumo Logic</Authors>
     <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
     <NoWarn>$(NoWarn),1587</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -46,7 +46,10 @@
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
+    <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj">
+      <Project>{e182aa49-af0b-48a9-8c65-e0241da8c623}</Project>
+      <Name>SumoLogic.Logging.Common</Name>      
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.Github" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
