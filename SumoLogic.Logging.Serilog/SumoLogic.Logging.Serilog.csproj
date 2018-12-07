@@ -52,7 +52,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.Github" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
     <PackageReference Include="Serilog" Version="[2.0,3.0)" />
     <PackageReference Include="System.Net.Http" Version="4.3.1" />
   </ItemGroup>
