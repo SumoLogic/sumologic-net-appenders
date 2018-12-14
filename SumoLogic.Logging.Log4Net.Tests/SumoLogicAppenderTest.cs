@@ -120,13 +120,26 @@ namespace SumoLogic.Logging.Log4Net.Tests
         [Fact]
         public void TestConsoleLogging()
         {
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            lock (ConsoleMutex.mutex)
+            {
+                var writer = new StringWriter();
+                try
+                {
+                    Console.SetOut(writer);
 
-            this.log4netLog.Info("hello");
-
-            var consoleText = writer.GetStringBuilder().ToString();
-            Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                    this.log4netLog.Info("hello");
+                    writer.Flush();
+                    var consoleText = writer.GetStringBuilder().ToString();
+                    Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                }
+                finally
+                {
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                    writer.Close();
+                }
+            }
         }
 
         /// <summary>
