@@ -55,6 +55,11 @@ namespace SumoLogic.Logging.Log4Net
         private volatile BufferWithEviction<string> messagesQueue;
 
         /// <summary>
+        /// The flush buffer task.
+        /// </summary>
+        private SumoLogicMessageSenderBufferFlushingTask flushBufferTask;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BufferedSumoLogicAppender"/> class.
         /// </summary>
         public BufferedSumoLogicAppender()
@@ -175,10 +180,10 @@ namespace SumoLogic.Logging.Log4Net
         /// <summary>
         /// Gets or sets a value indicating whether the console log should be used.
         /// </summary>
-        public bool UseConsoleLog 
-        { 
-            get; 
-            set; 
+        public bool UseConsoleLog
+        {
+            get;
+            set;
         }
 
         protected override bool RequiresLayout { get { return true; } }
@@ -256,7 +261,7 @@ namespace SumoLogic.Logging.Log4Net
                 this.flushBufferTimer.Dispose();
             }
 
-            var flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
+            this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
                 this.messagesQueue,
                 this.SumoLogicMessageSender,
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
@@ -266,7 +271,7 @@ namespace SumoLogic.Logging.Log4Net
                 this.SourceHost,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer((s)=>flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
+            this.flushBufferTimer = new Timer((s) => flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -286,7 +291,7 @@ namespace SumoLogic.Logging.Log4Net
                 {
                     this.LogLog.Warn("Appender not initialized. Dropping log entry");
                 }
-                    
+
                 return;
             }
 
@@ -335,6 +340,17 @@ namespace SumoLogic.Logging.Log4Net
         private void ActivateConsoleLog()
         {
             this.LogLog = new ConsoleLog();
+        }
+
+        /// <summary>
+        /// Flush the any remaining messages that are buffered.
+        /// </summary>
+        /// <param name="millisecondsTimeout"></param>
+        /// <returns></returns>
+        public override bool Flush(int millisecondsTimeout)
+        {
+            flushBufferTask?.FlushAndSend();
+            return true;
         }
     }
 }
