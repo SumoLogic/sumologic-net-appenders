@@ -43,6 +43,7 @@ if(($env:APPVEYOR_REPO_TAG -eq "true") -or ($forcePackage -eq $true)) {
     dotnet pack .\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$fin_ver
     dotnet pack .\SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:Version=$fin_ver
     dotnet pack .\SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:VersionPrefix=$fin_ver
+    dotnet pack .\SumoLogic.Logging.Serilog\SumoLogic.Logging.Serilog.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration Release /p:VersionPrefix=$fin_ver
 }
 else{
     Write-Warning "APPVEYOR_REPO_TAG value not set thus we are not making packages on tags, thus we are not making packages. If you wish to make packages set the APPVEYOR_REPO_TAG envionmental variable to the word true"
