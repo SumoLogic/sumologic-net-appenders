@@ -18,7 +18,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <None Include="SumoLogic.Logging.snk" />
@@ -35,6 +35,6 @@
   <ItemGroup>
     <PackageReference Include="Log4Net" Version="2.0.8" />
     <PackageReference Include="NLog" Version="5.0.0-beta09" />
-    <None Include="Nlog.config"  CopyToOutputDirectory="Always" />
+    <None Include="Nlog.config" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
