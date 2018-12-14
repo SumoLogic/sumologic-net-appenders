@@ -27,13 +27,11 @@ namespace SumoLogic.Logging.NLog
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IO;
     using System.Net.Http;
-    using System.Text;
     using System.Threading;
     using global::NLog;
     using global::NLog.Targets;
+    using global::NLog.Layouts;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
@@ -82,7 +80,7 @@ namespace SumoLogic.Logging.NLog
             this.MaxQueueSizeBytes = 1000000;
             this.LogLog = log ?? new DummyLog();
             this.HttpMessageHandler = httpMessageHandler;
-            this.AppendException = true;
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}{newline}";
         }
 
         /// <summary>
@@ -91,36 +89,40 @@ namespace SumoLogic.Logging.NLog
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Property needs to be exposed as string for allowing configuration")]
         public string Url
         {
-            get;
-            set;
+            get { return (_urlLayout as SimpleLayout).Text; }
+            set { _urlLayout = value ?? string.Empty; }
         }
+        Layout _urlLayout;
 
         /// <summary>
         /// Gets or sets the name used for messages sent to SumoLogic server (sent as X-Sumo-Name header).
         /// </summary>
         public string SourceName
         {
-            get;
-            set;
+            get { return (_sourceLayout as SimpleLayout).Text; }
+            set { _sourceLayout = value ?? string.Empty; }
         }
+        Layout _sourceLayout;
 
         /// <summary>
         /// Gets or sets the source category for messages sent to SumoLogic server (sent as X-Sumo-Category header).
         /// </summary>
         public string SourceCategory
         {
-            get;
-            set;
+            get { return (_categoryLayout as SimpleLayout).Text; }
+            set { _categoryLayout = value ?? string.Empty; }
         }
+        Layout _categoryLayout;
 
         /// <summary>
         /// Gets or sets the source host for messages sent to SumoLogic server (sent as X-Sumo-Host header).
         /// </summary>
         public string SourceHost
         {
-            get;
-            set;
+            get { return (_hostLayout as SimpleLayout).Text; }
+            set { _hostLayout = value ?? string.Empty; }
         }
+        Layout _hostLayout;
 
         /// <summary>
         /// Gets or sets the send message retry interval, in milliseconds.
@@ -189,11 +191,13 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets a value indicating whether the exception.ToString() should be automatically appended to the message being sent
         /// </summary>
+        [Obsolete("Instead configure Target.Layout to include wanted Exception details.")]
         public bool AppendException
         {
-            get;
-            set;
+            get { return _appendException ?? true; }
+            set { _appendException = value; }
         }
+        private bool? _appendException;
 
         /// <summary>
         /// Gets or sets the log service.
@@ -228,11 +232,11 @@ namespace SumoLogic.Logging.NLog
         public void ActivateConsoleLog()
         {
 #if netfull
-			this.LogLog = new ConsoleLog();
+            this.LogLog = new ConsoleLog();
 #else
-			this.LogLog = new DummyLog();
+            this.LogLog = new DummyLog();
 #endif
-		}
+        }
 
         /// <summary>
         /// Initialize the target based on the options set
@@ -269,9 +273,32 @@ namespace SumoLogic.Logging.NLog
                 this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-nlog-buffered-sender");
             }
 
+            var simpleLayout = Layout as SimpleLayout;
+            if (simpleLayout != null)
+            {
+                // HACK to update the NLog Layout to include exception details and newline. Initial release did not make proper use of NLog Layout-engine
+                if (_appendException != false)
+                {
+                    if (simpleLayout.Text?.IndexOf("${exception", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        Layout = simpleLayout = new SimpleLayout(string.Concat(simpleLayout.Text, "${exception:format=tostring}${newline}"));
+                    }
+                }
+
+                if (simpleLayout.Text.IndexOf("${newline}", StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    Layout = new SimpleLayout(string.Concat(simpleLayout.Text, "${newline}"));
+                }
+            }
+
+            var url = _urlLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceName = _sourceLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceCategory = _categoryLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceHost = _hostLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
-            this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(this.Url) ? null : new Uri(this.Url);
+            this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(url) ? null : new Uri(url);
 
             // Initialize flusher
             if (this.flushBufferTimer != null)
@@ -290,9 +317,9 @@ namespace SumoLogic.Logging.NLog
                 this.SumoLogicMessageSender,
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
                 this.MessagesPerRequest,
-                this.SourceName,
-                this.SourceCategory,
-                this.SourceHost,
+                sourceName,
+                sourceCategory,
+                sourceHost,
                 this.LogLog);
 
             this.flushBufferTimer = new Timer((s)=> this.flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
@@ -319,19 +346,13 @@ namespace SumoLogic.Logging.NLog
                 return;
             }
 
-            var bodyBuilder = new StringBuilder();
-            using (var textWriter = new StringWriter(bodyBuilder, CultureInfo.InvariantCulture))
+            var body = this.Layout?.Render(logEvent) ?? string.Empty;
+            if (body.Length < Environment.NewLine.Length || body[body.Length - 1] != Environment.NewLine[Environment.NewLine.Length - 1])
             {
-                textWriter.Write(Layout.Render(logEvent));
-                if (logEvent.Exception != null && this.AppendException)
-                {
-                    textWriter.Write(logEvent.Exception.ToString());
-                }
-
-                textWriter.WriteLine();
+                body = string.Concat(body, Environment.NewLine);
             }
 
-            this.messagesQueue.Add(bodyBuilder.ToString());
+            this.messagesQueue.Add(body);
         }
 
         /// <summary>
@@ -352,7 +373,6 @@ namespace SumoLogic.Logging.NLog
 
             if (this.flushBufferTimer != null)
             {
-
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
             }

@@ -26,6 +26,7 @@
 namespace SumoLogic.Logging.NLog.Tests
 {
     using System;
+    using System.Linq;
     using global::NLog;
     using global::NLog.Config;
     using global::NLog.Targets;
@@ -64,7 +65,7 @@ namespace SumoLogic.Logging.NLog.Tests
             this.sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}";
             this.sumoLogicTarget.SourceName = "SumoLogicTargetTest";
             this.sumoLogicTarget.SourceCategory = "SumoLogicTargetSourceCategory";
-            this.sumoLogicTarget.SourceHost = "SumoLogicTargetSourceHost";
+            this.sumoLogicTarget.SourceHost = "${machinename}";
             this.sumoLogicTarget.Name = "SumoLogicTargetTest";           
             if (LogManager.Configuration == null)
             {
@@ -135,6 +136,17 @@ namespace SumoLogic.Logging.NLog.Tests
             Assert.Equal("WARN: This is third message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
             Assert.Equal("INFO: This is second message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
             Assert.Equal("DEBUG: This is first message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+        }
+
+        /// <summary>
+        /// Test logging multiple message and checking the request content.
+        /// </summary>
+        [Fact]
+        public void EvaluateSourceConfigurationTest()
+        {
+            this.logger.Debug("This is a test message");
+            Assert.Equal("DEBUG: This is a test message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+            Assert.Equal(Environment.MachineName, this.messagesHandler.ReceivedRequests[0].Content.Headers.GetValues("X-Sumo-Host").First<string>());
         }
         
         /// <summary>

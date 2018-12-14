@@ -44,7 +44,7 @@ Install-Package SumoLogic.Logging.NLog
     <add assembly="SumoLogic.Logging.NLog"/>
   </extensions>
   <targets>
-    <target name="sumoLogic" type="SumoLogicTarget"	layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}">
+    <target name="sumoLogic" type="SumoLogicTarget"	layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}${exception:format=tostring}{newline}">
       <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==X</Url>
       <ConnectionTimeout>30000</ConnectionTimeout>
       <SourceName>ExampleNameNLogTarget</SourceName>
@@ -52,7 +52,7 @@ Install-Package SumoLogic.Logging.NLog
       <SourceHost>ExampleHostNLogTarget</SourceHost>
       <UseConsoleLog>true</UseConsoleLog>
     </target>
-    <target name="bufferedSumoLogic" type="BufferedSumoLogicTarget" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}">
+    <target name="bufferedSumoLogic" type="BufferedSumoLogicTarget" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}${exception:format=tostring}{newline}">
       <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==</Url>
       <SourceName>ExampleNameNLogBufferedTarget</SourceName>
       <SourceCategory>ExampleCategoryNLogBufferedTarget</SourceCategory>
