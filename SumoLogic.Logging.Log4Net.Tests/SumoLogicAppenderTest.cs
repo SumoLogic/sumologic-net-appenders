@@ -157,8 +157,9 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLog.Info("oops"); // push through a message
 
                 // nothing should be thrown, but an error should be generated
-                Assert.Equal(1, ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors.Count);
-                Assert.Contains("No layout set", ((TestErrorHandler)this.sumoLogicAppender.ErrorHandler).Errors[0]);
+                var errHandler = (TestErrorHandler)this.sumoLogicAppender.ErrorHandler;
+                Assert.Single(errHandler.Errors);
+                Assert.Contains("No layout set", errHandler.Errors[0]);
             }
             finally
             {

@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <PackageLicenseUrl>https://github.com/SumoLogic/sumologic-net-appenders/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
