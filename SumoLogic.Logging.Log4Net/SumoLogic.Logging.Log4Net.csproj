@@ -29,8 +29,8 @@
     <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
     <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
-    <PackageReleaseNotes>- Update copyrights
- - New model for nuget metadata</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\SumoLogic.Logging.snk">
