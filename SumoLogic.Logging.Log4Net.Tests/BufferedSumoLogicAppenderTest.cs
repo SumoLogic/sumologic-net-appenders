@@ -150,14 +150,27 @@ namespace SumoLogic.Logging.Log4Net.Tests
         [Fact]
         public void TestConsoleLogging()
         {
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            lock (ConsoleMutex.mutex)
+            {
+                var writer = new StringWriter();
+                try
+                {
+                    Console.SetOut(writer);
 
-            this.SetUpLogger(10000, 500, 10);
-            this.log4netLog.Info("hello");
-
-            var consoleText = writer.GetStringBuilder().ToString();
-            Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                    this.SetUpLogger(10000, 500, 10);
+                    this.log4netLog.Info("hello");
+                    writer.Flush();
+                    var consoleText = writer.GetStringBuilder().ToString();
+                    Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                }
+                finally
+                {
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                    writer.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -196,8 +209,9 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLog.Info("oops"); // push through a message
 
                 // nothing should be thrown, but an error should be generated
-                Assert.Equal(1, ((TestErrorHandler)this.bufferedSumoLogicAppender.ErrorHandler).Errors.Count);
-                Assert.Contains("No layout set", ((TestErrorHandler)this.bufferedSumoLogicAppender.ErrorHandler).Errors[0]);
+                var errHandler = (TestErrorHandler)this.bufferedSumoLogicAppender.ErrorHandler;
+                Assert.Single(errHandler.Errors);
+                Assert.Contains("No layout set", errHandler.Errors[0]);
             }
             finally
             {
