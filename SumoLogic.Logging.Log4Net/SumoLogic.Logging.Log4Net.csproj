@@ -1,59 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugCA|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DebugCA\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>..\Settings.ruleset</CodeAnalysisRuleSet>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PackageId>SumoLogic.Logging.Log4Net</PackageId>
-    <Description>Log4Net appender which sends logs to the Sumo Logic machine data analytics platform.</Description>
-    <Authors>Sumo Logic</Authors>
-    <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
-    <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>netfull</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <PackageLicenseUrl></PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
-    <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <RepositoryType>git</RepositoryType>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\SumoLogic.Logging.snk">
-      <Link>SumoLogic.Logging.snk</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
-      <Link>CustomDictionary.xml</Link>
-    </CodeAnalysisDictionary>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="System.Net.Http" Version="4.3.1" />
-  </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <PropertyGroup>
+        <PackageId>SumoLogic.Logging.Log4Net</PackageId>
+        <Description>Log4Net appender which sends logs to the Sumo Logic machine data analytics platform.</Description>
+        <Authors>Sumo Logic</Authors>
+        <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
+        <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+        <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <DefineConstants>netfull</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+        <DefineConstants>netstandard</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
+        <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+        <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
+        <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
+        <PackageReleaseNotes></PackageReleaseNotes>
+        <RepositoryType>git</RepositoryType>
+        <SignAssembly>true</SignAssembly>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\SumoLogic.Logging.snk">
+            <Link>SumoLogic.Logging.snk</Link>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+            <Link>CustomDictionary.xml</Link>
+        </CodeAnalysisDictionary>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="log4net" Version="2.0.8" />
+        <PackageReference Include="System.Net.Http" Version="4.3.1" />
+    </ItemGroup>
 </Project>
