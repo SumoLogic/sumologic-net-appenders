@@ -20,7 +20,7 @@ There are two Serilog sinks included in this package:
 
 To set up logger using configuration file, additional dependency is required - install `Serilog.Settings.Configuration` as well.
 
-```
+```ps
 Install-Package Serilog.Settings.Configuration
 ```
 
@@ -78,7 +78,7 @@ to configure JSON formatter (`Serilog.Formatting.Compact.CompactJsonFormatter`) 
 
 Install package containing JSON formatter:
 
-```
+```ps
 Install-Package Serilog.Formatting.Compact
 ```
 
@@ -135,7 +135,7 @@ Either use as sink arguments in configuration or as name arguments of extension 
 
 _arguments marked with "(B)" are available only to buffered sink (`SumoLogicSink`)_
 
-#### Notes
+**Notes**:
 
 - default `outputTemplate` = `"{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message} {Exception}"`
 - provide `HttpMessageHandler httpMessageHandler` to adjust HTTP request sent SumoLogic
