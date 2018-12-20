@@ -2,13 +2,10 @@
 *.dbmdl
 *.schemaview
 
-/TestsResults/*
-!/TestsResults/*.xsl
+TestsResults/
 
 SumoLogic.Logging.Nuget/
-
 packages/
-!packages/repositories.config
 
 # User-specific files
 *.suo
@@ -25,3 +22,9 @@ packages/
 
 # Visual Studio Code
 .vscode/
+
+# NuGet
+.nuget/
+
+# MacOS
+.DS_Store

@@ -24,27 +24,29 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Example", "SumoLogic.Logging.Serilog.Example\SumoLogic.Logging.Serilog.Example.csproj", "{A835A83E-A5B7-4483-8C42-9524506DF1DE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{16D42CFF-3BBF-4BBD-8ADD-81B1DB9B1054}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{865F3748-1B53-471F-9AA3-F4C388424068}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
 		CustomDictionary.xml = CustomDictionary.xml
+		icon.png = icon.png
 		LICENSE = LICENSE
 		README.md = README.md
 		Settings.ruleset = Settings.ruleset
 		Settings.StyleCop = Settings.StyleCop
-		SumoLogic.Logging.CI.ps1 = SumoLogic.Logging.CI.ps1
-		SumoLogic.Logging.CI.Test.ps1 = SumoLogic.Logging.CI.Test.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{1750CC42-F658-4E64-9FA2-0E634BE843B5}"
 	ProjectSection(SolutionItems) = preProject
+		docs\sumologic.logging.log4net.md = docs\sumologic.logging.log4net.md
+		docs\sumologic.logging.nlog.md = docs\sumologic.logging.nlog.md
 		docs\sumologic.logging.serilog.md = docs\sumologic.logging.serilog.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{64F7E0C4-1EA6-4908-AC9F-C490B84BF2A9}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		ci\build-solution.ps1 = ci\build-solution.ps1
+		ci\run-test.ps1 = ci\run-test.ps1
 	EndProjectSection
 EndProject
 Global
@@ -103,6 +105,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0C74B63D-100D-4DAC-8D9E-AB91E5DFCB34}
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Logging.6.0.1304.0\lib\NET45
 	EndGlobalSection
 EndGlobal
