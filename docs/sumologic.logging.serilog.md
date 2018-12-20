@@ -1,6 +1,7 @@
 # SumoLogic.Logging.Serilog
 
-Serilog sink for logging events into SumoLogic.
+SumoLogic provides an interface between Serilog and remote service Logging. You can logging its application as the usual way.
+Once you have downloaded the NuGet package, you can watch the example project for configuration details.
 
 ## Installation
 
@@ -15,6 +16,12 @@ There are two Serilog sinks included in this package:
 
 - `BufferedSumoLogicSink`: Uses buffer to collect events, which are being sent in batches (extension method: `BufferedSumoLogic`)
 - `SumoLogicSink`: Sends event right away (extension method: `SumoLogic`)
+
+## Configuration
+
+The configuration is done in code or via appsettings.json. There are two sinks, BufferedSumoLogicSink and SumoLogicSink.
+We recommend to use the BufferedSumoLogicSink because SumoLogicSink might make the application runs slower.
+The output url is which you get from SumoLogic http collector.
 
 ### Using config file
 
