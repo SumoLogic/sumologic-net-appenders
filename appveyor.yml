@@ -1,9 +1,9 @@
 image: Visual Studio 2017
-version: 1.0.{build}
+version: 1.0.0.{build}
 build_script:
-- ps: .\SumoLogic.Logging.CI.ps1
+- ps: .\ci\build-solution.ps1
 test_script:
-- ps: .\SumoLogic.Logging.CI.Test.ps1
+- ps: .\ci\run-test.ps1
 artifacts:
 - path: SumoLogic.Logging.Nuget\**.nupkg
 deploy:

@@ -35,10 +35,7 @@
         </CodeAnalysisDictionary>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj">
-            <Project>{e182aa49-af0b-48a9-8c65-e0241da8c623}</Project>
-            <Name>SumoLogic.Logging.Common</Name>
-        </ProjectReference>
+        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="NLog" Version="4.5.11" />

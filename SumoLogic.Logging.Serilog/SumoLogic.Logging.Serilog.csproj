@@ -15,7 +15,7 @@
     </PropertyGroup>
     <PropertyGroup>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
-        <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+        <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
         <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
@@ -35,10 +35,7 @@
         </CodeAnalysisDictionary>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj">
-            <Project>{e182aa49-af0b-48a9-8c65-e0241da8c623}</Project>
-            <Name>SumoLogic.Logging.Common</Name>
-        </ProjectReference>
+        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Serilog" Version="[2.0,3.0)" />
