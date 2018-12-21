@@ -106,7 +106,7 @@ namespace SumoLogic.Logging.NLog.Tests
                 this.logger.Fatal(i);
             }
 
-            Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+            Assert.True(this.messagesHandler.ReceivedRequests.Count > 5);
         }        
 
         /// <summary>

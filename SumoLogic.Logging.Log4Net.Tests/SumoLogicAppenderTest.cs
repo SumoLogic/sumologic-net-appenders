@@ -110,7 +110,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLog.Error("error " + i);
             }
 
-            Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+            Assert.True(this.messagesHandler.ReceivedRequests.Count > 1);
         }
 
         /// <summary>

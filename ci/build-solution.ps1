@@ -26,8 +26,8 @@ Write-Host "APPVEYOR_REPO_TAG_NAME = $env:APPVEYOR_REPO_TAG_NAME"
 Write-Host "APPVEYOR_BUILD_VERSION = $env:APPVEYOR_BUILD_VERSION"
 
 if([string]::IsNullOrWhiteSpace($finalVersion)){
-    Write-Error "Unable to determine release version"
-    exit -1
+    Write-Warning "Unable to determine release version, defaults to 0.0.0.0"
+    $finalVersion = "0.0.0.0"
 }
 
 Write-Host "Building solution - [$finalVersion] [$Config]"
