@@ -87,7 +87,7 @@ namespace SumoLogic.Logging.NLog.Tests
         {
             this.logger.Info("This is a message");           
             Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("INFO: This is a message\r\n", this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal("INFO: This is a message" + Environment.NewLine, this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -129,12 +129,12 @@ namespace SumoLogic.Logging.NLog.Tests
             this.logger.Info("This is second message");
             this.logger.Warn("This is third message");
             this.logger.Error("This is fourth message");
-            this.logger.Fatal("This is fifh message");
-            Assert.Equal("FATAL: This is fifh message\r\n", this.messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
-            Assert.Equal("ERROR: This is fourth message\r\n", this.messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
-            Assert.Equal("WARN: This is third message\r\n", this.messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
-            Assert.Equal("INFO: This is second message\r\n", this.messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
-            Assert.Equal("DEBUG: This is first message\r\n", this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+            this.logger.Fatal("This is fifth message");
+            Assert.Equal("FATAL: This is fifth message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
+            Assert.Equal("ERROR: This is fourth message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
+            Assert.Equal("WARN: This is third message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
+            Assert.Equal("INFO: This is second message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
+            Assert.Equal("DEBUG: This is first message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
         }
         
         /// <summary>

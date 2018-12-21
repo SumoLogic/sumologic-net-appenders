@@ -13,6 +13,13 @@ param (
   [string]$Config = "Release"
 )
 
+$suffix = ""
+if (-not $IsWindows) {
+  $suffix = ".netstandard"
+}
+
+$slnName = "SumoLogic.Logging$suffix.sln"
+
 # the "final version" used everywhere
 $finalVersion = $env:APPVEYOR_REPO_TAG_NAME
 
@@ -35,11 +42,11 @@ Write-Host "Building solution - [$finalVersion] [$Config]"
 Write-Output "======================================"
 Write-Output "Clean PHASE"
 Write-Output "======================================"
-if(Test-Path .\SumoLogic.Logging.Nuget) 
+if(Test-Path ".\SumoLogic.Logging.Nuget$suffix") 
 {
-    Remove-Item -Recurse -Force .\SumoLogic.Logging.Nuget
+    Remove-Item -Recurse -Force ".\SumoLogic.Logging.Nuget$suffix"
 }
-dotnet clean SumoLogic.Logging.sln --configuration $Config
+dotnet clean $slnName --configuration $Config
 if ($LastExitCode -ne 0) {
     Write-Error "Failed to clean [$LastExitCode]"
     exit $LastExitCode
@@ -48,7 +55,7 @@ if ($LastExitCode -ne 0) {
 Write-Output "======================================"
 Write-Output "Restore PHASE"
 Write-Output "======================================"
-dotnet restore SumoLogic.Logging.sln /p:Version=$finalVersion
+dotnet restore $slnName /p:Version=$finalVersion
 if ($LastExitCode -ne 0) {
     Write-Error "Failed to restore [$LastExitCode]"
     exit $LastExitCode
@@ -57,14 +64,14 @@ if ($LastExitCode -ne 0) {
 Write-Output "======================================"
 Write-Output "Build PHASE"
 Write-Output "======================================"
-dotnet build --configuration $Config SumoLogic.Logging.sln /p:Version=$finalVersion
+dotnet build --configuration $Config $slnName /p:Version=$finalVersion
 if ($LastExitCode -ne 0) {
     Write-Error "Failed to build [$LastExitCode]"
     exit $LastExitCode
 }
 
 function run-pack($name) {
-    dotnet pack .\$name\$name.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration $Config /p:Version=$finalVersion
+    dotnet pack .\$name\$name$suffix.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget$suffix" --configuration $Config /p:Version=$finalVersion
     if ($LastExitCode -ne 0) {
         Write-Error "Failed to pack $name [$LastExitCode]"
         exit $LastExitCode

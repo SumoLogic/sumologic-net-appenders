@@ -13,8 +13,13 @@ param (
   [string]$Config = "Release"
 )
 
+$suffix = ""
+if (-not $IsWindows) {
+  $suffix = ".netstandard"
+}
+
 function test-assembly($name) {
-  dotnet test --configuration $Config --no-build $name\$name.csproj
+  dotnet test --configuration $Config --no-build $name\$name$suffix.csproj
   if ($LastExitCode -ne 0) {
     Write-Error "Failed to test $name [$LastExitCode]"
     exit $LastExitCode

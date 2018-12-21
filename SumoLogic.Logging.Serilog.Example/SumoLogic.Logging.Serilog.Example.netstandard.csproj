@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+            <Link>CustomDictionary.xml</Link>
+        </CodeAnalysisDictionary>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+        <PackageReference Include="Serilog" Version="2.7.1" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.1" />
+        <None Include="appsettings.json" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SumoLogic.Logging.Serilog\SumoLogic.Logging.Serilog.netstandard.csproj" />
+    </ItemGroup>
+</Project>
