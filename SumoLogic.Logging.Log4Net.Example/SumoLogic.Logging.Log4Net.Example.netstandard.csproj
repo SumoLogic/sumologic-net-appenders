@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+            <Link>CustomDictionary.xml</Link>
+        </CodeAnalysisDictionary>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Log4Net" Version="2.0.8" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.netstandard.csproj" />
+    </ItemGroup>
+</Project>

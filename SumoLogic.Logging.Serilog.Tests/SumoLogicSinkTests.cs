@@ -87,7 +87,7 @@ namespace SumoLogic.Logging.Serilog.Tests
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
 
-            Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
+            Assert.True(_messagesHandler.ReceivedRequests.Count > 1);
         }
 
         /// <summary>

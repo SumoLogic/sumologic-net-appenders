@@ -1,0 +1,109 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Common.netstandard", "SumoLogic.Logging.Common\SumoLogic.Logging.Common.netstandard.csproj", "{E182AA49-AF0B-48A9-8C65-E0241DA8C623}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.netstandard", "SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.netstandard.csproj", "{75BD9161-A607-4C13-8F3A-6B4E5A04460D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.netstandard", "SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.netstandard.csproj", "{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.Tests.netstandard", "SumoLogic.Logging.NLog.Tests\SumoLogic.Logging.NLog.Tests.netstandard.csproj", "{A71BB234-A8E5-440F-BCCD-E7B50A696739}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.Tests.netstandard", "SumoLogic.Logging.Log4Net.Tests\SumoLogic.Logging.Log4Net.Tests.netstandard.csproj", "{590FA175-2ED9-486D-B489-B0D054BFE68F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Common.Tests.netstandard", "SumoLogic.Logging.Common.Tests\SumoLogic.Logging.Common.Tests.netstandard.csproj", "{538DA881-D377-41DA-B360-CBFD0D8113C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.Example.netstandard", "SumoLogic.Logging.Log4Net.Example\SumoLogic.Logging.Log4Net.Example.netstandard.csproj", "{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.Example.netstandard", "SumoLogic.Logging.NLog.Example\SumoLogic.Logging.NLog.Example.netstandard.csproj", "{F0962273-9325-4359-855C-B290C1EECC8E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.netstandard", "SumoLogic.Logging.Serilog\SumoLogic.Logging.Serilog.netstandard.csproj", "{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Tests.netstandard", "SumoLogic.Logging.Serilog.Tests\SumoLogic.Logging.Serilog.Tests.netstandard.csproj", "{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Example.netstandard", "SumoLogic.Logging.Serilog.Example\SumoLogic.Logging.Serilog.Example.netstandard.csproj", "{A835A83E-A5B7-4483-8C42-9524506DF1DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{865F3748-1B53-471F-9AA3-F4C388424068}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		CustomDictionary.xml = CustomDictionary.xml
+		icon.png = icon.png
+		LICENSE = LICENSE
+		README.md = README.md
+		Settings.ruleset = Settings.ruleset
+		Settings.StyleCop = Settings.StyleCop
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{1750CC42-F658-4E64-9FA2-0E634BE843B5}"
+	ProjectSection(SolutionItems) = preProject
+		docs\sumologic.logging.log4net.md = docs\sumologic.logging.log4net.md
+		docs\sumologic.logging.nlog.md = docs\sumologic.logging.nlog.md
+		docs\sumologic.logging.serilog.md = docs\sumologic.logging.serilog.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{64F7E0C4-1EA6-4908-AC9F-C490B84BF2A9}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		ci\build-solution.ps1 = ci\build-solution.ps1
+		ci\run-test.ps1 = ci\run-test.ps1
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E182AA49-AF0B-48A9-8C65-E0241DA8C623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E182AA49-AF0B-48A9-8C65-E0241DA8C623}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E182AA49-AF0B-48A9-8C65-E0241DA8C623}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E182AA49-AF0B-48A9-8C65-E0241DA8C623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75BD9161-A607-4C13-8F3A-6B4E5A04460D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75BD9161-A607-4C13-8F3A-6B4E5A04460D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75BD9161-A607-4C13-8F3A-6B4E5A04460D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75BD9161-A607-4C13-8F3A-6B4E5A04460D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A71BB234-A8E5-440F-BCCD-E7B50A696739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{590FA175-2ED9-486D-B489-B0D054BFE68F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{590FA175-2ED9-486D-B489-B0D054BFE68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{590FA175-2ED9-486D-B489-B0D054BFE68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{590FA175-2ED9-486D-B489-B0D054BFE68F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{538DA881-D377-41DA-B360-CBFD0D8113C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{538DA881-D377-41DA-B360-CBFD0D8113C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{538DA881-D377-41DA-B360-CBFD0D8113C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{538DA881-D377-41DA-B360-CBFD0D8113C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0962273-9325-4359-855C-B290C1EECC8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0962273-9325-4359-855C-B290C1EECC8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0962273-9325-4359-855C-B290C1EECC8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0962273-9325-4359-855C-B290C1EECC8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C74B63D-100D-4DAC-8D9E-AB91E5DFCB34}
+	EndGlobalSection
+EndGlobal
