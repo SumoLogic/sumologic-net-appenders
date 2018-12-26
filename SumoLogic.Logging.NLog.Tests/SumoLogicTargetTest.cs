@@ -62,7 +62,7 @@ namespace SumoLogic.Logging.NLog.Tests
             this.messagesHandler = new MockHttpMessageHandler();
             this.sumoLogicTarget = new SumoLogicTarget(null, this.messagesHandler);           
             this.sumoLogicTarget.Url = "http://www.fakeadress.com";
-            this.sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}";
+            this.sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}${exception:format=tostring}${newline}";
             this.sumoLogicTarget.SourceName = "SumoLogicTargetTest";
             this.sumoLogicTarget.SourceCategory = "SumoLogicTargetSourceCategory";
             this.sumoLogicTarget.SourceHost = "${machinename}";

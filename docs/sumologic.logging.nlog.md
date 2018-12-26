@@ -7,7 +7,7 @@ Once you have downloaded the NuGet package, you can watch the example project fo
 
 ## Minimum requirements
 
-- .NET 4.5 or later or .NET Standard 1.5
+- .NET 4.5 or later or .NET Standard 1.3
 
 ## Targets
 
@@ -22,6 +22,14 @@ Once you have downloaded the NuGet package, you can watch the example project fo
 
 ## Properties
 
+Like all NLog targets then formatting of message payload happens with the standard Layout-property:
+
+- Default Layout = `${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}`
+
+!NOTE! Older versions (<= 1.0.0.8) also reacted to the now obsolete `AppendException` property.
+That controlled whether exception details was added independent of the configured NLog Target Layout.
+Instead of using `AppendException` property, then one should just configure the NLog Target Layout as wanted.
+
 ### SumoLogicTarget
 
 | Argument                  | Description                                                                           | Default value         |
@@ -29,7 +37,7 @@ Once you have downloaded the NuGet package, you can watch the example project fo
 | Url                       | The http collector URL from SumoLogic.                                                | __mandatory__         |
 | SourceName                | The named used for messages sent to SumoLogic.                                        | `Nlog-SumoObject`     |
 | SourceCategory            | The category used for messages sent to SumoLogic.                                     | `null`                |
-| SourceHost                | The host used for messages sent to SumoLogic.                                         | `null`                |
+| SourceHost                | The host used for messages sent to SumoLogic. Ex. ${machinename}                      | `null`                |
 | ConnectionTimeout         | The connection timeout in milliseconds.                                               | `60000`               |
 
 ### BufferedSumoLogicTarget
@@ -39,8 +47,9 @@ Once you have downloaded the NuGet package, you can watch the example project fo
 | Url                       | The http collector URL from SumoLogic.                                                | __mandatory__             |
 | SourceName                | The named used for messages sent to SumoLogic.                                        | `Nlog-SumoObject-Buffered`|
 | SourceCategory            | The category used for messages sent to SumoLogic.                                     | `null`                    |
-| SourceHost                | The host used for messages sent to SumoLogic.                                         | `null`                    |
+| SourceHost                | The host used for messages sent to SumoLogic. Ex. ${machinename}                      | `null`                    |
 | ConnectionTimeout         | The connection timeout in milliseconds.                                               | `60000`                   |
+| RetryInterval             | The send message retry interval, in milliseconds                                      | `10000`                   |
 | FlushingAccuracy          | How often the messages queue is checked for messages to send, in milliseconds.        | `250`                     |
 | MaxFlushInterval          | The maximum interval between flushes, in milliseconds.                                | `10000`                   |
 | MessagePerRequest         | How many messages need to be in the queue before flushing.                            | `100`                     |

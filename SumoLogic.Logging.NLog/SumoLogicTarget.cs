@@ -29,6 +29,8 @@ namespace SumoLogic.Logging.NLog
     using System.Diagnostics.CodeAnalysis;
     using System.Net.Http;
     using global::NLog;
+    using global::NLog.Common;
+    using global::NLog.Config;
     using global::NLog.Targets;
     using global::NLog.Layouts;
     using SumoLogic.Logging.Common.Log;
@@ -58,12 +60,13 @@ namespace SumoLogic.Logging.NLog
             this.ConnectionTimeout = 60000;
             this.LogLog = log ?? new DummyLog();
             this.HttpMessageHandler = httpMessageHandler;
-            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}{newline}";
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
         }
 
         /// <summary>
         /// Gets or sets the SumoLogic server URL.
         /// </summary>
+        [RequiredParameter]
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Property needs to be exposed as string for allowing configuration")]
         public string Url
         {
@@ -121,15 +124,12 @@ namespace SumoLogic.Logging.NLog
         }
 
         /// <summary>
+        /// !! Obsolete !! Instead configure Target.Layout to include wanted Exception details Ex. ${exception:format=tostring}
+        /// 
         /// Gets or sets a value indicating whether the exception.ToString() should be automatically appended to the message being sent
         /// </summary>
         [Obsolete("Instead configure Target.Layout to include wanted Exception details.")]
-        public bool AppendException
-        {
-            get { return _appendException ?? true; }
-            set { _appendException = value; }
-        }
-        private bool? _appendException;
+        public bool AppendException { get; set; }
 
         /// <summary>
         /// Gets or sets the log service.
@@ -193,24 +193,6 @@ namespace SumoLogic.Logging.NLog
             if (this.SumoLogicMessageSender == null)
             {
                 this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-nlog-sender");
-            }
-
-            var simpleLayout = Layout as SimpleLayout;
-            if (simpleLayout != null)
-            {
-                // HACK to update the NLog Layout to include exception details and newline. Initial release did not make proper use of NLog Layout-engine
-                if (_appendException != false)
-                {
-                    if (simpleLayout.Text?.IndexOf("${exception", StringComparison.OrdinalIgnoreCase) < 0)
-                    {
-                        Layout = simpleLayout = new SimpleLayout(string.Concat(simpleLayout.Text, "${exception:format=tostring}${newline}"));
-                    }
-                }
-
-                if (simpleLayout.Text.IndexOf("${newline}", StringComparison.OrdinalIgnoreCase) < 0)
-                {
-                    Layout = new SimpleLayout(string.Concat(simpleLayout.Text, "${newline}"));
-                }
             }
 
             var url = _urlLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
