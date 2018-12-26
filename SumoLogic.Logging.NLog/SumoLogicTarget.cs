@@ -27,15 +27,15 @@ namespace SumoLogic.Logging.NLog
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IO;
     using System.Net.Http;
-    using System.Text;
     using global::NLog;
+    using global::NLog.Common;
+    using global::NLog.Config;
     using global::NLog.Targets;
+    using global::NLog.Layouts;
     using SumoLogic.Logging.Common.Log;
-    using SumoLogic.Logging.Common.Sender;   
-    
+    using SumoLogic.Logging.Common.Sender;
+
     /// <summary>
     /// Sumo logic target implementation.
     /// </summary>
@@ -57,49 +57,54 @@ namespace SumoLogic.Logging.NLog
         public SumoLogicTarget(ILog log, HttpMessageHandler httpMessageHandler)
         {
             this.SourceName = "Nlog-SumoObject";
-            this.ConnectionTimeout = 60000;            
+            this.ConnectionTimeout = 60000;
             this.LogLog = log ?? new DummyLog();
             this.HttpMessageHandler = httpMessageHandler;
-            this.AppendException = true;          
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
         }
 
         /// <summary>
         /// Gets or sets the SumoLogic server URL.
         /// </summary>
+        [RequiredParameter]
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Property needs to be exposed as string for allowing configuration")]
         public string Url
         {
-            get;
-            set;
+            get { return (_urlLayout as SimpleLayout).Text; }
+            set { _urlLayout = value ?? string.Empty; }
         }
+        Layout _urlLayout;
 
         /// <summary>
         /// Gets or sets the name used for messages sent to SumoLogic server (sent as X-Sumo-Name header).
         /// </summary>
         public string SourceName
         {
-            get;
-            set;
+            get { return (_sourceLayout as SimpleLayout).Text; }
+            set { _sourceLayout = value ?? string.Empty; }
         }
+        Layout _sourceLayout;
 
         /// <summary>
         /// Gets or sets the source category used for messages sent to SumoLogic server (sent as X-Sumo-Category header).
         /// </summary>
         public string SourceCategory
         {
-            get;
-            set;
+            get { return (_categoryLayout as SimpleLayout).Text; }
+            set { _categoryLayout = value ?? string.Empty; }
         }
+        Layout _categoryLayout;
 
         /// <summary>
         /// Gets or sets the source host used for messages sent to SumoLogic server (sent as X-Sumo-Host header).
         /// </summary>
         public string SourceHost
         {
-            get;
-            set;
+            get { return (_hostLayout as SimpleLayout).Text; }
+            set { _hostLayout = value ?? string.Empty; }
         }
-      
+        Layout _hostLayout;
+
         /// <summary>
         /// Gets or sets the connection timeout, in milliseconds.
         /// </summary>
@@ -119,13 +124,12 @@ namespace SumoLogic.Logging.NLog
         }
 
         /// <summary>
+        /// !! Obsolete !! Instead configure Target.Layout to include wanted Exception details Ex. ${exception:format=tostring}
+        /// 
         /// Gets or sets a value indicating whether the exception.ToString() should be automatically appended to the message being sent
         /// </summary>
-        public bool AppendException
-        {
-            get;
-            set;
-        }
+        [Obsolete("Instead configure Target.Layout to include wanted Exception details.")]
+        public bool AppendException { get; set; }
 
         /// <summary>
         /// Gets or sets the log service.
@@ -159,13 +163,13 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-        #if netfull
+#if netfull
             this.LogLog = new ConsoleLog();
-        #else
+#else
             this.LogLog = new DummyLog();
-        #endif
+#endif
         }
-  
+
         /// <summary>
         /// Initialize the target based on the options set
         /// </summary>
@@ -191,10 +195,12 @@ namespace SumoLogic.Logging.NLog
                 this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-nlog-sender");
             }
 
+            var url = _urlLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
-            this.SumoLogicMessageSender.Url = new Uri(this.Url);
-        }        
-         
+            this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(url) ? null : new Uri(url);
+        }
+
         /// <summary>
         /// Performs the actual logging of events.
         /// </summary>
@@ -212,25 +218,21 @@ namespace SumoLogic.Logging.NLog
                 {
                     this.LogLog.Warn("Target not initialized. Dropping log entry");
                 }
-
                 return;
             }
 
-            var bodyBuilder = new StringBuilder();
-            using (var textWriter = new StringWriter(bodyBuilder, CultureInfo.InvariantCulture))
+            var sourceName = _sourceLayout?.Render(logEvent) ?? string.Empty;
+            var sourceCategory = _categoryLayout?.Render(logEvent) ?? string.Empty;
+            var sourceHost = _hostLayout?.Render(logEvent) ?? string.Empty;
+            var body = this.Layout?.Render(logEvent) ?? string.Empty;
+            if (body.Length < Environment.NewLine.Length || body[body.Length - 1] != Environment.NewLine[Environment.NewLine.Length - 1])
             {
-                textWriter.Write(Layout.Render(logEvent));
-                if (logEvent.Exception != null && this.AppendException)
-                {
-                    textWriter.Write(logEvent.Exception.ToString());
-                }
-
-                textWriter.WriteLine();            
+                body = string.Concat(body, Environment.NewLine);
             }
 
-            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost);
+            this.SumoLogicMessageSender.TrySend(body, sourceName, sourceCategory, sourceHost);
         }
-        
+
         /// <summary>
         /// Is called when the target is closed.
         /// </summary>
