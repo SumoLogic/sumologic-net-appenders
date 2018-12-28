@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.NLog
     using System.Diagnostics.CodeAnalysis;
     using System.Net.Http;
     using global::NLog;
-    using global::NLog.Common;
     using global::NLog.Config;
     using global::NLog.Targets;
     using global::NLog.Layouts;
@@ -58,7 +57,7 @@ namespace SumoLogic.Logging.NLog
         {
             this.SourceName = "Nlog-SumoObject";
             this.ConnectionTimeout = 60000;
-            this.LogLog = log ?? new DummyLog();
+            this.LogLog = new InternalLoggerLog(GetType().Name + ": ", log);
             this.HttpMessageHandler = httpMessageHandler;
             this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
         }
@@ -134,7 +133,7 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets the log service.
         /// </summary>
-        private ILog LogLog
+        private InternalLoggerLog LogLog
         {
             get;
             set;
@@ -163,11 +162,11 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-#if netfull
-            this.LogLog = new ConsoleLog();
-#else
-            this.LogLog = new DummyLog();
-#endif
+            // If console output for the NLog InternalLogger is already active, then no need to have double console-output
+            if (!this.LogLog.IsConsoleEnabled)
+            {
+                this.LogLog = new InternalLoggerLog(GetType().Name + ": ", new ConsoleLog());
+            }
         }
 
         /// <summary>

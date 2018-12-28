@@ -79,7 +79,7 @@ namespace SumoLogic.Logging.NLog
             this.MaxFlushInterval = 10000;
             this.FlushingAccuracy = 250;
             this.MaxQueueSizeBytes = 1000000;
-            this.LogLog = log ?? new DummyLog();
+            this.LogLog = new InternalLoggerLog(GetType().Name + ": ", log);
             this.HttpMessageHandler = httpMessageHandler;
             this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
         }
@@ -184,6 +184,9 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets a value indicating whether the console log should be used.
         /// </summary>
+        /// <remarks>
+        /// Consider using the builtin NLog InternalLogger for troubleshooting
+        /// </remarks>
         public bool UseConsoleLog
         {
             get;
@@ -201,7 +204,7 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets the log service.
         /// </summary>
-        private ILog LogLog
+        private InternalLoggerLog LogLog
         {
             get;
             set;
@@ -230,11 +233,11 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-#if netfull
-            this.LogLog = new ConsoleLog();
-#else
-            this.LogLog = new DummyLog();
-#endif
+            // If console output for the NLog InternalLogger is already active, then no need to have double console-output
+            if (!this.LogLog.IsConsoleEnabled)
+            {
+                this.LogLog = new InternalLoggerLog(GetType().Name + ": ", new ConsoleLog());
+            }
         }
 
         /// <summary>
