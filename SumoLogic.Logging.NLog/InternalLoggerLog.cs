@@ -54,41 +54,61 @@ namespace SumoLogic.Logging.NLog
         public void Debug(string msg)
         {
             if (InternalLogger.IsDebugEnabled)
+            {
                 InternalLogger.Debug(string.Concat(_prefix, msg));
+            }
             if (_customLog?.IsDebugEnabled == true)
+            {
                 _customLog.Debug(msg);
+            }
         }
 
         public void Error(string msg)
         {
             if (InternalLogger.IsErrorEnabled)
+            {
                 InternalLogger.Error(string.Concat(_prefix, msg));
+            }
             if (_customLog?.IsErrorEnabled == true)
+            {
                 _customLog.Error(msg);
+            }
         }
 
         public void Info(string msg)
         {
             if (InternalLogger.IsInfoEnabled)
+            {
                 InternalLogger.Info(string.Concat(_prefix, msg));
+            }
             if (_customLog?.IsInfoEnabled == true)
+            {
                 _customLog.Info(msg);
+            }
         }
 
         public void Trace(string msg)
         {
             if (InternalLogger.IsTraceEnabled)
+            {
                 InternalLogger.Trace(string.Concat(_prefix, msg));
+            }
             if (_customLog?.IsTraceEnabled == true)
+            {
                 _customLog.Trace(msg);
+            }
         }
 
         public void Warn(string msg)
         {
             if (InternalLogger.IsWarnEnabled)
+            {
                 InternalLogger.Warn(string.Concat(_prefix, msg));
+            }
             if (_customLog?.IsWarnEnabled == true)
+            {
                 _customLog.Warn(msg);
+            }
         }
     }
 }
