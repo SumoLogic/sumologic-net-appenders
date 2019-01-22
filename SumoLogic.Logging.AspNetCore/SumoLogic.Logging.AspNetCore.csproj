@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>SumoLogic.Logging.AspNetCore</PackageId>
+        <Description>ASP.NET core logger providers uploading to Sumo Logic.</Description>
+        <Authors>Sumo Logic</Authors>
+        <Copyright>Copyright © 2019 Sumo Logic Inc. - All Rights Reserved</Copyright>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+        <DefineConstants>netstandard</DefineConstants>
+        <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
+    </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
+        <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+        <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
+        <PackageTags>Sumo Logic SumoLogic Logging ASP.NET Core C# F# VB</PackageTags>
+        <PackageReleaseNotes></PackageReleaseNotes>
+        <RepositoryType>git</RepositoryType>
+        <SignAssembly>true</SignAssembly>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="..\SumoLogic.Logging.snk">
+            <Link>SumoLogic.Logging.snk</Link>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+            <Link>CustomDictionary.xml</Link>
+        </CodeAnalysisDictionary>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    </ItemGroup>
+</Project>
