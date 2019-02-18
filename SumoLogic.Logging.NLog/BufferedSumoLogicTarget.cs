@@ -293,7 +293,8 @@ namespace SumoLogic.Logging.NLog
             // Ensure any existing buffer is flushed
             if (this.flushBufferTask != null)
             {
-                this.flushBufferTask.FlushAndSend();
+                // this is NOT present in the log4net code. one-time blocking operation.
+                this.flushBufferTask.FlushAndSend().Wait();
             }
 
             this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
@@ -306,7 +307,11 @@ namespace SumoLogic.Logging.NLog
                 sourceHost,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer((s)=> this.flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
+            this.flushBufferTimer = new Timer(
+                async _ => await flushBufferTask.Run().ConfigureAwait(false),
+                null,
+                TimeSpan.FromMilliseconds(0),
+                TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -379,7 +384,8 @@ namespace SumoLogic.Logging.NLog
                 var task = this.flushBufferTask;
                 if (task != null)
                 {
-                    task.FlushAndSend();
+                    // i don't love this, but it maintains parity w/ existing sync calls
+                    task.FlushAndSend().Wait();
                 }
 
                 asyncContinuation(null);

@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Threading.Tasks;
+
 namespace SumoLogic.Logging.Common.Sender
 {
     using System;
@@ -39,6 +42,17 @@ namespace SumoLogic.Logging.Common.Sender
     /// <typeparam name="TMessage">Type for output.</typeparam>
     public abstract class BufferFlushingTask<TBufferItem, TMessage>
     {
+
+        /// <summary>
+        /// Static instance of a successful task. Task.CompletedResult isn't available in 4.5 so...
+        /// </summary>
+        private static Task CompletedTask
+#if netfull
+           { get; } = Task.FromResult(0);
+#else
+        => Task.CompletedTask;
+#endif
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferFlushingTask{TBufferItem, TMessage}" /> class.
         /// </summary>
@@ -104,14 +118,14 @@ namespace SumoLogic.Logging.Common.Sender
         /// This flush and sends the messages.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception unknown at compile time.")]
-        public void Run()
+        public Task Run()
         {
             if (this.NeedsFlushing())
             {
                 this.IsFlushing = true;
                 try
                 {
-                    this.FlushAndSend();
+                    return this.FlushAndSend();
                 }
                 catch (Exception ex)
                 {
@@ -123,12 +137,13 @@ namespace SumoLogic.Logging.Common.Sender
             }
 
             this.IsFlushing = false;
+            return CompletedTask;
         }
 
         /// <summary>
         /// Flush and send all messages from the queue of messages.
         /// </summary>
-        public void FlushAndSend()
+        public Task FlushAndSend()
         {
             var messages = new List<TBufferItem>();
             this.MessageQueue.DrainTo(messages);
@@ -141,10 +156,12 @@ namespace SumoLogic.Logging.Common.Sender
                 }
 
                 TMessage body = this.Aggregate(messages);
-                this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost);
+                return this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost);
             }
 
             this.LastFlushedOn = DateTime.UtcNow;
+
+            return CompletedTask;
         }
 
         /// <summary>
@@ -160,7 +177,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The body.</param>
         /// <param name="name">The name.</param>
         [Obsolete("use SendOut(TMessage body, string name, string category, string host)")]
-        protected abstract void SendOut(TMessage body, string name);
+        protected abstract Task SendOut(TMessage body, string name);
 
         /// <summary>
         /// Sends aggregated message out. Block until we've successfully sent it.
@@ -169,7 +186,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="name">The name.</param>
         /// <param name="category">The category.</param>
         /// <param name="host">The host.</param>
-        protected abstract void SendOut(TMessage body, string name, string category, string host);
+        protected abstract Task SendOut(TMessage body, string name, string category, string host);
 
         /// <summary>
         /// Returns if the queue needs to flushing messages.

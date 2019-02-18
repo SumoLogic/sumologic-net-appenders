@@ -149,14 +149,14 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="category">The message category.</param>
         /// <param name="host">The message host.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void Send(string body, string name, string category, string host)
+        public async Task Send(string body, string name, string category, string host)
         {
             bool success = false;
             do
             {
                 try
                 {
-                    this.TrySend(body, name, category, host);
+                    await this.TrySend(body, name, category, host);
                     success = true;
                 }
                 catch (Exception ex)
@@ -195,9 +195,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [Obsolete("use Send(string body, string name, string category, string host)")]
-        public void Send(string body, string name)
+        public Task Send(string body, string name)
         {
-            Send(body, name, null, null);
+            return Send(body, name, null, null);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="name">The message name.</param>
         /// <param name="category">The message category.</param>
         /// <param name="host">The message host.</param>
-        public void TrySend(string body, string name, string category, string host)
+        public async Task TrySend(string body, string name, string category, string host)
         {
             if (this.Url == null)
             {
@@ -239,7 +239,7 @@ namespace SumoLogic.Logging.Common.Sender
                 }
                 try
                 {
-                    var response = this.HttpClient.PostAsync(this.Url, httpContent).Result;
+                    var response = await this.HttpClient.PostAsync(this.Url, httpContent);
                     if (!response.IsSuccessStatusCode)
                     {
                         if (this.Log.IsWarnEnabled)
@@ -295,9 +295,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">The message body.</param>
         /// <param name="name">The message name.</param>
         [Obsolete("use TrySend(string body, string name, string category, string host)")]
-        public void TrySend(string body, string name)
+        public Task TrySend(string body, string name)
         {
-            TrySend(body, name, null, null);
+            return TrySend(body, name, null, null);
         }
 
         /// <summary>

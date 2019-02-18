@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Threading.Tasks;
+
 namespace SumoLogic.Logging.Common.Tests.Aggregation
 {
     using System;
@@ -42,21 +45,21 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unit test")]
         [Fact]
-        public void FlushBySizeTest()
+        public async Task FlushBySizeTest()
         {
             var buffer = new BufferWithFifoEviction<string>(1000, new StringLengthCostAssigner());
             var bufferFlushingTask = new DummyBufferFlushingTask(buffer, TimeSpan.MaxValue, 3, "No-Name");
 
-            bufferFlushingTask.Run();
+            await bufferFlushingTask.Run();
             Assert.Equal(0, bufferFlushingTask.SentOut.Count);
 
             buffer.Add("msg1");
             buffer.Add("msg2");
-            bufferFlushingTask.Run();
+            await bufferFlushingTask.Run();
             Assert.Equal(0, bufferFlushingTask.SentOut.Count);
 
             buffer.Add("msg3");
-            bufferFlushingTask.Run();
+            await bufferFlushingTask.Run();
             Assert.Equal(1, bufferFlushingTask.SentOut.Count);
 
             Assert.Equal(3, bufferFlushingTask.SentOut[0].Count);
@@ -68,7 +71,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unit test")]
         [Fact]
-        public void FlushWithNPlusOneElementsTest()
+        public async Task FlushWithNPlusOneElementsTest()
         {
             var buffer = new BufferWithFifoEviction<string>(1000, new StringLengthCostAssigner());
             var bufferFlushingTask = new DummyBufferFlushingTask(buffer, TimeSpan.MaxValue, 3, "No-Name");
@@ -77,7 +80,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
             buffer.Add("msg2");
             buffer.Add("msg3");
             buffer.Add("msg4");
-            bufferFlushingTask.Run();
+            await bufferFlushingTask.Run();
             Assert.Equal(4, bufferFlushingTask.SentOut[0].Count);
         }
 
@@ -86,7 +89,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unit test")]
         [Fact]
-        public void FlushWhenBufferCapacityIsSmallTest()
+        public async Task FlushWhenBufferCapacityIsSmallTest()
         {
             var buffer = new BufferWithFifoEviction<string>(12, new StringLengthCostAssigner());
             var bufferFlushingTask = new DummyBufferFlushingTask(buffer, TimeSpan.MaxValue, 3, "No-Name");
@@ -94,7 +97,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
             buffer.Add("msg2");
             buffer.Add("msg3");
             buffer.Add("msg4");
-            bufferFlushingTask.Run();
+            await bufferFlushingTask.Run();
             Assert.Equal(3, bufferFlushingTask.SentOut[0].Count);
             Assert.Equal(new List<string>() { "msg2", "msg3", "msg4" }, bufferFlushingTask.SentOut[0]);
         }      

@@ -119,7 +119,7 @@ namespace SumoLogic.Logging.Serilog
                 this.logService);
 
             this.flushBufferTimer = new Timer(
-                _ => flushBufferTask.Run(),
+                async _ => await flushBufferTask.Run(),
                 null,
                 TimeSpan.FromMilliseconds(0),
                 connection.FlushingAccuracy);
