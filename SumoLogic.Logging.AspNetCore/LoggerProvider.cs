@@ -81,7 +81,7 @@ namespace SumoLogic.Logging.AspNetCore
                 DebuggingLogger);
 
             flushBufferTimer = new Timer(
-                callback: (s) => flushBufferTask.Run(), 
+                callback: async _ => await flushBufferTask.Run(), 
                 state: null, 
                 dueTime: TimeSpan.FromMilliseconds(0), 
                 period: options.FlushingAccuracy);
@@ -136,7 +136,9 @@ namespace SumoLogic.Logging.AspNetCore
                 body, 
                 LoggerOptions.SourceName,
                 LoggerOptions.SourceCategory,
-                LoggerOptions.SourceHost);
+                LoggerOptions.SourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
     }

@@ -66,16 +66,6 @@ namespace SumoLogic.Logging.AspNetCore.Tests
         }
 
         /// <summary>
-        /// Test do not logging on the trace level.
-        /// </summary>
-        [Fact]
-        public void NoLogOnTheLevelTraceTest()
-        {
-            _logger.LogTrace("This is message");
-            Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-        }
-
-        /// <summary>
         /// Test logging multiple message and checking the request content.
         /// </summary>
         [Fact]
