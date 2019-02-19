@@ -154,7 +154,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
                 this.messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
             });
             this.sumoLogicMessageSender.Send("body", "name", "category", "host");
-            changeResponseTask.Wait();
+            changeResponseTask.GetAwaiter().GetResult();
             Assert.True(requestBeforeSuccess < this.messagesHandler.ReceivedRequests.Count);
             Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
         }       

@@ -111,10 +111,12 @@ namespace SumoLogic.Logging.Serilog
             }
 
             this.messageSender.TrySend(
-                this.formatter.Format(logEvent),
-                this.source.SourceName,
-                this.source.SourceCategory,
-                this.source.SourceHost);
+                    this.formatter.Format(logEvent),
+                    this.source.SourceName,
+                    this.source.SourceCategory,
+                    this.source.SourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <inheritdoc/>

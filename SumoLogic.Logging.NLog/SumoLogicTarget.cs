@@ -229,7 +229,11 @@ namespace SumoLogic.Logging.NLog
                 body = string.Concat(body, Environment.NewLine);
             }
 
-            this.SumoLogicMessageSender.TrySend(body, sourceName, sourceCategory, sourceHost);
+            // synchronous send
+            this.SumoLogicMessageSender
+                .TrySend(body, sourceName, sourceCategory, sourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <summary>

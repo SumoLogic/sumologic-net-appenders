@@ -271,7 +271,11 @@ namespace SumoLogic.Logging.Log4Net
                 this.SourceHost,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer((s) => flushBufferTask.Run(), null, TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(this.FlushingAccuracy));
+            this.flushBufferTimer = new Timer(
+                async _ => await flushBufferTask.Run().ConfigureAwait(false),
+                null,
+                TimeSpan.FromMilliseconds(0),
+                TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>

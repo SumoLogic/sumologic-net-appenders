@@ -145,7 +145,7 @@ namespace SumoLogic.Logging.Common.Sender
             if (request.Content != null)
             {
                 var requestContentStream = new MemoryStream();
-                request.Content.CopyToAsync(requestContentStream).Wait();
+                request.Content.CopyToAsync(requestContentStream).GetAwaiter().GetResult();
                 requestContentStream.Position = 0;
 
                 requestClone.Content = new StreamContent(requestContentStream);

@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Threading.Tasks;
+
 namespace SumoLogic.Logging.Log4Net
 {
     using System;
@@ -210,7 +213,11 @@ namespace SumoLogic.Logging.Log4Net
                 }
             }
 
-            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost);
+            // this maintains synchronous behavior for single event scenarios.
+            this.SumoLogicMessageSender
+                .TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <summary>

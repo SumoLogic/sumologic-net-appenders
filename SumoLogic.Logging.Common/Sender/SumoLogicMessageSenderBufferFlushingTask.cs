@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Threading.Tasks;
+
 namespace SumoLogic.Logging.Common.Sender
 {
     using System;
@@ -131,9 +134,9 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="body">Message body.</param>
         /// <param name="name">Message name.</param>
         [Obsolete("use SendOut(string body, string name, string category, string host)")]
-        protected override void SendOut(string body, String name)
+        protected override Task SendOut(string body, string name)
         {
-            SendOut(body, name, null, null);
+            return SendOut(body, name, null, null);
         }
 
         /// <summary>
@@ -143,7 +146,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="name">Message name.</param>
         /// <param name="category">Message category.</param>
         /// <param name="host">Message host.</param>
-        protected override void SendOut(string body, string name, string category, string host)
+        protected override Task SendOut(string body, string name, string category, string host)
         {
             if (!this.MessageSender.CanSend)
             {
@@ -152,10 +155,10 @@ namespace SumoLogic.Logging.Common.Sender
                     Log.Error("HTTP Sender is not initialized");
                 }
                 
-                return;
+                return Task.FromResult(0);
             }
 
-            this.MessageSender.Send(body, name, category, host);
+           return this.MessageSender.Send(body, name, category, host);
         }
     }
 }
