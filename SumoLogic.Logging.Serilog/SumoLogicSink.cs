@@ -115,7 +115,8 @@ namespace SumoLogic.Logging.Serilog
                     this.source.SourceName,
                     this.source.SourceCategory,
                     this.source.SourceHost)
-                .Wait();
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <inheritdoc/>

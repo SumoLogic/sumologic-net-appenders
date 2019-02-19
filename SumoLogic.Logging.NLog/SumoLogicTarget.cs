@@ -230,7 +230,10 @@ namespace SumoLogic.Logging.NLog
             }
 
             // synchronous send
-            this.SumoLogicMessageSender.TrySend(body, sourceName, sourceCategory, sourceHost).Wait();
+            this.SumoLogicMessageSender
+                .TrySend(body, sourceName, sourceCategory, sourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <summary>

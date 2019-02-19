@@ -214,7 +214,10 @@ namespace SumoLogic.Logging.Log4Net
             }
 
             // this maintains synchronous behavior for single event scenarios.
-            this.SumoLogicMessageSender.TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost).Wait();
+            this.SumoLogicMessageSender
+                .TrySend(bodyBuilder.ToString(), this.SourceName, this.SourceCategory, this.SourceHost)
+                .GetAwaiter()
+                .GetResult();
         }
 
         /// <summary>

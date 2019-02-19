@@ -294,7 +294,7 @@ namespace SumoLogic.Logging.NLog
             if (this.flushBufferTask != null)
             {
                 // this is NOT present in the log4net code. one-time blocking operation.
-                this.flushBufferTask.FlushAndSend().Wait();
+                this.flushBufferTask.FlushAndSend().GetAwaiter().GetResult();
             }
 
             this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
@@ -385,7 +385,7 @@ namespace SumoLogic.Logging.NLog
                 if (task != null)
                 {
                     // i don't love this, but it maintains parity w/ existing sync calls
-                    task.FlushAndSend().Wait();
+                    task.FlushAndSend().GetAwaiter().GetResult();
                 }
 
                 asyncContinuation(null);
