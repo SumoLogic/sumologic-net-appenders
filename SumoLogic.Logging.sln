@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{64F7E0C4-1EA6-
 		ci\run-test.ps1 = ci\run-test.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.AspNetCore.Tests", "SumoLogic.Logging.AspNetCore.Tests\SumoLogic.Logging.AspNetCore.Tests.csproj", "{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

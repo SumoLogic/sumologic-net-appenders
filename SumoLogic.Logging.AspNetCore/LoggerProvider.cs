@@ -28,13 +28,17 @@ namespace SumoLogic.Logging.AspNetCore
             ReConfig(options.CurrentValue);
         }
 
+        public LoggerProvider(LoggerOptions options)
+        {
+            ReConfig(options);
+        }
+
         private void ReConfig(LoggerOptions options)
         {
             Dispose();
             if (string.IsNullOrWhiteSpace(options.Uri))
             {
-                return;
-                // throw new ArgumentOutOfRangeException(nameof(options.Uri), $"{nameof(options.Uri)} cannot be empty.");
+                throw new ArgumentOutOfRangeException(nameof(options.Uri), $"{nameof(options.Uri)} cannot be empty.");
             }
             DebuggingLogger = options.DebuggingLogger != null ? new LoggerLog(options.DebuggingLogger) : null;
             InitSender(options);
