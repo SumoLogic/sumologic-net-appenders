@@ -98,7 +98,7 @@ namespace SumoLogic.Logging.AspNetCore
         {
             flushBufferTimer?.Dispose();
 
-            flushBufferTask?.FlushAndSend();
+            flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
 
             SumoLogicMessageSender?.Dispose();
         }

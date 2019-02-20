@@ -7,7 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SumoLogic.Logging.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SumoLogic.Logging.AspNetCore.Example
 {
@@ -15,25 +15,28 @@ namespace SumoLogic.Logging.AspNetCore.Example
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
-        }
-
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                 // bind logger configuration from configuration
-                 .ConfigureLogging((context, builder) =>
-                 {
-                     builder.AddSumoLogic(opts =>
-                     {
-                         context.Configuration.GetSection("SumoLogicLoggingOptions").Bind(opts);
-                     });
-                 })
-                // or alternatively, manually set the options
-                //.ConfigureLogging(builder => builder.AddSumoLogic(opts =>
-                //{
-                //    opts.Uri = "https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==";
-                //}))
+            var webHost = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
+                })
+#if USE_BUILDER
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                    logging.AddDebug();
+                    logging.AddSumoLogic("https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==");
+                    logging.AddEventSourceLogger();
+                })
+#endif
                 .UseStartup<Startup>()
                 .Build();
+
+            webHost.Run();
+        }
     }
 }

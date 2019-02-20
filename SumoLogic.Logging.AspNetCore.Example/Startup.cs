@@ -13,12 +13,6 @@ namespace SumoLogic.Logging.AspNetCore.Example
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -27,6 +21,19 @@ namespace SumoLogic.Logging.AspNetCore.Example
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+#if !USE_BUILDER
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole();
+            loggerFactory.AddSumoLogic("https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==");
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseMvc();
+        }
+#else
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -36,5 +43,6 @@ namespace SumoLogic.Logging.AspNetCore.Example
 
             app.UseMvc();
         }
+#endif
     }
 }

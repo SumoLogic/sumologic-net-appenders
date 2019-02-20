@@ -45,7 +45,7 @@ Install-Package SumoLogic.Logging.NLog
   </extensions>
   <targets>
     <target name="sumoLogic" type="SumoLogicTarget"	layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}${exception:format=tostring}${newline}">
-      <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==X</Url>
+      <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==</Url>
       <ConnectionTimeout>30000</ConnectionTimeout>
       <SourceName>ExampleNameNLogTarget</SourceName>
       <SourceCategory>ExampleCategoryNLogTarget</SourceCategory>
