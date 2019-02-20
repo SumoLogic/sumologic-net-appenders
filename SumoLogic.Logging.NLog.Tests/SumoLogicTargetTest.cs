@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.NLog.Tests
     using System.Linq;
     using global::NLog;
     using global::NLog.Config;
-    using global::NLog.Targets;
     using SumoLogic.Logging.Common.Sender;   
     using Xunit;
 

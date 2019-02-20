@@ -32,6 +32,7 @@ namespace SumoLogic.Logging.Serilog.Tests
     using global::Serilog.Core;
     using global::Serilog.Formatting.Display;
     using SumoLogic.Logging.Common.Sender;
+    using SumoLogic.Logging.Common.Tests;
     using SumoLogic.Logging.Serilog.Config;
     using Xunit;
 
@@ -67,9 +68,11 @@ namespace SumoLogic.Logging.Serilog.Tests
             logger.Information("This is a message");
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
-            Assert.Equal($"INFORMATION: This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+                Assert.Equal($"INFORMATION: This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            });
         }
 
         /// <summary>
@@ -87,7 +90,10 @@ namespace SumoLogic.Logging.Serilog.Tests
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
 
-            Assert.True(_messagesHandler.ReceivedRequests.Count > 1);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -106,8 +112,10 @@ namespace SumoLogic.Logging.Serilog.Tests
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(2000));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -125,8 +133,10 @@ namespace SumoLogic.Logging.Serilog.Tests
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            });
 
             for (var i = 6; i <= 10; ++i)
             {
@@ -134,8 +144,10 @@ namespace SumoLogic.Logging.Serilog.Tests
             }
 
             Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(2, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(2, _messagesHandler.ReceivedRequests.Count);
+            });
         }
                 
         /// <summary>

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SumoLogic.Logging.Common.Sender;
+using SumoLogic.Logging.Common.Tests;
 using System;
-using System.Threading;
 using Xunit;
 
 namespace SumoLogic.Logging.AspNetCore.Tests
@@ -61,8 +61,10 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 _logger.LogError(i.ToString());
                 _logger.LogCritical(i.ToString());
             }
-
-            Assert.True(_messagesHandler.ReceivedRequests.Count > 5);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>

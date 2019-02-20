@@ -33,6 +33,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
     using SumoLogic.Logging.Common.Sender;
+    using SumoLogic.Logging.Common.Tests;
     using Xunit;
 
     /// <summary>
@@ -109,8 +110,10 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 this.log4netLog.Info("info " + i);
                 this.log4netLog.Error("error " + i);
             }
-
-            Assert.True(this.messagesHandler.ReceivedRequests.Count > 1);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>

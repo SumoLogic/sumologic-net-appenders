@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using SumoLogic.Logging.Common.Sender;
+using SumoLogic.Logging.Common.Tests;
 using System;
 using System.Threading;
 using Xunit;
@@ -12,7 +13,6 @@ namespace SumoLogic.Logging.AspNetCore.Tests
     [Collection("Logger provider tests")]
     public class LoggerProviderTests: IDisposable
     {
-
         private MockHttpMessageHandler _messagesHandler;
 
         private LoggerProvider _provider;
@@ -30,9 +30,11 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             _logger.LogInformation("This is a message");
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
-            Assert.Equal($"This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+                Assert.Equal($"This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            });
         }
 
         /// <summary>
@@ -49,8 +51,10 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 _logger.LogInformation(i.ToString());
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-
-            Assert.True(_messagesHandler.ReceivedRequests.Count > 1);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -69,8 +73,10 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(2000));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -88,8 +94,10 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            });
 
             for (var i = 6; i <= 10; ++i)
             {
@@ -97,8 +105,10 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             }
 
             Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(2, _messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(2, _messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
