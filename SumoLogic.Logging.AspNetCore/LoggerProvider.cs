@@ -97,7 +97,7 @@ namespace SumoLogic.Logging.AspNetCore
                 message.TrimEnd(Environment.NewLine.ToCharArray()),
                 Environment.NewLine);
 
-            if (LoggerOptions.IsBufferred)
+            if (LoggerOptions.IsBuffered)
             {
                 messagesQueue.Add(line);
             }
@@ -116,7 +116,7 @@ namespace SumoLogic.Logging.AspNetCore
             }
             DebuggingLogger = options.DebuggingLogger != null ? new LoggerLog(options.DebuggingLogger) : null;
             InitSender(options);
-            if (options.IsBufferred)
+            if (options.IsBuffered)
             {
                 InitBuffer(options);
             }

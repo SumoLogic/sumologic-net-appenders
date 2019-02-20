@@ -47,7 +47,7 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 SourceName = "LoggerProviderTestSourceName",
                 SourceCategory = "LoggerProviderTestSourceCategory",
                 SourceHost = "LoggerProviderTestSourceHost",
-                IsBufferred = false,
+                IsBuffered = false,
                 HttpMessageHandler = _messagesHandler,
             });
 

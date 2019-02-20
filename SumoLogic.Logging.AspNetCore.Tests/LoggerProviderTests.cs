@@ -168,7 +168,7 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 SourceName = "LoggerProviderTestSourceName",
                 SourceCategory = "LoggerProviderTestSourceCategory",
                 SourceHost = "LoggerProviderTestSourceHost",
-                IsBufferred = false,
+                IsBuffered = false,
                 HttpMessageHandler = _messagesHandler,
             });
 
@@ -189,7 +189,7 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 MaxFlushInterval = TimeSpan.FromMilliseconds(maxFlushInterval),
                 FlushingAccuracy = TimeSpan.FromMilliseconds(flushingAccuracy),
                 RetryInterval = TimeSpan.FromMilliseconds(retryInterval),
-                IsBufferred = true,
+                IsBuffered = true,
                 HttpMessageHandler = _messagesHandler,
             });
 

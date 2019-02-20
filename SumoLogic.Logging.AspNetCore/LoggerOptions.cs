@@ -74,7 +74,7 @@ namespace SumoLogic.Logging.AspNetCore
         /// <summary>
         /// Gets or sets if the sender using a buffer
         /// </summary>
-        public bool IsBufferred { get; set; } = true;
+        public bool IsBuffered { get; set; } = true;
         
         /// <summary>
         /// Gets or sets the send message retry interval.
