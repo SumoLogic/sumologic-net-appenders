@@ -7,8 +7,7 @@
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <DefineConstants>netstandard</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup>
+        <RestoreFallbackFolders>clear</RestoreFallbackFolders>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
         <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
@@ -23,13 +22,9 @@
         <None Include="..\SumoLogic.Logging.snk">
             <Link>SumoLogic.Logging.snk</Link>
         </None>
-    </ItemGroup>
-    <ItemGroup>
         <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
             <Link>CustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
-    </ItemGroup>
-    <ItemGroup>
         <PackageReference Include="System.Net.Http" Version="4.3.1" />
         <PackageReference Include="System.Net.Requests" Version="4.3.0" />
     </ItemGroup>

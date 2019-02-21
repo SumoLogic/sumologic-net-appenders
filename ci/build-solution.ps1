@@ -14,8 +14,9 @@ param (
 )
 
 $suffix = ""
-if (-not $IsWindows) {
-  $suffix = ".netstandard"
+if ($PSVersionTable["PSVersion"].Major -ge 6 -and (-not $IsWindows)) {
+    Write-Warning "On non-Windows environment, using .NET Standard lib only"
+    $suffix = ".netstandard"
 }
 
 $slnName = "SumoLogic.Logging$suffix.sln"
@@ -40,6 +41,15 @@ if([string]::IsNullOrWhiteSpace($finalVersion)){
 Write-Host "Building solution - [$finalVersion] [$Config]"
 
 Write-Output "======================================"
+Write-Output "Restore PHASE"
+Write-Output "======================================"
+dotnet restore $slnName /p:Version=$finalVersion
+if ($LastExitCode -ne 0) {
+    Write-Error "Failed to restore [$LastExitCode]"
+    exit $LastExitCode
+}
+
+Write-Output "======================================"
 Write-Output "Clean PHASE"
 Write-Output "======================================"
 if(Test-Path ".\SumoLogic.Logging.Nuget$suffix") 
@@ -49,15 +59,6 @@ if(Test-Path ".\SumoLogic.Logging.Nuget$suffix")
 dotnet clean $slnName --configuration $Config
 if ($LastExitCode -ne 0) {
     Write-Error "Failed to clean [$LastExitCode]"
-    exit $LastExitCode
-}
-
-Write-Output "======================================"
-Write-Output "Restore PHASE"
-Write-Output "======================================"
-dotnet restore $slnName /p:Version=$finalVersion
-if ($LastExitCode -ne 0) {
-    Write-Error "Failed to restore [$LastExitCode]"
     exit $LastExitCode
 }
 
@@ -85,3 +86,4 @@ run-pack SumoLogic.Logging.Common
 run-pack SumoLogic.Logging.Log4Net
 run-pack SumoLogic.Logging.NLog
 run-pack SumoLogic.Logging.Serilog
+run-pack SumoLogic.Logging.AspNetCore
