@@ -237,6 +237,7 @@ namespace SumoLogic.Logging.Common.Sender
                 {
                     httpContent.Headers.Add(SUMO_CLIENT_HEADER, ClientName);
                 }
+
                 try
                 {
                     var response = await this.HttpClient.PostAsync(this.Url, httpContent);
@@ -285,6 +286,23 @@ namespace SumoLogic.Logging.Common.Sender
                     }
 
                     throw;
+                }
+                // Its possible for a buffered sender to get disposed while an outstanding timer callback is
+                // executing. netstandard 1.3's System.Threading.Timer task doesn't implement the overload of
+                // Dispose that has a WaitHandle, so we'll just have to suppress these exceptions.
+                catch (TaskCanceledException)
+                {
+                    if (this.Log.IsWarnEnabled)
+                    {
+                        this.Log.Warn("Could not send log to Sumo Logic; a task was canceled");
+                    }
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    if (this.Log.IsWarnEnabled)
+                    {
+                        this.Log.Warn($"Could not send log to Sumo Logic: ${ode.Message}");
+                    }
                 }
             }
         }
