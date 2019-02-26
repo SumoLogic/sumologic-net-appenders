@@ -31,6 +31,7 @@ namespace SumoLogic.Logging.Serilog.Tests
     using global::Serilog;
     using global::Serilog.Core;
     using global::Serilog.Formatting.Display;
+    using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Sender;
     using SumoLogic.Logging.Common.Tests;
     using SumoLogic.Logging.Serilog.Config;
@@ -184,7 +185,7 @@ namespace SumoLogic.Logging.Serilog.Tests
             _messagesHandler = new MockHttpMessageHandler();
 
             sink = new BufferedSumoLogicSink(
-                null,
+                new ConsoleLog(),
                 _messagesHandler,
                 new SumoLogicConnection
                 {

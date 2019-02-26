@@ -74,7 +74,7 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             for (var i = 0; i < numMessages; i++)
             {
                 _logger.LogInformation(i.ToString());
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(200));
             }
             TestHelper.Eventually(() =>
             {
@@ -191,7 +191,8 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 RetryInterval = TimeSpan.FromMilliseconds(retryInterval),
                 IsBuffered = true,
                 HttpMessageHandler = _messagesHandler,
-            });
+                DebuggingLogger = new Microsoft.Extensions.Logging.Console.ConsoleLogger("debugging", (a, b) => true, true)
+        });
 
             _logger = _provider.CreateLogger("OverriddenCategory");
         }

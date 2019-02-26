@@ -188,6 +188,7 @@ namespace SumoLogic.Logging.NLog.Tests
             bufferedSumoLogicTarget.MaxFlushInterval = maxFlushInterval;
             bufferedSumoLogicTarget.FlushingAccuracy = flushingAccuracy;
             bufferedSumoLogicTarget.RetryInterval = retryInterval;
+            bufferedSumoLogicTarget.UseConsoleLog = true;
             if (LogManager.Configuration == null)
             {
                 LogManager.Configuration = new LoggingConfiguration();

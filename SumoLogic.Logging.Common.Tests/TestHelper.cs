@@ -33,7 +33,7 @@ namespace SumoLogic.Logging.Common.Tests
     {
         public delegate void VerifierDelegate();
 
-        public static TimeSpan DEFAULT_TIMEOUT = TimeSpan.FromSeconds(10);
+        public static TimeSpan DEFAULT_TIMEOUT = TimeSpan.FromSeconds(15);
 
         public static TimeSpan DEFAULT_INTERVAL = TimeSpan.FromMilliseconds(100);
 
