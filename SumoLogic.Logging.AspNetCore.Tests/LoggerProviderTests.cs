@@ -74,7 +74,7 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             for (var i = 0; i < numMessages; i++)
             {
                 _logger.LogInformation(i.ToString());
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(200));
             }
             TestHelper.Eventually(() =>
             {
