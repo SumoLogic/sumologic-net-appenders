@@ -1,10 +1,12 @@
 # Sumo Logic .NET Appenders
 
-[![Build status](https://ci.appveyor.com/api/projects/status/fnfnxdoanv5aux3f?svg=true)](https://ci.appveyor.com/project/bin3377/sumologic-net-appenders)<br />
+
+[![Build status](https://ci.appveyor.com/api/projects/status/fnfnxdoanv5aux3f?svg=true)](https://ci.appveyor.com/project/bin3377/sumologic-net-appenders)
 [![SumoLogic.Logging.Common](https://img.shields.io/nuget/v/SumoLogic.Logging.Common.svg?label=SumoLogic.Logging.Common&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.Common/)
-[![SumoLogic.Logging.Log4Net](https://img.shields.io/nuget/v/SumoLogic.Logging.Log4Net.svg?label=SumoLogic.Logging.Log4Net&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.Log4Net/)<br />
+[![SumoLogic.Logging.Log4Net](https://img.shields.io/nuget/v/SumoLogic.Logging.Log4Net.svg?label=SumoLogic.Logging.Log4Net&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.Log4Net/)
 [![SumoLogic.Logging.NLog](https://img.shields.io/nuget/v/SumoLogic.Logging.NLog.svg?label=SumoLogic.Logging.NLog&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.NLog/)
 [![SumoLogic.Logging.Serilog](https://img.shields.io/nuget/v/SumoLogic.Logging.Serilog.svg?label=SumoLogic.Logging.Serilog&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.Serilog/)
+[![SumoLogic.Logging.AspNetCore](https://img.shields.io/nuget/v/SumoLogic.Logging.AspNetCore.svg?label=SumoLogic.Logging.AspNetCore&logo=nuget&logoColor=C0C0C0)](https://www.nuget.org/packages/SumoLogic.Logging.AspNetCore/)
 
 Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources.
 
