@@ -353,7 +353,7 @@ namespace SumoLogic.Logging.Log4Net
         /// <returns></returns>
         public override bool Flush(int millisecondsTimeout)
         {
-            flushBufferTask?.FlushAndSend();
+            flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
             return true;
         }
     }

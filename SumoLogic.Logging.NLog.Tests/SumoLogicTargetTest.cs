@@ -29,7 +29,6 @@ namespace SumoLogic.Logging.NLog.Tests
     using System.Linq;
     using global::NLog;
     using global::NLog.Config;
-    using global::NLog.Targets;
     using SumoLogic.Logging.Common.Sender;   
     using Xunit;
 
@@ -59,25 +58,25 @@ namespace SumoLogic.Logging.NLog.Tests
         /// </summary>
         public SumoLogicTargetTest()
         {
-            this.messagesHandler = new MockHttpMessageHandler();
-            this.sumoLogicTarget = new SumoLogicTarget(null, this.messagesHandler);           
-            this.sumoLogicTarget.Url = "http://www.fakeadress.com";
-            this.sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}${exception:format=tostring}${newline}";
-            this.sumoLogicTarget.SourceName = "SumoLogicTargetTest";
-            this.sumoLogicTarget.SourceCategory = "SumoLogicTargetSourceCategory";
-            this.sumoLogicTarget.SourceHost = "${machinename}";
-            this.sumoLogicTarget.Name = "SumoLogicTargetTest";           
+            messagesHandler = new MockHttpMessageHandler();
+            sumoLogicTarget = new SumoLogicTarget(null, messagesHandler);           
+            sumoLogicTarget.Url = "http://www.fakeadress.com";
+            sumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}${exception:format=tostring}${newline}";
+            sumoLogicTarget.SourceName = "SumoLogicTargetTest";
+            sumoLogicTarget.SourceCategory = "SumoLogicTargetSourceCategory";
+            sumoLogicTarget.SourceHost = "${machinename}";
+            sumoLogicTarget.Name = "SumoLogicTargetTest";           
             if (LogManager.Configuration == null)
             {
                 LogManager.Configuration = new LoggingConfiguration();
             }
            
-            LogManager.Configuration.AddTarget(this.sumoLogicTarget.SourceName, this.sumoLogicTarget);
-            LoggingRule rule = new LoggingRule("SumoLogicTargetTest", LogLevel.Debug, this.sumoLogicTarget);           
+            LogManager.Configuration.AddTarget(sumoLogicTarget.SourceName, sumoLogicTarget);
+            LoggingRule rule = new LoggingRule("SumoLogicTargetTest", LogLevel.Debug, sumoLogicTarget);           
             LogManager.Configuration.LoggingRules.Add(rule);
             LogManager.Configuration.Reload();
             LogManager.ReconfigExistingLoggers();
-            this.logger = LogManager.GetLogger("SumoLogicTargetTest");         
+            logger = LogManager.GetLogger("SumoLogicTargetTest");         
          }
        
         /// <summary>
@@ -86,9 +85,9 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void SingleMessageTest()
         {
-            this.logger.Info("This is a message");           
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("INFO: This is a message" + Environment.NewLine, this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            logger.Info("This is a message");           
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            Assert.Equal("INFO: This is a message" + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -100,14 +99,14 @@ namespace SumoLogic.Logging.NLog.Tests
             int numMessages = 50;
             for (int i = 0; i < numMessages / 5; i++)
             {               
-                this.logger.Debug(i);
-                this.logger.Info(i);
-                this.logger.Warn(i);
-                this.logger.Error(i);
-                this.logger.Fatal(i);
+                logger.Debug(i);
+                logger.Info(i);
+                logger.Warn(i);
+                logger.Error(i);
+                logger.Fatal(i);
             }
 
-            Assert.True(this.messagesHandler.ReceivedRequests.Count > 5);
+            Assert.True(messagesHandler.ReceivedRequests.Count > 5);
         }        
 
         /// <summary>
@@ -116,8 +115,8 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void NoLogOnTheLevelTraceTest()
         {
-            this.logger.Trace("This is message");
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
+            logger.Trace("This is message");
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
         }
 
         /// <summary>
@@ -126,16 +125,16 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void CheckedRequestContentTest()
         {
-            this.logger.Debug("This is first message");
-            this.logger.Info("This is second message");
-            this.logger.Warn("This is third message");
-            this.logger.Error("This is fourth message");
-            this.logger.Fatal("This is fifth message");
-            Assert.Equal("FATAL: This is fifth message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
-            Assert.Equal("ERROR: This is fourth message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
-            Assert.Equal("WARN: This is third message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
-            Assert.Equal("INFO: This is second message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
-            Assert.Equal("DEBUG: This is first message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+            logger.Debug("This is first message");
+            logger.Info("This is second message");
+            logger.Warn("This is third message");
+            logger.Error("This is fourth message");
+            logger.Fatal("This is fifth message");
+            Assert.Equal("FATAL: This is fifth message" + Environment.NewLine, messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
+            Assert.Equal("ERROR: This is fourth message" + Environment.NewLine, messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
+            Assert.Equal("WARN: This is third message" + Environment.NewLine, messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
+            Assert.Equal("INFO: This is second message" + Environment.NewLine, messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
+            Assert.Equal("DEBUG: This is first message" + Environment.NewLine, messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -144,9 +143,9 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void EvaluateSourceConfigurationTest()
         {
-            this.logger.Debug("This is a test message");
-            Assert.Equal("DEBUG: This is a test message" + Environment.NewLine, this.messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
-            Assert.Equal(Environment.MachineName, this.messagesHandler.ReceivedRequests[0].Content.Headers.GetValues("X-Sumo-Host").First<string>());
+            logger.Debug("This is a test message");
+            Assert.Equal("DEBUG: This is a test message" + Environment.NewLine, messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+            Assert.Equal(Environment.MachineName, messagesHandler.ReceivedRequests[0].Content.Headers.GetValues("X-Sumo-Host").First<string>());
         }
         
         /// <summary>
@@ -154,7 +153,7 @@ namespace SumoLogic.Logging.NLog.Tests
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -166,8 +165,8 @@ namespace SumoLogic.Logging.NLog.Tests
         {
             if (disposing)
             {
-                this.sumoLogicTarget.Dispose();
-                this.messagesHandler.Dispose();
+                sumoLogicTarget.Dispose();
+                messagesHandler.Dispose();
             }
         }
     }

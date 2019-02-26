@@ -24,15 +24,13 @@
  * under the License.
  */
 
-using System.Threading.Tasks;
-
 namespace SumoLogic.Logging.Common.Tests.Aggregation
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Queue;
-    using SumoLogic.Logging.Common.Tests.Queue;
     using Xunit;
 
     /// <summary>

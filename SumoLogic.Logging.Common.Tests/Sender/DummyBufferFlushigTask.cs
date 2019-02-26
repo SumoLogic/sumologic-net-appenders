@@ -46,7 +46,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         public DummyBufferFlushingTask(BufferWithEviction<string> queue)
             : base(queue, null)
         {
-            this.SentOut = new List<List<string>>();
+            SentOut = new List<List<string>>();
         }
 
         /// <summary>
@@ -59,9 +59,9 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         public DummyBufferFlushingTask(BufferWithEviction<string> queue, TimeSpan maxFlushInterval, long messagesPerRequest, string name)
             : this(queue)
         {
-            this.MaxFlushInterval = maxFlushInterval;
-            this.MessagesPerRequest = messagesPerRequest;
-            this.MessagesName = name;
+            MaxFlushInterval = maxFlushInterval;
+            MessagesPerRequest = messagesPerRequest;
+            MessagesName = name;
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         [Obsolete("use SendOut(IList<string> body, string name, string category, string host)")]
         protected override Task SendOut(IList<string> body, string name)
         {
-            return Task.Run(() => this.SentOut.Add(new List<string>(body)));
+            return Task.Run(() => SentOut.Add(new List<string>(body)));
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// <param name="host">Message host.</param>
         protected override Task SendOut(IList<string> body, string name, string category, string host)
         {
-            return Task.Run(() => this.SentOut.Add(new List<string>(body)));
+            return Task.Run(() => SentOut.Add(new List<string>(body)));
         }
     }
 }

@@ -2,27 +2,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.AspNetCore", "SumoLogic.Logging.AspNetCore\SumoLogic.Logging.AspNetCore.csproj", "{0117EFFE-AAC4-4F50-9F69-AC9169FDF5D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.AspNetCore.Example", "SumoLogic.Logging.AspNetCore.Example\SumoLogic.Logging.AspNetCore.Example.csproj", "{F484BA69-B000-41F7-A1C5-97F664CA068F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SumoLogic.Logging.AspNetCore.Tests", "SumoLogic.Logging.AspNetCore.Tests\SumoLogic.Logging.AspNetCore.Tests.csproj", "{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Common", "SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj", "{E182AA49-AF0B-48A9-8C65-E0241DA8C623}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net", "SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.csproj", "{75BD9161-A607-4C13-8F3A-6B4E5A04460D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog", "SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj", "{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.Tests", "SumoLogic.Logging.NLog.Tests\SumoLogic.Logging.NLog.Tests.csproj", "{A71BB234-A8E5-440F-BCCD-E7B50A696739}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.Tests", "SumoLogic.Logging.Log4Net.Tests\SumoLogic.Logging.Log4Net.Tests.csproj", "{590FA175-2ED9-486D-B489-B0D054BFE68F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Common.Tests", "SumoLogic.Logging.Common.Tests\SumoLogic.Logging.Common.Tests.csproj", "{538DA881-D377-41DA-B360-CBFD0D8113C1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net", "SumoLogic.Logging.Log4Net\SumoLogic.Logging.Log4Net.csproj", "{75BD9161-A607-4C13-8F3A-6B4E5A04460D}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.Example", "SumoLogic.Logging.Log4Net.Example\SumoLogic.Logging.Log4Net.Example.csproj", "{B7D93D79-E187-4FB3-9FA5-9B3156DBC51B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Log4Net.Tests", "SumoLogic.Logging.Log4Net.Tests\SumoLogic.Logging.Log4Net.Tests.csproj", "{590FA175-2ED9-486D-B489-B0D054BFE68F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog", "SumoLogic.Logging.NLog\SumoLogic.Logging.NLog.csproj", "{DD204B9E-3BB7-499F-8FF2-9D2B4263BF07}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.Example", "SumoLogic.Logging.NLog.Example\SumoLogic.Logging.NLog.Example.csproj", "{F0962273-9325-4359-855C-B290C1EECC8E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.NLog.Tests", "SumoLogic.Logging.NLog.Tests\SumoLogic.Logging.NLog.Tests.csproj", "{A71BB234-A8E5-440F-BCCD-E7B50A696739}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog", "SumoLogic.Logging.Serilog\SumoLogic.Logging.Serilog.csproj", "{3DFB934E-92F3-4222-A2CD-6B1EF1C07511}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Tests", "SumoLogic.Logging.Serilog.Tests\SumoLogic.Logging.Serilog.Tests.csproj", "{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Example", "SumoLogic.Logging.Serilog.Example\SumoLogic.Logging.Serilog.Example.csproj", "{A835A83E-A5B7-4483-8C42-9524506DF1DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SumoLogic.Logging.Serilog.Tests", "SumoLogic.Logging.Serilog.Tests\SumoLogic.Logging.Serilog.Tests.csproj", "{ABEA1737-FB22-4E90-AE2E-1301C7710DEF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{865F3748-1B53-471F-9AA3-F4C388424068}"
 	ProjectSection(SolutionItems) = preProject
@@ -99,6 +105,18 @@ Global
 		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A835A83E-A5B7-4483-8C42-9524506DF1DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0117EFFE-AAC4-4F50-9F69-AC9169FDF5D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0117EFFE-AAC4-4F50-9F69-AC9169FDF5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0117EFFE-AAC4-4F50-9F69-AC9169FDF5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0117EFFE-AAC4-4F50-9F69-AC9169FDF5D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F484BA69-B000-41F7-A1C5-97F664CA068F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CAE8062-CDF1-4A0B-9F0B-B90337EA931F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

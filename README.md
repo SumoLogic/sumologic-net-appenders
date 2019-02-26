@@ -11,6 +11,7 @@ Appenders for .NET logging frameworks which send data to Sumo Logic HTTP sources
 ## Prerequisites
 
 - .NET 4.5 or later or .NET Standard 1.5
+- ASP.NET Core 2.0 or later for ASP.NET Core Logging provider 
 - A Sumo Logic Account (trial can be started [here](https://www.sumologic.com/))
 
 ## Appenders
@@ -20,6 +21,7 @@ Appenders are provided for the following .NET logging frameworks
 - NLog
 - Log4Net
 - Serilog
+- ASP.NET Core Logging Provider (Beta)
 
 All appenders have two implementations: a buffering and a non-buffering version.
 The non-buffering implementations will send each log message to Sumo Logic in a distinct HTTP request. The buffering
@@ -45,7 +47,7 @@ Install-Package SumoLogic.Logging.NLog
   </extensions>
   <targets>
     <target name="sumoLogic" type="SumoLogicTarget"	layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff} ${level}, ${message}${exception:format=tostring}${newline}">
-      <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==X</Url>
+      <Url>https://collectors.us2.sumologic.com/receiver/v1/http/==your_endpoint_here==</Url>
       <ConnectionTimeout>30000</ConnectionTimeout>
       <SourceName>ExampleNameNLogTarget</SourceName>
       <SourceCategory>ExampleCategoryNLogTarget</SourceCategory>
@@ -205,6 +207,16 @@ log.Information("Hello world!");
 ```
 
 More about Serilog sink configuration: [SumoLogic.Logging.Serilog](docs/sumologic.logging.serilog.md)
+
+### ASP.NET Core Logging Provider
+
+To install the logging provider, use the following steps:
+
+```ps
+Install-Package SumoLogic.Logging.AspNetCore
+```
+
+More about ASP.NET Core logging provider configuration: [SumoLogic.Logging.AspNetCore](docs/sumologic.logging.aspnetcore.md)
 
 ## TLS 1.2 Requirement
 

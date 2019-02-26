@@ -55,10 +55,10 @@ namespace SumoLogic.Logging.Common.Tests.Http
         /// </summary>
         public SumoLogicMessageSenderTest()
         {
-            this.messagesHandler = new MockHttpMessageHandler();
-            this.sumoLogicMessageSender = new SumoLogicMessageSender(this.messagesHandler, null, "sumo-test");
-            this.sumoLogicMessageSender.Url = new Uri("http://www.fakeadress.com");
-            this.sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(30);
+            messagesHandler = new MockHttpMessageHandler();
+            sumoLogicMessageSender = new SumoLogicMessageSender(messagesHandler, null, "sumo-test");
+            sumoLogicMessageSender.Url = new Uri("http://www.fakeadress.com");
+            sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(30);
         }
 
         /// <summary>
@@ -68,9 +68,9 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void HttpClientCallWith200ResponseTest()
         {
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            this.sumoLogicMessageSender.Send("body", "name", "category", "host");
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
         }      
 
         /// <summary>
@@ -80,11 +80,11 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void RequestHeaderTest()
         {
-           this.sumoLogicMessageSender.Send("body", "name", "category", "host");
-            Assert.Equal("name", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
-            Assert.Equal("category", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Category").First<string>());
-            Assert.Equal("host", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Host").First<string>());
-            Assert.Equal("sumo-test", this.messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Client").First<string>());
+           sumoLogicMessageSender.Send("body", "name", "category", "host");
+            Assert.Equal("name", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
+            Assert.Equal("category", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Category").First<string>());
+            Assert.Equal("host", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Host").First<string>());
+            Assert.Equal("sumo-test", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Client").First<string>());
         }
 
         /// <summary>
@@ -95,8 +95,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public void RequestContentTest()
         {
             string body = "ContentBody";
-            this.sumoLogicMessageSender.Send(body, "name", "category", "host");
-            var contentInString = this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result;
+            sumoLogicMessageSender.Send(body, "name", "category", "host");
+            var contentInString = messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result;
             Assert.Equal(body, contentInString);
         }
 
@@ -105,7 +105,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -116,10 +116,10 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void HttpResponseCodeTest()
         {
-            Assert.True(this.sumoLogicMessageSender.CanSend);
-            Assert.True(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("body", "name", "category", "host");
-            Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
+            Assert.True(sumoLogicMessageSender.CanSend);
+            Assert.True(sumoLogicMessageSender.CanTrySend);
+            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            Assert.Equal(HttpStatusCode.OK, messagesHandler.CurrentResponse.StatusCode);
         }
 
         /// <summary>
@@ -129,11 +129,11 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void HttpResponseCodeWhenUrlNullTest()
         {
-            this.sumoLogicMessageSender.Url = null;
-            Assert.False(this.sumoLogicMessageSender.CanSend);
-            Assert.False(this.sumoLogicMessageSender.CanTrySend);
-            this.sumoLogicMessageSender.Send("body", "name", "category", "host");
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);          
+            sumoLogicMessageSender.Url = null;
+            Assert.False(sumoLogicMessageSender.CanSend);
+            Assert.False(sumoLogicMessageSender.CanTrySend);
+            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);          
         }
 
         /// <summary>
@@ -145,18 +145,18 @@ namespace SumoLogic.Logging.Common.Tests.Http
         {
             int requestBeforeSuccess = 0;
 
-            this.messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
-            this.sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(1);
+            messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
+            sumoLogicMessageSender.RetryInterval = TimeSpan.FromSeconds(1);
             Task changeResponseTask = Task.Factory.StartNew(() =>
             {
-                Thread.Sleep(this.sumoLogicMessageSender.RetryInterval + TimeSpan.FromSeconds(2));
-                requestBeforeSuccess = this.messagesHandler.ReceivedRequests.Count;
-                this.messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
+                Thread.Sleep(sumoLogicMessageSender.RetryInterval + TimeSpan.FromSeconds(2));
+                requestBeforeSuccess = messagesHandler.ReceivedRequests.Count;
+                messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
             });
-            this.sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host");
             changeResponseTask.GetAwaiter().GetResult();
-            Assert.True(requestBeforeSuccess < this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal(HttpStatusCode.OK, this.messagesHandler.CurrentResponse.StatusCode);
+            Assert.True(requestBeforeSuccess < messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(HttpStatusCode.OK, messagesHandler.CurrentResponse.StatusCode);
         }       
                 
         /// <summary>
@@ -167,8 +167,8 @@ namespace SumoLogic.Logging.Common.Tests.Http
         {
             if (disposing)
             {
-                this.messagesHandler.Dispose();
-                this.sumoLogicMessageSender.Dispose();
+                messagesHandler.Dispose();
+                sumoLogicMessageSender.Dispose();
             }
         }       
     }

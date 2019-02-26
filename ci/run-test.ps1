@@ -33,3 +33,4 @@ test-assembly SumoLogic.Logging.Common.Tests
 test-assembly SumoLogic.Logging.NLog.Tests
 test-assembly SumoLogic.Logging.Log4Net.Tests
 test-assembly SumoLogic.Logging.Serilog.Tests
+test-assembly SumoLogic.Logging.AspNetCore.Tests

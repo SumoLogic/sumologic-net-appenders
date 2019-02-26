@@ -28,7 +28,6 @@ namespace SumoLogic.Logging.Common.Tests.Queue
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
-    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Queue;
     using Xunit;
 
@@ -128,23 +127,34 @@ namespace SumoLogic.Logging.Common.Tests.Queue
             // new messages while we drain
             var token = new CancellationTokenSource();
             var writerThread = StartBackgroundWriter(queue, 1, 7000, token);
-            Thread.Sleep(100);
-            var drainCollection = new List<string>();
-            queue.DrainTo(drainCollection);
-
-            // only the original 5000 messages should be drained, none
-            // of the newly-written messages
-            Assert.Equal(5000, drainCollection.Count);
-
-            // background writer should finish writing
-            Thread.Sleep(1000);
-            drainCollection.Clear();
-            queue.DrainTo(drainCollection);
-            Assert.Equal(7000, drainCollection.Count);
-
-            if (writerThread.IsAlive)
+            try
             {
-                token.Cancel();
+                Thread.Sleep(100);
+                var drainCollection = new List<string>();
+                queue.DrainTo(drainCollection);
+
+                // only the original 5000 messages should be drained, none
+                // of the newly-written messages
+                TestHelper.Eventually(() =>
+                {
+                    Assert.Equal(5000, drainCollection.Count);
+                });
+
+                // background writer should finish writing
+                Thread.Sleep(1000);
+                drainCollection.Clear();
+                queue.DrainTo(drainCollection);
+                TestHelper.Eventually(() =>
+                {
+                    Assert.Equal(7000, drainCollection.Count);
+                });
+            }
+            finally
+            {
+                if (writerThread.IsAlive)
+                {
+                    token.Cancel();
+                }
             }
         }
 

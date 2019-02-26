@@ -54,8 +54,8 @@ namespace SumoLogic.Logging.Common.Sender
         /// <param name="currentResponse">The fake response object.</param>
         public MockHttpMessageHandler(HttpResponseMessage currentResponse)
         {
-            this.ReceivedRequests = new List<HttpRequestMessage>();
-            this.CurrentResponse = currentResponse ?? new HttpResponseMessage(HttpStatusCode.OK);
+            ReceivedRequests = new List<HttpRequestMessage>();
+            CurrentResponse = currentResponse ?? new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         public HttpRequestMessage LastReceivedRequest
         {
-            get { return this.ReceivedRequests.LastOrDefault(); }
+            get { return ReceivedRequests.LastOrDefault(); }
         }
 
         /// <summary>
@@ -94,12 +94,12 @@ namespace SumoLogic.Logging.Common.Sender
 
             if (disposing)
             {
-                foreach (var request in this.ReceivedRequests)
+                foreach (var request in ReceivedRequests)
                 {
                     request.Dispose();
                 }
 
-                this.ReceivedRequests.Clear();
+                ReceivedRequests.Clear();
             }
         }
 
@@ -117,8 +117,8 @@ namespace SumoLogic.Logging.Common.Sender
             }
 
             var responseTask = new TaskCompletionSource<HttpResponseMessage>();
-            responseTask.SetResult(this.CurrentResponse);
-            this.ReceivedRequests.Add(CloneRequest(request));
+            responseTask.SetResult(CurrentResponse);
+            ReceivedRequests.Add(CloneRequest(request));
             return responseTask.Task;
         }
 

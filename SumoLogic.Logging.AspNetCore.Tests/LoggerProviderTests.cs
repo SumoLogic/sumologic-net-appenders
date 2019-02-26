@@ -23,39 +23,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-namespace SumoLogic.Logging.Serilog.Tests
-{
-    using System;
-    using System.Globalization;
-    using System.Threading;
-    using global::Serilog;
-    using global::Serilog.Core;
-    using global::Serilog.Formatting.Display;
-    using SumoLogic.Logging.Common.Sender;
-    using SumoLogic.Logging.Common.Tests;
-    using SumoLogic.Logging.Serilog.Config;
-    using Xunit;
+using Microsoft.Extensions.Logging;
+using SumoLogic.Logging.Common.Sender;
+using SumoLogic.Logging.Common.Tests;
+using System;
+using System.Threading;
+using Xunit;
 
+namespace SumoLogic.Logging.AspNetCore.Tests
+{
     /// <summary>
-    /// Buffered Sumo Logic target test implementation.
+    /// Sumo Logic Logger Provider test implementation.
     /// </summary>
-    [Collection("Serilog tests")]
-    public class BufferedSumoLogicSinkTests : IDisposable
+    [Collection("Logger provider tests")]
+    public class LoggerProviderTests: IDisposable
     {
-        /// <summary>
-        /// The HTTP messages handler mock.
-        /// </summary>
         private MockHttpMessageHandler _messagesHandler;
 
-        /// <summary>
-        /// The buffered SumoLogic sink.
-        /// </summary>
-        private BufferedSumoLogicSink sink;
+        private LoggerProvider _provider;
 
-        /// <summary>
-        /// The Serilog logger.
-        /// </summary>
-        private Logger logger;
+        private ILogger _logger;
 
         /// <summary>
         /// Test logging of a single message.
@@ -63,15 +50,15 @@ namespace SumoLogic.Logging.Serilog.Tests
         [Fact]
         public void TestSingleMessage()
         {
-            SetUpLogger(1, 10000, 10);
+            SetupLogger(1, 10000, 10);
 
-            logger.Information("This is a message");
+            _logger.LogInformation("This is a message");
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
             TestHelper.Eventually(() =>
             {
                 Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
-                Assert.Equal($"INFORMATION: This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+                Assert.Equal($"This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
             });
         }
 
@@ -81,15 +68,14 @@ namespace SumoLogic.Logging.Serilog.Tests
         [Fact]
         public void TestMultipleMessages()
         {
-            SetUpLogger(1, 10000, 10);
+            SetupLogger(1, 10000, 10);
 
             var numMessages = 20;
             for (var i = 0; i < numMessages; i++)
             {
-                logger.Information(i.ToString());
+                _logger.LogInformation(i.ToString());
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-
             TestHelper.Eventually(() =>
             {
                 Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
@@ -103,12 +89,12 @@ namespace SumoLogic.Logging.Serilog.Tests
         public void TestBatchingBySize()
         {
             // Huge time window, ensure all messages get batched into one
-            SetUpLogger(100, 10000, 10);
+            SetupLogger(100, 10000, 10);
 
             var numMessages = 100;
             for (var i = 0; i < numMessages; i++)
             {
-                logger.Information(i.ToString());
+                _logger.LogInformation(i.ToString());
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
@@ -125,11 +111,11 @@ namespace SumoLogic.Logging.Serilog.Tests
         public void TestBatchingByWindow()
         {
             // Small time window, ensure all messages get batched by time
-            SetUpLogger(10000, 500, 10);
+            SetupLogger(10000, 500, 10);
 
             for (var i = 1; i <= 5; ++i)
             {
-                logger.Information(i.ToString());
+                _logger.LogInformation(i.ToString());
             }
 
             Assert.Equal(0, _messagesHandler.ReceivedRequests.Count);
@@ -140,7 +126,7 @@ namespace SumoLogic.Logging.Serilog.Tests
 
             for (var i = 6; i <= 10; ++i)
             {
-                logger.Information(i.ToString());
+                _logger.LogInformation(i.ToString());
             }
 
             Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
@@ -149,14 +135,14 @@ namespace SumoLogic.Logging.Serilog.Tests
                 Assert.Equal(2, _messagesHandler.ReceivedRequests.Count);
             });
         }
-                
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);          
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -167,46 +153,47 @@ namespace SumoLogic.Logging.Serilog.Tests
         {
             if (disposing)
             {
-                sink.Dispose();      
+                _provider.Dispose();
                 _messagesHandler.Dispose();
             }
         }
 
-        /// <summary>
-        /// Setups the logger with the <see cref="SumoLogicSink"/> based on the given settings.
-        /// </summary>
-        /// <param name="messagesPerRequest">The maximum messages per request.</param>
-        /// <param name="maxFlushInterval">The maximum flush interval, in milliseconds.</param>
-        /// <param name="flushingAccuracy">The flushing accuracy, in milliseconds.</param>
-        /// <param name="retryInterval">The retry interval, in milliseconds.</param>
-        private void SetUpLogger(long messagesPerRequest, long maxFlushInterval, long flushingAccuracy, long retryInterval = 10000)
+        private void SetupUnbufferedLogger()
         {
             _messagesHandler = new MockHttpMessageHandler();
 
-            sink = new BufferedSumoLogicSink(
-                null,
-                _messagesHandler,
-                new SumoLogicConnection
-                {
-                    Uri = new Uri("http://www.fakeadress.com"),
-                    ClientName = "BufferedSumoLogicSinkTest",
-                    MessagesPerRequest = messagesPerRequest,
-                    MaxFlushInterval = TimeSpan.FromMilliseconds(maxFlushInterval),
-                    FlushingAccuracy = TimeSpan.FromMilliseconds(flushingAccuracy),
-                    RetryInterval = TimeSpan.FromMilliseconds(retryInterval),
-                },
-                new SumoLogicSource
-                {
-                    SourceName = "BufferedSumoLogicSinkTest",
-                    SourceCategory = "BufferedSumoLogicSinkSourceCategory",
-                    SourceHost = "BufferedSumoLogicSinkSourceHost",
-                },
-                new MessageTemplateTextFormatter("{Level:u}: {Message}", CultureInfo.InvariantCulture));
+            _provider = new LoggerProvider(new LoggerOptions()
+            {
+                Uri = "http://www.fakeadress.com",
+                SourceName = "LoggerProviderTestSourceName",
+                SourceCategory = "LoggerProviderTestSourceCategory",
+                SourceHost = "LoggerProviderTestSourceHost",
+                IsBuffered = false,
+                HttpMessageHandler = _messagesHandler,
+            });
 
-            logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.Sink(sink)
-                .CreateLogger();
+            _logger = _provider.CreateLogger("OverriddenCategory");
+        }
+
+        private void SetupLogger(long messagesPerRequest, long maxFlushInterval, long flushingAccuracy, long retryInterval = 10000)
+        {
+            _messagesHandler = new MockHttpMessageHandler();
+
+            _provider = new LoggerProvider(new LoggerOptions()
+            {
+                Uri = "http://www.fakeadress.com",
+                SourceName = "LoggerProviderTestSourceName",
+                SourceCategory = "LoggerProviderTestSourceCategory",
+                SourceHost = "LoggerProviderTestSourceHost",
+                MessagesPerRequest = messagesPerRequest,
+                MaxFlushInterval = TimeSpan.FromMilliseconds(maxFlushInterval),
+                FlushingAccuracy = TimeSpan.FromMilliseconds(flushingAccuracy),
+                RetryInterval = TimeSpan.FromMilliseconds(retryInterval),
+                IsBuffered = true,
+                HttpMessageHandler = _messagesHandler,
+            });
+
+            _logger = _provider.CreateLogger("OverriddenCategory");
         }
     }
 }

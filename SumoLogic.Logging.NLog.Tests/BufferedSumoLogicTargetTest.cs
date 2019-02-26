@@ -29,7 +29,8 @@ namespace SumoLogic.Logging.NLog.Tests
     using System.Threading;
     using global::NLog;
     using global::NLog.Config;
-    using SumoLogic.Logging.Common.Sender;   
+    using SumoLogic.Logging.Common.Sender;
+    using SumoLogic.Logging.Common.Tests;
     using Xunit;
 
     /// <summary>
@@ -59,14 +60,16 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void TestSingleMessage()
         {
-            this.SetUpLogger(1, 10000, 10);
+            SetUpLogger(1, 10000, 10);
 
-            this.logger.Info("This is a message");
+            logger.Info("This is a message");
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("INFO: This is a message" + Environment.NewLine, this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+                Assert.Equal("INFO: This is a message" + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            });
         }
 
         /// <summary>
@@ -75,16 +78,18 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void TestMultipleMessages()
         {
-            this.SetUpLogger(1, 10000, 10);
+            SetUpLogger(1, 10000, 10);
 
             int numMessages = 20;
             for (int i = 0; i < numMessages; i++)
             {
-                this.logger.Info(i);
+                logger.Info(i);
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-
-            Assert.True(this.messagesHandler.ReceivedRequests.Count > 1);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -94,17 +99,19 @@ namespace SumoLogic.Logging.NLog.Tests
         public void TestBatchingBySize()
         {
             // Huge time window, ensure all messages get batched into one
-            this.SetUpLogger(100, 10000, 10);
+            SetUpLogger(100, 10000, 10);
 
             int numMessages = 100;
             for (int i = 0; i < numMessages; i++)
             {
-                this.logger.Info(i);
+                logger.Info(i);
             }
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(2000));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -114,25 +121,29 @@ namespace SumoLogic.Logging.NLog.Tests
         public void TestBatchingByWindow()
         {
             // Small time window, ensure all messages get batched by time
-            this.SetUpLogger(10000, 500, 10);
+            SetUpLogger(10000, 500, 10);
 
             for (int i = 1; i <= 5; ++i)
             {
-                this.logger.Info(i);
+                logger.Info(i);
             }
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            });
 
             for (int i = 6; i <= 10; ++i)
             {
-                this.logger.Info(i);
+                logger.Info(i);
             }
 
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(2, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(2, messagesHandler.ReceivedRequests.Count);
+            });
         }
                 
         /// <summary>
@@ -140,7 +151,7 @@ namespace SumoLogic.Logging.NLog.Tests
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);          
         }
 
@@ -152,8 +163,8 @@ namespace SumoLogic.Logging.NLog.Tests
         {
             if (disposing)
             {
-                this.bufferedSumoLogicTarget.Dispose();      
-                this.messagesHandler.Dispose();
+                bufferedSumoLogicTarget.Dispose();      
+                messagesHandler.Dispose();
             }
         }
 
@@ -166,28 +177,28 @@ namespace SumoLogic.Logging.NLog.Tests
         /// <param name="retryInterval">The retry interval, in milliseconds.</param>
         private void SetUpLogger(long messagesPerRequest, long maxFlushInterval, long flushingAccuracy, long retryInterval = 10000)
         {
-            this.messagesHandler = new MockHttpMessageHandler();
-            this.bufferedSumoLogicTarget = new BufferedSumoLogicTarget(null, this.messagesHandler);
-            this.bufferedSumoLogicTarget.Url = "http://www.fakeadress.com";
-            this.bufferedSumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}${exception:format=tostring}${newline}";
-            this.bufferedSumoLogicTarget.SourceName = "BufferedSumoLogicTargetTest";
-            this.bufferedSumoLogicTarget.SourceCategory = "BufferedSumoLogicTargetSourceCategory";
-            this.bufferedSumoLogicTarget.SourceHost = "BufferedSumoLogicTargetSourceHost";
-            this.bufferedSumoLogicTarget.MessagesPerRequest = messagesPerRequest;
-            this.bufferedSumoLogicTarget.MaxFlushInterval = maxFlushInterval;
-            this.bufferedSumoLogicTarget.FlushingAccuracy = flushingAccuracy;
-            this.bufferedSumoLogicTarget.RetryInterval = retryInterval;
+            messagesHandler = new MockHttpMessageHandler();
+            bufferedSumoLogicTarget = new BufferedSumoLogicTarget(null, messagesHandler);
+            bufferedSumoLogicTarget.Url = "http://www.fakeadress.com";
+            bufferedSumoLogicTarget.Layout = @"${level:upperCase=true}: ${message}${exception:format=tostring}${newline}";
+            bufferedSumoLogicTarget.SourceName = "BufferedSumoLogicTargetTest";
+            bufferedSumoLogicTarget.SourceCategory = "BufferedSumoLogicTargetSourceCategory";
+            bufferedSumoLogicTarget.SourceHost = "BufferedSumoLogicTargetSourceHost";
+            bufferedSumoLogicTarget.MessagesPerRequest = messagesPerRequest;
+            bufferedSumoLogicTarget.MaxFlushInterval = maxFlushInterval;
+            bufferedSumoLogicTarget.FlushingAccuracy = flushingAccuracy;
+            bufferedSumoLogicTarget.RetryInterval = retryInterval;
             if (LogManager.Configuration == null)
             {
                 LogManager.Configuration = new LoggingConfiguration();
             }
 
-            LogManager.Configuration.AddTarget(this.bufferedSumoLogicTarget.SourceName, this.bufferedSumoLogicTarget);
-            LoggingRule rule = new LoggingRule("BufferedSumoLogicTargetTest", LogLevel.Info, this.bufferedSumoLogicTarget);
+            LogManager.Configuration.AddTarget(bufferedSumoLogicTarget.SourceName, bufferedSumoLogicTarget);
+            LoggingRule rule = new LoggingRule("BufferedSumoLogicTargetTest", LogLevel.Info, bufferedSumoLogicTarget);
             LogManager.Configuration.LoggingRules.Add(rule);
             LogManager.Configuration.Reload();
             LogManager.ReconfigExistingLoggers();
-            this.logger = LogManager.GetLogger("BufferedSumoLogicTargetTest");  
+            logger = LogManager.GetLogger("BufferedSumoLogicTargetTest");  
         }
     }
 }

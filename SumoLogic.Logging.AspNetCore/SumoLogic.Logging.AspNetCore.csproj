@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <PackageId>SumoLogic.Logging.NLog</PackageId>
-        <Description>NLog appender which sends logs to the Sumo Logic machine data platform.</Description>
+        <PackageId>SumoLogic.Logging.AspNetCore</PackageId>
+        <Description>ASP.NET core logger providers uploading to Sumo Logic.</Description>
         <Authors>Sumo Logic</Authors>
-        <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
+        <Copyright>Copyright © 2019 Sumo Logic Inc. - All Rights Reserved</Copyright>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
-        <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <DefineConstants>netstandard</DefineConstants>
-        <RestoreFallbackFolders>clear</RestoreFallbackFolders>
+        <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
         <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
         <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
-        <PackageTags>Sumo Logic SumoLogic Logging Log4Net C# F# VB</PackageTags>
+        <PackageTags>Sumo Logic SumoLogic Logging ASP.NET Core C# F# VB</PackageTags>
         <PackageReleaseNotes></PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
         <SignAssembly>true</SignAssembly>
@@ -25,8 +24,7 @@
         <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
             <Link>CustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
-        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.netstandard.csproj" />
-        <PackageReference Include="NLog" Version="4.5.11" />
-        <PackageReference Include="System.Net.Http" Version="4.3.1" />
+        <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     </ItemGroup>
 </Project>
