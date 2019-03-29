@@ -73,6 +73,7 @@ namespace SumoLogic.Logging.NLog
         public BufferedSumoLogicTarget(ILog log, HttpMessageHandler httpMessageHandler)
         {
             this.SourceName = "Nlog-SumoObject-Buffered";
+            this.OptimizeBufferReuse = true;
             this.ConnectionTimeout = 60000;
             this.RetryInterval = 10000;
             this.MessagesPerRequest = 100;
@@ -81,7 +82,7 @@ namespace SumoLogic.Logging.NLog
             this.MaxQueueSizeBytes = 1000000;
             this.LogLog = new InternalLoggerLog(GetType().Name + ": ", log);
             this.HttpMessageHandler = httpMessageHandler;
-            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}|${message}${exception:format=tostring}${newline}";
         }
 
         /// <summary>
@@ -335,7 +336,7 @@ namespace SumoLogic.Logging.NLog
                 return;
             }
 
-            var body = this.Layout?.Render(logEvent) ?? string.Empty;
+            var body = this.RenderLogEvent(this.Layout, logEvent) ?? string.Empty;
             if (body.Length < Environment.NewLine.Length || body[body.Length - 1] != Environment.NewLine[Environment.NewLine.Length - 1])
             {
                 body = string.Concat(body, Environment.NewLine);
