@@ -56,10 +56,11 @@ namespace SumoLogic.Logging.NLog
         public SumoLogicTarget(ILog log, HttpMessageHandler httpMessageHandler)
         {
             this.SourceName = "Nlog-SumoObject";
+            this.OptimizeBufferReuse = true;
             this.ConnectionTimeout = 60000;
             this.LogLog = new InternalLoggerLog(GetType().Name + ": ", log);
             this.HttpMessageHandler = httpMessageHandler;
-            this.Layout = "${longdate}|${level:uppercase=true}|${logger}${exception:format=tostring}${newline}";
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}|${message}${exception:format=tostring}${newline}";
         }
 
         /// <summary>
@@ -223,7 +224,7 @@ namespace SumoLogic.Logging.NLog
             var sourceName = _sourceLayout?.Render(logEvent) ?? string.Empty;
             var sourceCategory = _categoryLayout?.Render(logEvent) ?? string.Empty;
             var sourceHost = _hostLayout?.Render(logEvent) ?? string.Empty;
-            var body = this.Layout?.Render(logEvent) ?? string.Empty;
+            var body = this.RenderLogEvent(this.Layout, logEvent) ?? string.Empty;
             if (body.Length < Environment.NewLine.Length || body[body.Length - 1] != Environment.NewLine[Environment.NewLine.Length - 1])
             {
                 body = string.Concat(body, Environment.NewLine);
