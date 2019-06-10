@@ -60,7 +60,7 @@ namespace SumoLogic.Logging.AspNetCore
                 return;
             }
             var line = $"{formatter(state, exception)}";
-            provider.WriteLine(line, categoryName);
+            provider.WriteLine(line, categoryName, logLevel);
         }
     }
 }
