@@ -52,6 +52,7 @@ namespace SumoLogic.Logging.AspNetCore
 
         private volatile BufferWithEviction<string> messagesQueue = null;
         private bool includeScopes;
+        private bool includeCategory;
         private IExternalScopeProvider scopeProvider;
 
         internal IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
@@ -99,11 +100,13 @@ namespace SumoLogic.Logging.AspNetCore
             }
 
             var builder = new StringBuilder();
-            //builder.Append(timestamp.ToString("yyyy-MM-dd HH:mm:ss.fff zzz"));
-            builder.Append(" [");
-            builder.Append(logLevel.ToString());
-            builder.Append("] ");
-            builder.Append(categoryName);
+            if (includeCategory)
+            {
+                builder.Append(" [");
+                builder.Append(logLevel.ToString());
+                builder.Append("] ");
+                builder.Append(categoryName);
+            }
 
             var scopeProvider = ScopeProvider;
             if (scopeProvider != null)
@@ -115,7 +118,7 @@ namespace SumoLogic.Logging.AspNetCore
 
                 builder.AppendLine(":");
             }
-            else
+            else if(includeCategory)
             {
                 builder.Append(": ");
             }
@@ -147,6 +150,7 @@ namespace SumoLogic.Logging.AspNetCore
                 InitBuffer(options);
             }
             includeScopes = options.IncludeScopes;
+            includeCategory = options.IncludeCategory;
             LoggerOptions = options;
         }
 
