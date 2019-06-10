@@ -112,5 +112,6 @@ namespace SumoLogic.Logging.AspNetCore
         /// </summary>
         public ILogger DebuggingLogger { get; set; }
 
+        public bool IncludeScopes { get; set; } = true;
     }
 }
