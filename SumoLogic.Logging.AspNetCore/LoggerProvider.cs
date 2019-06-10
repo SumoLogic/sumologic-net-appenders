@@ -116,11 +116,11 @@ namespace SumoLogic.Logging.AspNetCore
                     stringBuilder.Append(" => ").Append(scope);
                 }, builder);
 
-                builder.AppendLine(":");
+                builder.AppendLine("=> ");
             }
             else if(includeCategory)
             {
-                builder.Append(": ");
+                builder.Append("=> ");
             }
 
 
