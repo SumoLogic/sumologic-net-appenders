@@ -53,6 +53,7 @@ namespace SumoLogic.Logging.AspNetCore
         private volatile BufferWithEviction<string> messagesQueue = null;
         private bool includeScopes;
         private bool includeCategory;
+        private string scopeSeparator;
         private IExternalScopeProvider scopeProvider;
 
         internal IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
@@ -113,14 +114,14 @@ namespace SumoLogic.Logging.AspNetCore
             {
                 scopeProvider.ForEachScope((scope, stringBuilder) =>
                 {
-                    stringBuilder.Append(" => ").Append(scope);
+                    stringBuilder.Append(this.scopeSeparator).Append(scope);
                 }, builder);
 
-                builder.AppendLine("=> ");
+                builder.Append(this.scopeSeparator);
             }
             else if(includeCategory)
             {
-                builder.Append("=> ");
+                builder.Append(this.scopeSeparator);
             }
 
 
@@ -151,6 +152,7 @@ namespace SumoLogic.Logging.AspNetCore
             }
             includeScopes = options.IncludeScopes;
             includeCategory = options.IncludeCategory;
+            scopeSeparator = options.ScopeSeparator;
             LoggerOptions = options;
         }
 
