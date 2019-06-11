@@ -113,6 +113,7 @@ namespace SumoLogic.Logging.AspNetCore
         public ILogger DebuggingLogger { get; set; }
 
         public bool IncludeScopes { get; set; }
+        public string ScopeSeparator { get; set; } = " => ";
         public bool IncludeCategory { get; set; }
     }
 }
