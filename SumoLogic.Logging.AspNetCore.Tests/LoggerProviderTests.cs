@@ -23,10 +23,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SumoLogic.Logging.Common.Sender;
 using SumoLogic.Logging.Common.Tests;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Xunit;
 
@@ -136,6 +140,38 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             });
         }
 
+        [Fact]
+        public void TestConfigIsReadFromConfigProvider()
+        {
+            var configuration = new ConfigurationBuilder().AddInMemoryCollection(new[]
+            {
+                new KeyValuePair<string, string>("SumoLogic:Uri", "http://www.fakeadress2.com"),
+                new KeyValuePair<string, string>("SumoLogic:FlushingAccuracy", "00:00:00.123"),
+            }).Build();
+
+            var loggerProvider = new ServiceCollection()
+                .AddLogging(builder => builder.AddConfiguration(configuration).AddSumoLogic())
+                .BuildServiceProvider()
+                .GetRequiredService<ILoggerProvider>();
+
+            var sumoLogicLoggerProvider = Assert.IsType<LoggerProvider>(loggerProvider);
+            Assert.Equal("http://www.fakeadress2.com/", sumoLogicLoggerProvider.LoggerOptions.Uri);
+            Assert.Equal(123, sumoLogicLoggerProvider.LoggerOptions.FlushingAccuracy.Milliseconds);
+        }
+
+        [Fact]
+        public void TestConfigUpdatesWithConfigProvider()
+        {
+            var monitor = new TestOptionsMonitor(new LoggerOptions() { Uri = "http://www.fakeadress2.com"});
+            var loggerProvider = new LoggerProvider(monitor);
+
+            Assert.Equal("http://www.fakeadress2.com/", loggerProvider.LoggerOptions.Uri);
+
+            monitor.Set(new LoggerOptions() { Uri = "https://www.fakeadress2.com" });
+
+            Assert.Equal("https://www.fakeadress2.com/", loggerProvider.LoggerOptions.Uri);
+        }
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -153,8 +189,8 @@ namespace SumoLogic.Logging.AspNetCore.Tests
         {
             if (disposing)
             {
-                _provider.Dispose();
-                _messagesHandler.Dispose();
+                _provider?.Dispose();
+                _messagesHandler?.Dispose();
             }
         }
 
@@ -195,6 +231,34 @@ namespace SumoLogic.Logging.AspNetCore.Tests
         });
 
             _logger = _provider.CreateLogger("OverriddenCategory");
+        }
+
+        // Taken from https://github.com/aspnet/Extensions/blob/2.2.0/src/Logging/test/ConsoleLoggerTest.cs#L1081
+        public class TestOptionsMonitor : IOptionsMonitor<LoggerOptions>
+        {
+            private LoggerOptions _options;
+            private event Action<LoggerOptions, string> _onChange;
+
+            public TestOptionsMonitor(LoggerOptions options)
+            {
+                _options = options;
+            }
+
+            public LoggerOptions Get(string name) => _options;
+
+            public IDisposable OnChange(Action<LoggerOptions, string> listener)
+            {
+                _onChange += listener;
+                return null;
+            }
+
+            public LoggerOptions CurrentValue => _options;
+
+            public void Set(LoggerOptions options)
+            {
+                _options = options;
+                _onChange?.Invoke(options, "");
+            }
         }
     }
 }
