@@ -51,8 +51,11 @@ namespace SumoLogic.Logging.AspNetCore
 
         private volatile BufferWithEviction<string> messagesQueue = null;
 
+        private readonly IDisposable optionsReloadToken;
+
         public LoggerProvider(IOptionsMonitor<LoggerOptions> options)
         {
+            optionsReloadToken = options.OnChange(ReConfig);
             ReConfig(options.CurrentValue);
         }
 
@@ -73,6 +76,8 @@ namespace SumoLogic.Logging.AspNetCore
             flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
 
             SumoLogicMessageSender?.Dispose();
+
+            optionsReloadToken?.Dispose();
         }
 
         /// <summary>

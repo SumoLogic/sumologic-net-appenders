@@ -23,8 +23,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-using Microsoft.Extensions.Logging;
+using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace SumoLogic.Logging.AspNetCore
 {
@@ -55,7 +59,7 @@ namespace SumoLogic.Logging.AspNetCore
         /// Adds a Sumo Logic logger named 'SumoLogic' to the factory.
         /// </summary>
         /// <param name="factory">The factory.</param>
-        /// <param name="uri">Sets the uri of Sumo Logic ingesting endpoint/param>
+        /// <param name="uri">Sets the uri of Sumo Logic ingesting endpoint</param>
         public static ILoggerFactory AddSumoLogic(this ILoggerFactory factory, string uri)
             => factory.AddSumoLogic(new LoggerOptions() { Uri = uri });
 
@@ -76,13 +80,38 @@ namespace SumoLogic.Logging.AspNetCore
         /// </summary>
         /// <param name="builder">The <see cref="ILoggingBuilder"/> to use.</param>
         public static ILoggingBuilder AddSumoLogic(this ILoggingBuilder builder)
-            => builder.AddSumoLogic(new LoggerOptions());
+        {
+            builder.AddConfiguration();
+
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LoggerProvider>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<LoggerOptions>, LoggerOptionsSetup>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IOptionsChangeTokenSource<LoggerOptions>, LoggerProviderOptionsChangeTokenSource<LoggerOptions, LoggerProvider>>());
+            return builder;
+        }
 
         /// <summary>
         /// Adds a Sumo Logic logger named 'SumoLogic' to the factory.
         /// </summary>
         /// <param name="builder">The <see cref="ILoggingBuilder"/> to use.</param>
-        /// <param name="uri">Sets the uri of Sumo Logic ingesting endpoint/param>
+        /// <param name="configure"></param>
+        public static ILoggingBuilder AddSumoLogic(this ILoggingBuilder builder, Action<LoggerOptions> configure)
+        {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            builder.AddSumoLogic();
+            builder.Services.Configure(configure);
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds a Sumo Logic logger named 'SumoLogic' to the factory.
+        /// </summary>
+        /// <param name="builder">The <see cref="ILoggingBuilder"/> to use.</param>
+        /// <param name="uri">Sets the uri of Sumo Logic ingesting endpoint</param>
         public static ILoggingBuilder AddSumoLogic(this ILoggingBuilder builder, string uri)
             => builder.AddSumoLogic(new LoggerOptions() { Uri = uri });
 #endif
