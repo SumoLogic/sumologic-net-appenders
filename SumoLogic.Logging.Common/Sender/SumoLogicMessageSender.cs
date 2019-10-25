@@ -27,6 +27,7 @@ namespace SumoLogic.Logging.Common.Sender
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -156,7 +157,7 @@ namespace SumoLogic.Logging.Common.Sender
             {
                 try
                 {
-                    await this.TrySend(body, name, category, host);
+                    await this.TrySend(body, name, category, host).ConfigureAwait(false);
                     success = true;
                 }
                 catch (Exception ex)
@@ -168,22 +169,10 @@ namespace SumoLogic.Logging.Common.Sender
 
                     if (this.Log.IsErrorEnabled)
                     {
-                        this.Log.Error("Error trying send messages. Exception: " + ex.Message);
+                        this.Log.Error($"Error trying send messages. {ex.GetType()}: {ex.Message}");
                     }
 
-                    try
-                    {
-                        Task.Delay(this.RetryInterval).GetAwaiter().GetResult();
-                    }
-                    catch (Exception ex2)
-                    {
-                        if (this.Log.IsErrorEnabled)
-                        {
-                            this.Log.Error(ex2.Message);
-                        }
-
-                        break;
-                    }
+                    await Task.Delay(this.RetryInterval).ConfigureAwait(false);
                 }
             }
             while (!success);
@@ -215,7 +204,6 @@ namespace SumoLogic.Logging.Common.Sender
                 {
                     this.Log.Warn("Could not send log to Sumo Logic (null Url)");
                 }
-
                 return;
             }
 
@@ -240,7 +228,17 @@ namespace SumoLogic.Logging.Common.Sender
 
                 try
                 {
-                    var response = await this.HttpClient.PostAsync(this.Url, httpContent);
+                    var httpClient = this.HttpClient;
+                    if (httpClient == null)
+                    {
+                        if (this.Log.IsWarnEnabled)
+                        {
+                            this.Log.Warn("Could not send log to Sumo Logic. HttpClient has been disposed");
+                        }
+                        return;
+                    }
+
+                    var response = await httpClient.PostAsync(this.Url, httpContent).ConfigureAwait(false);
                     if (!response.IsSuccessStatusCode)
                     {
                         if (this.Log.IsWarnEnabled)
@@ -261,48 +259,56 @@ namespace SumoLogic.Logging.Common.Sender
                 }
                 catch (AggregateException ex)
                 {
+                    var firstException = ex.Flatten().InnerExceptions?.FirstOrDefault() ?? ex.InnerException ?? ex;
                     if (this.Log.IsWarnEnabled)
                     {
-                        this.Log.Warn("Could not send log to Sumo Logic");
+                        this.Log.Warn($"Could not send log to Sumo Logic. {firstException.GetType()}:{firstException.Message}");
                     }
-
-                    if (this.Log.IsDebugEnabled)
+                    else if (this.Log.IsDebugEnabled)
                     {
-                        this.Log.Debug("Reason: " + ex.InnerException.Message);
+                        this.Log.Debug($"Could not send log to Sumo Logic. {firstException.GetType()}:{firstException.Message}");
                     }
 
-                    throw ex.InnerException;
+                    if (firstException is OperationCanceledException || firstException is ObjectDisposedException)
+                        return; // No rethrow, the operation cannot be retried
+
+                    throw firstException;
                 }
-                catch (IOException ex)
+                catch (OperationCanceledException ex)
                 {
                     if (this.Log.IsWarnEnabled)
                     {
-                        this.Log.Warn("Could not send log to Sumo Logic");
+                        this.Log.Warn("Could not send log to Sumo Logic. Operation was canceled");
                     }
-
-                    if (this.Log.IsDebugEnabled)
+                    else if (this.Log.IsDebugEnabled)
                     {
-                        this.Log.Debug("Reason: " + ex.Message);
+                        this.Log.Debug($"Could not send log to Sumo Logic. {ex.GetType()}: {ex.Message}");
                     }
-
+                    // No rethrow, the operation cannot be retried
+                }
+                catch (ObjectDisposedException ex)
+                {
+                    if (this.Log.IsWarnEnabled)
+                    {
+                        this.Log.Warn("Could not send log to Sumo Logic. Operation was disposed");
+                    }
+                    else if (this.Log.IsDebugEnabled)
+                    {
+                        this.Log.Debug($"Could not send log to Sumo Logic. {ex.GetType()}: {ex.Message}");
+                    }
+                    // No rethrow, the operation cannot be retried
+                }
+                catch (Exception ex)
+                {
+                    if (this.Log.IsWarnEnabled)
+                    {
+                        this.Log.Warn($"Could not send log to Sumo Logic. {ex.GetType()}: {ex.Message}");
+                    }
+                    else if (this.Log.IsDebugEnabled)
+                    {
+                        this.Log.Debug($"Could not send log to Sumo Logic. {ex.GetType()}: {ex.Message}");
+                    }
                     throw;
-                }
-                // Its possible for a buffered sender to get disposed while an outstanding timer callback is
-                // executing. netstandard 1.3's System.Threading.Timer task doesn't implement the overload of
-                // Dispose that has a WaitHandle, so we'll just have to suppress these exceptions.
-                catch (TaskCanceledException)
-                {
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn("Could not send log to Sumo Logic; a task was canceled");
-                    }
-                }
-                catch (ObjectDisposedException ode)
-                {
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn($"Could not send log to Sumo Logic: ${ode.Message}");
-                    }
                 }
             }
         }

@@ -24,14 +24,14 @@
  * under the License.
  */
 
-using System.Threading.Tasks;
-
 namespace SumoLogic.Logging.Common.Sender
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Linq;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
 
@@ -42,17 +42,6 @@ namespace SumoLogic.Logging.Common.Sender
     /// <typeparam name="TMessage">Type for output.</typeparam>
     public abstract class BufferFlushingTask<TBufferItem, TMessage>
     {
-
-        /// <summary>
-        /// Static instance of a successful task. Task.CompletedResult isn't available in 4.5 so...
-        /// </summary>
-        private static Task CompletedTask
-#if netfull
-           { get; } = Task.FromResult(0);
-#else
-        => Task.CompletedTask;
-#endif
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferFlushingTask{TBufferItem, TMessage}" /> class.
         /// </summary>
@@ -118,32 +107,33 @@ namespace SumoLogic.Logging.Common.Sender
         /// This flush and sends the messages.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception unknown at compile time.")]
-        public Task Run()
+        public async Task Run()
         {
-            if (this.NeedsFlushing())
+            try
             {
-                this.IsFlushing = true;
-                try
+                if (this.NeedsFlushing())
                 {
-                    return this.FlushAndSend();
+                    this.IsFlushing = true;
+                    await this.FlushAndSend().ConfigureAwait(false);
                 }
-                catch (Exception ex)
-                {
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn("Exception while attempting to flush and send, Exception: " + ex.Message);
-                    }
-                }
-            }
 
-            this.IsFlushing = false;
-            return CompletedTask;
+                this.IsFlushing = false;
+            }
+            catch (AggregateException ex)
+            {
+                var firstException = ex.Flatten().InnerExceptions?.FirstOrDefault() ?? ex.InnerException ?? ex;
+                Log.Warn($"HTTP Sender flush failed: {firstException.GetType()}: {firstException.Message}");
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"HTTP Sender flush failed: {ex.GetType()}: {ex.Message}");
+            }
         }
 
         /// <summary>
         /// Flush and send all messages from the queue of messages.
         /// </summary>
-        public Task FlushAndSend()
+        public async Task FlushAndSend()
         {
             var messages = new List<TBufferItem>();
             this.MessageQueue.DrainTo(messages);
@@ -156,12 +146,10 @@ namespace SumoLogic.Logging.Common.Sender
                 }
 
                 TMessage body = this.Aggregate(messages);
-                return this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost);
+                await this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost).ConfigureAwait(false);
             }
 
             this.LastFlushedOn = DateTime.UtcNow;
-
-            return CompletedTask;
         }
 
         /// <summary>

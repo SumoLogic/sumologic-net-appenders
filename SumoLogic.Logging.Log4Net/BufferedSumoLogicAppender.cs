@@ -272,7 +272,7 @@ namespace SumoLogic.Logging.Log4Net
                 this.LogLog);
 
             this.flushBufferTimer = new Timer(
-                async _ => await flushBufferTask.Run().ConfigureAwait(false),
+                _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
                 null,
                 TimeSpan.FromMilliseconds(0),
                 TimeSpan.FromMilliseconds(this.FlushingAccuracy));
@@ -325,16 +325,16 @@ namespace SumoLogic.Logging.Log4Net
         {
             base.OnClose();
 
-            if (this.SumoLogicMessageSender != null)
-            {
-                this.SumoLogicMessageSender.Dispose();
-                this.SumoLogicMessageSender = null;
-            }
-
             if (this.flushBufferTimer != null)
             {
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
+            }
+
+            if (this.SumoLogicMessageSender != null)
+            {
+                this.SumoLogicMessageSender.Dispose();
+                this.SumoLogicMessageSender = null;
             }
         }
 
