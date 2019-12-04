@@ -30,7 +30,6 @@ namespace SumoLogic.Logging.Common.Sender
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;
     using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
@@ -118,11 +117,6 @@ namespace SumoLogic.Logging.Common.Sender
                 }
 
                 this.IsFlushing = false;
-            }
-            catch (AggregateException ex)
-            {
-                var firstException = ex.Flatten().InnerExceptions?.FirstOrDefault() ?? ex.InnerException ?? ex;
-                Log.Warn($"HTTP Sender flush failed: {firstException.GetType()}: {firstException.Message}");
             }
             catch (Exception ex)
             {

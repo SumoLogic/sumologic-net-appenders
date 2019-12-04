@@ -27,7 +27,6 @@ namespace SumoLogic.Logging.Common.Sender
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -256,23 +255,6 @@ namespace SumoLogic.Logging.Common.Sender
                     {
                         this.Log.Debug("Successfully sent log request to Sumo Logic");
                     }
-                }
-                catch (AggregateException ex)
-                {
-                    var firstException = ex.Flatten().InnerExceptions?.FirstOrDefault() ?? ex.InnerException ?? ex;
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn($"Could not send log to Sumo Logic. {firstException.GetType()}:{firstException.Message}");
-                    }
-                    else if (this.Log.IsDebugEnabled)
-                    {
-                        this.Log.Debug($"Could not send log to Sumo Logic. {firstException.GetType()}:{firstException.Message}");
-                    }
-
-                    if (firstException is OperationCanceledException || firstException is ObjectDisposedException)
-                        return; // No rethrow, the operation cannot be retried
-
-                    throw firstException;
                 }
                 catch (OperationCanceledException ex)
                 {
