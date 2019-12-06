@@ -256,18 +256,6 @@ namespace SumoLogic.Logging.Common.Sender
                         this.Log.Debug("Successfully sent log request to Sumo Logic");
                     }
                 }
-                catch (OperationCanceledException ex)
-                {
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn("Could not send log to Sumo Logic. Operation was canceled");
-                    }
-                    else if (this.Log.IsDebugEnabled)
-                    {
-                        this.Log.Debug($"Could not send log to Sumo Logic. {ex.GetType()}: {ex.Message}");
-                    }
-                    // No rethrow, the operation cannot be retried
-                }
                 catch (ObjectDisposedException ex)
                 {
                     if (this.Log.IsWarnEnabled)
