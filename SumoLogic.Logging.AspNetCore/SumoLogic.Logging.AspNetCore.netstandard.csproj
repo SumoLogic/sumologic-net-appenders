@@ -17,7 +17,6 @@
         <PackageReleaseNotes></PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
         <SignAssembly>true</SignAssembly>
-        <Version>1.0.1</Version>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\SumoLogic.Logging.snk">

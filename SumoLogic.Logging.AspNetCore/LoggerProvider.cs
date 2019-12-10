@@ -56,7 +56,7 @@ namespace SumoLogic.Logging.AspNetCore
         private string scopeSeparator;
         private IExternalScopeProvider scopeProvider;
 
-        internal IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
+        private IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
 
         public LoggerProvider(IOptionsMonitor<LoggerOptions> options)
         {
@@ -129,7 +129,7 @@ namespace SumoLogic.Logging.AspNetCore
 
                 builder.Append(this.scopeSeparator);
             }
-            else if(includeCategory)
+            else if (includeCategory)
             {
                 builder.Append(this.scopeSeparator);
             }
