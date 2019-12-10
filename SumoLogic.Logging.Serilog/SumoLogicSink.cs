@@ -119,7 +119,9 @@ namespace SumoLogic.Logging.Serilog
                 .GetResult();
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Dispose for Serilog CloseAndFlush
+        /// </summary>
         public void Dispose() => this.messageSender?.Dispose();
     }
 }

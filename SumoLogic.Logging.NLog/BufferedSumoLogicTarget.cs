@@ -295,7 +295,14 @@ namespace SumoLogic.Logging.NLog
             if (this.flushBufferTask != null)
             {
                 // this is NOT present in the log4net code. one-time blocking operation.
-                this.flushBufferTask.FlushAndSend().GetAwaiter().GetResult();
+                try
+                {
+                    this.flushBufferTask.FlushAndSend().GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    this.LogLog.Warn($"Buffered target failed to flush pending logevents. {ex.GetType()}: {ex.Message}");
+                }
             }
 
             this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
@@ -309,7 +316,7 @@ namespace SumoLogic.Logging.NLog
                 this.LogLog);
 
             this.flushBufferTimer = new Timer(
-                async _ => await flushBufferTask.Run().ConfigureAwait(false),
+                _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
                 null,
                 TimeSpan.FromMilliseconds(0),
                 TimeSpan.FromMilliseconds(this.FlushingAccuracy));
@@ -355,16 +362,16 @@ namespace SumoLogic.Logging.NLog
         {
             base.CloseTarget();
 
-            if (this.SumoLogicMessageSender != null)
-            {
-                this.SumoLogicMessageSender.Dispose();
-                this.SumoLogicMessageSender = null;
-            }
-
             if (this.flushBufferTimer != null)
             {
                 this.flushBufferTimer.Dispose();
                 this.flushBufferTimer = null;
+            }
+
+            if (this.SumoLogicMessageSender != null)
+            {
+                this.SumoLogicMessageSender.Dispose();
+                this.SumoLogicMessageSender = null;
             }
         }
 
@@ -385,11 +392,12 @@ namespace SumoLogic.Logging.NLog
                 var task = this.flushBufferTask;
                 if (task != null)
                 {
-                    // i don't love this, but it maintains parity w/ existing sync calls
-                    task.FlushAndSend().GetAwaiter().GetResult();
+                    task.FlushAndSend().ContinueWith(t => asyncContinuation(t.Exception));
                 }
-
-                asyncContinuation(null);
+                else
+                {
+                    asyncContinuation(null);
+                }
             }
             catch (Exception ex)
             {
