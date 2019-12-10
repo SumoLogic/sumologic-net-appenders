@@ -56,7 +56,7 @@ namespace SumoLogic.Logging.AspNetCore
         private string scopeSeparator;
         private IExternalScopeProvider scopeProvider;
 
-        internal IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
+        private IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
 
         public LoggerProvider(IOptionsMonitor<LoggerOptions> options)
         {
@@ -119,7 +119,7 @@ namespace SumoLogic.Logging.AspNetCore
 
                 builder.Append(this.scopeSeparator);
             }
-            else if(includeCategory)
+            else if (includeCategory)
             {
                 builder.Append(this.scopeSeparator);
             }
@@ -188,9 +188,9 @@ namespace SumoLogic.Logging.AspNetCore
                 DebuggingLogger);
 
             flushBufferTimer = new Timer(
-                callback: async _ => await flushBufferTask.Run(), 
-                state: null, 
-                dueTime: TimeSpan.FromMilliseconds(0), 
+                callback: async _ => await flushBufferTask.Run(),
+                state: null,
+                dueTime: TimeSpan.FromMilliseconds(0),
                 period: options.FlushingAccuracy);
 
             DebuggingLogger?.Debug("InitBuffer::Completed");
@@ -199,7 +199,7 @@ namespace SumoLogic.Logging.AspNetCore
         private void WriteLineToSumo(String body)
         {
             SumoLogicMessageSender.TrySend(
-                body, 
+                body,
                 LoggerOptions.SourceName,
                 LoggerOptions.SourceCategory,
                 LoggerOptions.SourceHost)
