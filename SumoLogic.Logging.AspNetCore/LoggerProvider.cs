@@ -44,7 +44,7 @@ namespace SumoLogic.Logging.AspNetCore
 
         private ILog DebuggingLogger { get; set; }
 
-        private SumoLogicMessageSender SumoLogicMessageSender { get; set; }
+        private SumoLogicMessageSender sumoLogicMessageSender = null;
 
         private Timer flushBufferTimer = null;
 
@@ -75,11 +75,21 @@ namespace SumoLogic.Logging.AspNetCore
 
         public void Dispose()
         {
-            flushBufferTimer?.Dispose();
-
-            flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
-
-            SumoLogicMessageSender?.Dispose();
+            try
+            {
+                flushBufferTimer?.Dispose();
+                flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                DebuggingLogger?.Warn($"SumoLogicProvider disposed with error. {ex.GetType()}: {ex.Message}");
+            }
+            finally
+            {
+                flushBufferTimer = null;
+                flushBufferTask = null;
+                sumoLogicMessageSender?.Dispose();
+            }
         }
 
         /// <summary>
@@ -94,7 +104,7 @@ namespace SumoLogic.Logging.AspNetCore
                 return;
             }
 
-            if (SumoLogicMessageSender == null || !SumoLogicMessageSender.CanTrySend)
+            if (sumoLogicMessageSender == null || !sumoLogicMessageSender.CanTrySend)
             {
                 DebuggingLogger?.Warn("Sender is not initialized. Dropping log entry");
                 return;
@@ -159,7 +169,7 @@ namespace SumoLogic.Logging.AspNetCore
         private void InitSender(LoggerOptions options)
         {
             DebuggingLogger?.Debug("InitSender");
-            SumoLogicMessageSender = new SumoLogicMessageSender(options.HttpMessageHandler, DebuggingLogger, "asp.net-core-logger")
+            sumoLogicMessageSender = new SumoLogicMessageSender(options.HttpMessageHandler, DebuggingLogger, "asp.net-core-logger")
             {
                 Url = new Uri(options.Uri),
                 ConnectionTimeout = options.ConnectionTimeout,
@@ -179,7 +189,7 @@ namespace SumoLogic.Logging.AspNetCore
 
             flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
                 messagesQueue,
-                SumoLogicMessageSender,
+                sumoLogicMessageSender,
                 options.MaxFlushInterval,
                 options.MessagesPerRequest,
                 options.SourceName,
@@ -188,7 +198,7 @@ namespace SumoLogic.Logging.AspNetCore
                 DebuggingLogger);
 
             flushBufferTimer = new Timer(
-                callback: async _ => await flushBufferTask.Run(),
+                callback: _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
                 state: null,
                 dueTime: TimeSpan.FromMilliseconds(0),
                 period: options.FlushingAccuracy);
@@ -198,8 +208,8 @@ namespace SumoLogic.Logging.AspNetCore
 
         private void WriteLineToSumo(String body)
         {
-            SumoLogicMessageSender.TrySend(
-                body,
+            sumoLogicMessageSender.TrySend(
+                body, 
                 LoggerOptions.SourceName,
                 LoggerOptions.SourceCategory,
                 LoggerOptions.SourceHost)

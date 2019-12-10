@@ -68,6 +68,11 @@ namespace SumoLogic.Logging.Serilog
         private readonly Timer flushBufferTimer;
 
         /// <summary>
+        /// The task that flushes the buffer.
+        /// </summary>
+        private readonly SumoLogicMessageSenderBufferFlushingTask flushBufferTask;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BufferedSumoLogicSink"/> class.
         /// </summary>
         /// <param name="log">The log service.</param>
@@ -108,7 +113,7 @@ namespace SumoLogic.Logging.Serilog
                 new StringLengthCostAssigner(),
                 this.logService);
 
-            SumoLogicMessageSenderBufferFlushingTask flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
+            this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
                 this.messageQueue,
                 this.messageSender,
                 connection.MaxFlushInterval,
@@ -119,7 +124,7 @@ namespace SumoLogic.Logging.Serilog
                 this.logService);
 
             this.flushBufferTimer = new Timer(
-                async _ => await flushBufferTask.Run(),
+                _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
                 null,
                 TimeSpan.FromMilliseconds(0),
                 connection.FlushingAccuracy);
@@ -144,11 +149,24 @@ namespace SumoLogic.Logging.Serilog
             this.messageQueue.Add(this.formatter.Format(logEvent));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Dispose for Serilog CloseAndFlush
+        /// </summary>
         public void Dispose()
         {
-            this.messageSender?.Dispose();
-            this.flushBufferTimer?.Dispose();
+            try
+            {
+                this.flushBufferTimer?.Dispose();
+                this.flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                this.logService.Warn($"Sink disposed with error. {ex.GetType()}: {ex.Message}");
+            }
+            finally
+            {
+                this.messageSender?.Dispose();
+            }
         }
     }
 }

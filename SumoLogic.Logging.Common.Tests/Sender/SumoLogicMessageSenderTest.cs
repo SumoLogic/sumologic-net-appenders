@@ -69,7 +69,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public void HttpClientCallWith200ResponseTest()
         {
             Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
-            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
             Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
         }      
 
@@ -80,7 +80,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         [Fact]
         public void RequestHeaderTest()
         {
-           sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
             Assert.Equal("name", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Name").First<string>());
             Assert.Equal("category", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Category").First<string>());
             Assert.Equal("host", messagesHandler.LastReceivedRequest.Content.Headers.GetValues("X-Sumo-Host").First<string>());
@@ -95,7 +95,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         public void RequestContentTest()
         {
             string body = "ContentBody";
-            sumoLogicMessageSender.Send(body, "name", "category", "host");
+            sumoLogicMessageSender.Send(body, "name", "category", "host").Wait();
             var contentInString = messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result;
             Assert.Equal(body, contentInString);
         }
@@ -118,7 +118,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
         {
             Assert.True(sumoLogicMessageSender.CanSend);
             Assert.True(sumoLogicMessageSender.CanTrySend);
-            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
             Assert.Equal(HttpStatusCode.OK, messagesHandler.CurrentResponse.StatusCode);
         }
 
@@ -132,7 +132,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
             sumoLogicMessageSender.Url = null;
             Assert.False(sumoLogicMessageSender.CanSend);
             Assert.False(sumoLogicMessageSender.CanTrySend);
-            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
             Assert.Equal(0, messagesHandler.ReceivedRequests.Count);          
         }
 
@@ -153,7 +153,7 @@ namespace SumoLogic.Logging.Common.Tests.Http
                 requestBeforeSuccess = messagesHandler.ReceivedRequests.Count;
                 messagesHandler.CurrentResponse = new HttpResponseMessage(HttpStatusCode.OK);
             });
-            sumoLogicMessageSender.Send("body", "name", "category", "host");
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
             changeResponseTask.GetAwaiter().GetResult();
             Assert.True(requestBeforeSuccess < messagesHandler.ReceivedRequests.Count);
             Assert.Equal(HttpStatusCode.OK, messagesHandler.CurrentResponse.StatusCode);
