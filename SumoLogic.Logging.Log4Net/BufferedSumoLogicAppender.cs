@@ -323,17 +323,19 @@ namespace SumoLogic.Logging.Log4Net
         /// </remarks>
         protected override void OnClose()
         {
-            base.OnClose();
-
-            if (this.flushBufferTimer != null)
+            try
             {
-                this.flushBufferTimer.Dispose();
+                this.flushBufferTimer?.Dispose();
                 this.flushBufferTimer = null;
+                Flush(0);
             }
-
-            if (this.SumoLogicMessageSender != null)
+            catch (Exception ex)
             {
-                this.SumoLogicMessageSender.Dispose();
+                this.LogLog.Warn($"Appender closed with error. {ex.GetType()}: {ex.Message}");
+            }
+            finally
+            {
+                this.SumoLogicMessageSender?.Dispose();
                 this.SumoLogicMessageSender = null;
             }
         }
