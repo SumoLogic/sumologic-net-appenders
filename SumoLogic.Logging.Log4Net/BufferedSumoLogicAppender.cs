@@ -329,15 +329,12 @@ namespace SumoLogic.Logging.Log4Net
                 this.flushBufferTimer?.Dispose();
                 this.flushBufferTimer = null;
                 Flush(5000);
+                this.SumoLogicMessageSender?.Dispose();
+                this.SumoLogicMessageSender = null;
             }
             catch (Exception ex)
             {
                 this.LogLog.Warn($"Appender closed with error. {ex.GetType()}: {ex.Message}");
-            }
-            finally
-            {
-                this.SumoLogicMessageSender?.Dispose();
-                this.SumoLogicMessageSender = null;
             }
         }
 
