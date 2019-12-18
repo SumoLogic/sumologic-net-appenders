@@ -161,7 +161,11 @@ namespace SumoLogic.Logging.Common.Sender
                 }
                 catch (Exception ex)
                 {
-                    if (!(ex is IOException || ex is HttpRequestException || ex is WebException))
+#if NETSTANDARD
+                    if (!(ex is IOException || ex is HttpRequestException))
+#else
+                    if (!(ex is IOException || ex is HttpRequestException || ex is System.Net.WebException))
+#endif
                     {
                         throw;
                     }

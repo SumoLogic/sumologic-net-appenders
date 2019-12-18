@@ -4,10 +4,10 @@
         <Description>Shared library used by .NET log appenders uploading to Sumo Logic.</Description>
         <Authors>Sumo Logic</Authors>
         <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-        <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
-        <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
         <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
@@ -16,20 +16,15 @@
         <RepositoryType>git</RepositoryType>
         <SignAssembly>true</SignAssembly>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-        <DefineConstants>netfull</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <DefineConstants>netstandard</DefineConstants>
-    </PropertyGroup>
     <ItemGroup>
-        <None Include="..\SumoLogic.Logging.snk">
-            <Link>SumoLogic.Logging.snk</Link>
-        </None>
-        <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
-            <Link>CustomDictionary.xml</Link>
-        </CodeAnalysisDictionary>
-        <PackageReference Include="System.Net.Http" Version="4.3.1" />
-        <PackageReference Include="System.Net.Requests" Version="4.3.0" />
+      <None Include="..\SumoLogic.Logging.snk">
+          <Link>SumoLogic.Logging.snk</Link>
+      </None>
+      <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+          <Link>CustomDictionary.xml</Link>
+      </CodeAnalysisDictionary>
+    </ItemGroup>
+    <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+      <PackageReference Include="System.Net.Http" Version="4.3.1" />
     </ItemGroup>
 </Project>

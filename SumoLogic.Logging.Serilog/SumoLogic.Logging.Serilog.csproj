@@ -4,10 +4,10 @@
         <Description>Serilog sink which sends logs to the Sumo Logic machine data analytics platform.</Description>
         <Authors>Sumo Logic</Authors>
         <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+        <TargetFrameworks>net45;netstandard1.3;;netstandard2.0</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
-        <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
         <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
@@ -15,12 +15,6 @@
         <PackageReleaseNotes></PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
         <SignAssembly>true</SignAssembly>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-        <DefineConstants>netfull</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <DefineConstants>netstandard</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\SumoLogic.Logging.snk">
@@ -31,6 +25,5 @@
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
         <PackageReference Include="Serilog" Version="[2.0,3.0)" />
-        <PackageReference Include="System.Net.Http" Version="4.3.1" />
     </ItemGroup>
 </Project>
