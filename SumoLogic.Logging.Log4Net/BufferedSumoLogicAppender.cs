@@ -31,12 +31,13 @@ namespace SumoLogic.Logging.Log4Net
     using System.IO;
     using System.Net.Http;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
     using log4net.Appender;
     using log4net.Core;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
-    using Timer = System.Threading.Timer;
 
     /// <summary>
     /// Buffered SumoLogic Appender implementation.
@@ -327,16 +328,13 @@ namespace SumoLogic.Logging.Log4Net
             {
                 this.flushBufferTimer?.Dispose();
                 this.flushBufferTimer = null;
-                Flush(0);
+                Flush(5000);
+                this.SumoLogicMessageSender?.Dispose();
+                this.SumoLogicMessageSender = null;
             }
             catch (Exception ex)
             {
                 this.LogLog.Warn($"Appender closed with error. {ex.GetType()}: {ex.Message}");
-            }
-            finally
-            {
-                this.SumoLogicMessageSender?.Dispose();
-                this.SumoLogicMessageSender = null;
             }
         }
 
@@ -355,8 +353,16 @@ namespace SumoLogic.Logging.Log4Net
         /// <returns></returns>
         public override bool Flush(int millisecondsTimeout)
         {
-            flushBufferTask?.FlushAndSend().GetAwaiter().GetResult();
-            return true;
+            try
+            {
+                var flushTask = flushBufferTask?.FlushAndSend() ?? Task.FromResult<object>(null);
+                return Task.WhenAny(flushTask, Task.Delay(TimeSpan.FromMilliseconds(millisecondsTimeout))).GetAwaiter().GetResult().Id == flushTask.Id;
+            }
+            catch (Exception ex)
+            {
+                this.LogLog.Warn($"Appender flush with error. {ex.GetType()}: {ex.Message}");
+                return false;   // Not allowed to throw exceptions, as it will affect flush of other appenders
+            }
         }
     }
 }

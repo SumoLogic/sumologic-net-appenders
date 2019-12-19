@@ -81,6 +81,24 @@ namespace SumoLogic.Logging.Log4Net.Tests
         }
 
         /// <summary>
+        /// Test logging of a single message.
+        /// </summary>
+        [Fact]
+        public void TestFlushMessage()
+        {
+            SetUpLogger(1, 10000, 10000);
+
+            log4netLog.Info("This is a message");
+
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+
+            bool success = (log4netLogger.Repository as log4net.Appender.IFlushable)?.Flush(5000) ?? false;
+            Assert.True(success);
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            Assert.Equal("This is a message" + Environment.NewLine + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+        }
+
+        /// <summary>
         /// Test logging of multiple messages.
         /// </summary>
         [Fact]
