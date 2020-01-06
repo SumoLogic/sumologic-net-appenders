@@ -25,6 +25,6 @@
             <Link>CustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.0" />
     </ItemGroup>
 </Project>
