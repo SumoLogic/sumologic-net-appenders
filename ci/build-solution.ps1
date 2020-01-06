@@ -13,13 +13,7 @@ param (
   [string]$Config = "Release"
 )
 
-$suffix = ""
-if ($PSVersionTable["PSVersion"].Major -ge 6 -and (-not $IsWindows)) {
-    Write-Warning "On non-Windows environment, using .NET Standard lib only"
-    $suffix = ".netstandard"
-}
-
-$slnName = "SumoLogic.Logging$suffix.sln"
+$slnName = "SumoLogic.Logging.sln"
 
 # the "final version" used everywhere
 $finalVersion = $env:APPVEYOR_REPO_TAG_NAME
@@ -52,9 +46,9 @@ if ($LastExitCode -ne 0) {
 Write-Output "======================================"
 Write-Output "Clean PHASE"
 Write-Output "======================================"
-if(Test-Path ".\SumoLogic.Logging.Nuget$suffix") 
+if(Test-Path ".\SumoLogic.Logging.Nuget") 
 {
-    Remove-Item -Recurse -Force ".\SumoLogic.Logging.Nuget$suffix"
+    Remove-Item -Recurse -Force ".\SumoLogic.Logging.Nuget"
 }
 dotnet clean $slnName --configuration $Config
 if ($LastExitCode -ne 0) {
@@ -72,7 +66,7 @@ if ($LastExitCode -ne 0) {
 }
 
 function run-pack($name) {
-    dotnet pack .\$name\$name$suffix.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget$suffix" --configuration $Config /p:Version=$finalVersion
+    dotnet pack .\$name\$name.csproj --output "$(Convert-Path .)\SumoLogic.Logging.Nuget" --configuration $Config /p:Version=$finalVersion
     if ($LastExitCode -ne 0) {
         Write-Error "Failed to pack $name [$LastExitCode]"
         exit $LastExitCode
