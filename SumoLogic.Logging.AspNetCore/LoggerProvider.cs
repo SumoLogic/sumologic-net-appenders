@@ -29,6 +29,7 @@ using SumoLogic.Logging.Common.Log;
 using SumoLogic.Logging.Common.Queue;
 using SumoLogic.Logging.Common.Sender;
 using System;
+using System.Text;
 using System.Threading;
 
 namespace SumoLogic.Logging.AspNetCore
@@ -37,7 +38,7 @@ namespace SumoLogic.Logging.AspNetCore
     /// Sumo Logic Logger Provider implementation
     /// </summary>
     [ProviderAlias("SumoLogic")]
-    public class LoggerProvider : ILoggerProvider
+    public class LoggerProvider : ILoggerProvider, ISupportExternalScope
     {
         public LoggerOptions LoggerOptions { get; private set; }
 
@@ -50,6 +51,12 @@ namespace SumoLogic.Logging.AspNetCore
         private SumoLogicMessageSenderBufferFlushingTask flushBufferTask = null;
 
         private volatile BufferWithEviction<string> messagesQueue = null;
+        private bool includeScopes;
+        private bool includeCategory;
+        private string scopeSeparator;
+        private IExternalScopeProvider scopeProvider;
+
+        private IExternalScopeProvider ScopeProvider => includeScopes ? scopeProvider : null;
 
         public LoggerProvider(IOptionsMonitor<LoggerOptions> options)
         {
@@ -90,7 +97,7 @@ namespace SumoLogic.Logging.AspNetCore
         /// </summary>
         /// <param name="message">the message line to be sent</param>
         /// <param name="categoryName">not used for now</param>
-        public void WriteLine(String message, String categoryName)
+        public void WriteLine(string message, string categoryName, LogLevel logLevel)
         {
             if (null == message)
             {
@@ -103,17 +110,40 @@ namespace SumoLogic.Logging.AspNetCore
                 return;
             }
 
-            String line = string.Concat(
-                message.TrimEnd(Environment.NewLine.ToCharArray()),
-                Environment.NewLine);
+            var builder = new StringBuilder();
+            if (includeCategory)
+            {
+                builder.Append(" [");
+                builder.Append(logLevel.ToString());
+                builder.Append("] ");
+                builder.Append(categoryName);
+            }
+
+            var scopeProvider = ScopeProvider;
+            if (scopeProvider != null)
+            {
+                scopeProvider.ForEachScope((scope, stringBuilder) =>
+                {
+                    stringBuilder.Append(this.scopeSeparator).Append(scope);
+                }, builder);
+
+                builder.Append(this.scopeSeparator);
+            }
+            else if (includeCategory)
+            {
+                builder.Append(this.scopeSeparator);
+            }
+
+
+            builder.AppendLine(message.Trim());
 
             if (LoggerOptions.IsBuffered)
             {
-                messagesQueue.Add(line);
+                messagesQueue.Add(builder.ToString());
             }
             else
             {
-                WriteLineToSumo(line);
+                WriteLineToSumo(builder.ToString());
             }
         }
 
@@ -130,6 +160,9 @@ namespace SumoLogic.Logging.AspNetCore
             {
                 InitBuffer(options);
             }
+            includeScopes = options.IncludeScopes;
+            includeCategory = options.IncludeCategory;
+            scopeSeparator = options.ScopeSeparator;
             LoggerOptions = options;
         }
 
@@ -184,5 +217,9 @@ namespace SumoLogic.Logging.AspNetCore
                 .GetResult();
         }
 
+        void ISupportExternalScope.SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            this.scopeProvider = scopeProvider;
+        }
     }
 }

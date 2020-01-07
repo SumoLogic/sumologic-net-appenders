@@ -112,5 +112,19 @@ namespace SumoLogic.Logging.AspNetCore
         /// </summary>
         public ILogger DebuggingLogger { get; set; }
 
+        /// <summary>
+        /// Gets or sets a flag to indicate whether to include scopes from <c>System.Extensions.Logging.IExternalScopeProvider</c>.
+        /// </summary>
+        public bool IncludeScopes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the separator to use when appending multiple scope values to a log message.
+        /// </summary>
+        public string ScopeSeparator { get; set; } = " => ";
+
+        /// <summary>
+        /// Gets or sets a flag to indicate whether to include the category provided to the log request.
+        /// </summary>
+        public bool IncludeCategory { get; set; }
     }
 }
