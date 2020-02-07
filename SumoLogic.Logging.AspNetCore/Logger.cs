@@ -45,12 +45,17 @@ namespace SumoLogic.Logging.AspNetCore
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            return null;
+            if (!provider.LoggerOptions.EnableScopes)
+            {
+                return null;
+            }
+
+            return provider.BeginScope(state);
         }
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return logLevel != LogLevel.None;
+            return logLevel >= provider.LoggerOptions.MinLogLevel && logLevel != LogLevel.None;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
@@ -59,8 +64,9 @@ namespace SumoLogic.Logging.AspNetCore
             {
                 return;
             }
+
             var line = $"{formatter(state, exception)}";
-            provider.WriteLine(line, categoryName);
+            provider.WriteLine(line, exception, categoryName, logLevel);
         }
     }
 }

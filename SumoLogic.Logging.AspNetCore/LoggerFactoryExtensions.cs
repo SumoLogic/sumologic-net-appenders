@@ -34,7 +34,19 @@ namespace SumoLogic.Logging.AspNetCore
     public static class LoggerFactoryExtensions
     {
         /// <summary>
-        /// Adds the log4net logging provider.
+        /// Adds a Sumo Logic logger named 'SumoLogic' to the service collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to use.</param>
+        /// <param name="options">Configure an instance of the <see cref="LoggerOptions" /> to set logging options</param>
+        /// <param name="messageFormatter">Delegate to call when formatting and enhancing log message with log level and scope information. By Default uses <see cref="MessageFormatters.SimpleMessageFormatter"/>.</param>
+        public static IServiceCollection AddSumoLogic(this IServiceCollection services, LoggerOptions options)
+        {
+            services.AddSingleton<ILoggerProvider>(new LoggerProvider(options));
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the SumoLogic logging provider.
         /// </summary>
         /// <param name="factory">The <see cref="ILoggerFactory"/> to use.</param>
         /// <param name="options">Configure an instance of the <see cref="LoggerOptions" /> to set logging options</param>
@@ -67,7 +79,7 @@ namespace SumoLogic.Logging.AspNetCore
         /// <param name="options">Configure an instance of the <see cref="LoggerOptions" /> to set logging options</param>
         public static ILoggingBuilder AddSumoLogic(this ILoggingBuilder builder, LoggerOptions options)
         {
-            builder.Services.AddSingleton<ILoggerProvider>(new LoggerProvider(options));
+            builder.Services.AddSumoLogic(options);
             return builder;
         }
 
