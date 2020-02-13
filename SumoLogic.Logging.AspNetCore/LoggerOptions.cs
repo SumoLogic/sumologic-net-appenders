@@ -129,6 +129,6 @@ namespace SumoLogic.Logging.AspNetCore
         /// Returns only log message by default. Should be overwritten if you want more rich log messages. Also you can serialize you message as json or xml or any other string format as part of it. 
         /// </summary>
         public Func<string, Exception, string, LogLevel, IDictionary<string, object>, string> MessageFormatterFunc { get; set; }
-            = (message, ex, category, level, scopedProperties) => message;
+            = (message, ex, category, level, scopedProperties) => $"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [{level}] {message} {ex}".TrimEnd();
     }
 }

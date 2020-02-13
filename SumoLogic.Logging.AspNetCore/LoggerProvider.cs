@@ -96,7 +96,7 @@ namespace SumoLogic.Logging.AspNetCore
         /// <param name="logLevel">Log message level.</param>
         public void WriteLine(string message, Exception ex, string categoryName, LogLevel logLevel)
         {
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace(message) && ex == null)
             {
                 return;
             }
@@ -106,6 +106,8 @@ namespace SumoLogic.Logging.AspNetCore
                 DebuggingLogger?.Warn("Sender is not initialized. Dropping log entry");
                 return;
             }
+
+            message = message ?? string.Empty;
 
             var fullMessage = LoggerOptions.MessageFormatterFunc(message.TrimEnd(Environment.NewLine.ToCharArray()), ex, categoryName,
                 logLevel, externalScopeProviderEnforcer.GetScopeProperties());

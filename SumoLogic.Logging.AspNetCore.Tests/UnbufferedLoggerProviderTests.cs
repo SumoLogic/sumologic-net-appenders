@@ -49,7 +49,8 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 SourceHost = "LoggerProviderTestSourceHost",
                 IsBuffered = false,
                 HttpMessageHandler = _messagesHandler,
-                MinLogLevel = LogLevel.Debug
+                MinLogLevel = LogLevel.Debug,
+                MessageFormatterFunc = (message, ex, category, level, scopedProperties) => message
             });
 
             _logger = _provider.CreateLogger("OverriddenCategory");

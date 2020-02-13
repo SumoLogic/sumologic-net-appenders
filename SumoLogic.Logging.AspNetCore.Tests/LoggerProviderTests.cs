@@ -191,7 +191,8 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 RetryInterval = TimeSpan.FromMilliseconds(retryInterval),
                 IsBuffered = true,
                 HttpMessageHandler = _messagesHandler,
-                DebuggingLogger = new Microsoft.Extensions.Logging.Console.ConsoleLogger("debugging", (a, b) => true, true)
+                DebuggingLogger = new Microsoft.Extensions.Logging.Console.ConsoleLogger("debugging", (a, b) => true, true),
+                MessageFormatterFunc = (message, ex, category, level, scopedProperties) => message
         });
 
             _logger = _provider.CreateLogger("OverriddenCategory");
