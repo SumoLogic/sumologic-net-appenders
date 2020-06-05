@@ -1,37 +1,133 @@
 # SumoLogic.Logging.AspNetCore
 
-## Description
+SumoLogic provider for [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging).
 
-Sumo Logic provides an [ASP.NET Core Logging Provider](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.2) for integrating your ASP.NET Core project with Sumo Logic logging system.
-Once you have downloaded the NuGet package, you can watch the example project for configuration details.
+## Installation
 
-## Minimum requirements
-
-- ASP.NET Core 2.0
-
-## Provider
-
-After using namespace `SumoLogic.Logging.AspNetCore`, a logging provider named "SumoLogic" is imported. You can also use [dependency injection](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2) (e.g. DI) to register the provider into your project. Please refer to the example project for details
+```ps
+Install-Package SumoLogic.Logging.AspNetCore
+```
 
 ## Configuration
 
-- Depends on the registering approach, you can either specify the settings in code or in config file (like in `appsettings.json`)
-- The provider support both buffered or instance mode. In instance mode, message lines are instantly pushed to Sumo Logic. In buffered mode (by default), message will be stored in a messages queue. It pushes the queue if the maximum quantity of messages was reached or if the maximum flush interval has passed.
-- We recommend to use the buffered mode in production environment because of the performance benefit.
-- The output url is which you get from SumoLogic http collector.
+The configuration is done in code via LoggerOptions class. 
+There are two modes that control how logs are pushed to sumologic: Buffered and instant.
+It is recommended to use the Buffered which is a default, because Instant mode might make the application run slower.
 
-## Properties
+### Configuration options
 
-| Argument                  | Description                                                                           | Default value         |
+All options below are properties of LoggerOptions class.
+
+| Argument (B/*)            | Description                                                                           | Default value         |
 |---------------------------|---------------------------------------------------------------------------------------|----------------------:|
-| Uri                       | The http collector URL from SumoLogic.                                                | __mandatory__         |
-| SourceName                | The named used for messages sent to SumoLogic.                                        | `asp.net-core-logger` |
-| SourceCategory            | The category used for messages sent to SumoLogic.                                     | `null`                |
-| SourceHost                | The host used for messages sent to SumoLogic.                                         | DNS host name         |
-| ConnectionTimeout         | The connection timeout in milliseconds.                                               | `60000`               |
-| IsBuffered                | `true` for buffered mode, `false` for instance mode                                   | `true`                |
-| RetryInterval             | Retry after specific of time when message failed to deliver                           | `10s`                 |
-| MaxFlushInterval          | The maximum interval between flushes                                                  | `10s`                 |
-| FlushingAccuracy          | How often the messages queue is checked for messages to send.                         | `250ms`               |
-| MessagePerRequest         | How many messages need to be in the queue before flushing.                            | `100`                 |
-| MaxQueueSizeBytes         | The messages queue capacity in bytes. Messages will be dropped when it is exceeded.   | `1000000`             |
+| Uri                       | SumoLogic endpoint URL, __mandatory__                                                 | `null`                |
+| IsBuffered                | Specifies weather Logger should accumulate logs or send them at once.                 | true                   |
+| MessageFormatterFunc      | Controls the rendering of log events into text, for example to log JSON.              | See below              |
+| SourceName                | The name of the source used for messages sent to SumoLogic server                     | `asp.net-core-logger`|
+| SourceCategory            | The source category for messages sent to SumoLogic server                             | `null`                |
+| SourceHost                | The source host for messages sent to SumoLogic Server                                 | System.Net.Dns.GetHostName();|
+| ConnectionTimeout         | The connection timeout                                                                | 60 seconds            |
+| RetryInterval (B)         | The send message retry interval                                                       | 10 seconds            |
+| MaxFlushInterval (B)      | The maximum interval between flushes                                                  | 10 seconds            |
+| FlushingAccuracy (B)      | How often the messages queue is checked for messages to send                          | 250 milliseconds      |
+| MessagesPerRequest (B)    | How many messages need to be in the queue before flushing                             | 100                   |
+| MaxQueueSizeBytes (B)     | The messages queue capacity, in bytes                                                 | 1 000 000             |
+| HttpMessageHandler        | Override HTTP message handler which manages requests to SumoLogic                     | `null`               |
+| MinLogLevel               | Min accpated Log Level.                                                               | LogLevel.Information |
+| EnableScopes              | Enable Logger Scopes support                                                          | true                 |
+
+_arguments marked with "(B)" are available only to buffered sink (`IsBuffered = true`)_
+
+
+### Logger Registration
+
+To register logger, call AddSumoLogic extenstion method with during startup of Asp.Net Core application or Azure Function App:
+
+#### Asp.Net Core
+```csharp
+
+ public void Configure(IApplicationBuilder app, 
+                       IHostingEnvironment env,
+                       ILoggerFactory loggerFactory)
+{
+  loggerFactory.AddConsole();
+  
+  loggerFactory.AddSumoLogic(
+    new LoggerOptions{
+      Uri = "https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here=="
+    });
+  }
+
+  // more removed
+}
+```
+
+#### AzureFunctions
+```csharp
+
+ public class LoggingStartup : IWebJobsStartup
+ {
+    public void Configure(IWebJobsBuilder builder)
+    {
+      builder.Services.AddSumoLogic(
+        new LoggerOptions{
+          Uri = "https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here=="
+       });
+     }
+  }
+```
+
+## MessageFormatterFunc
+
+
+### Setting JSON Formatter
+
+When logging to SumoLogic, you may find useful to log JSON or XML instead of plain text message or to change the message. It is possible
+to configure JSON formatter by providing formatter Func.
+
+The default function is:
+```csharp
+public Func<string, Exception, string, LogLevel, IDictionary<string, object>, string> MessageFormatterFunc { get; set; }
+            = (message, ex, category, level, scopedProperties) => 
+$"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [{level}] {message} {ex}";
+```
+
+You can change it by setting MessageFormatterFunc in LoggerOptions like this
+
+```csharp
+var loggerOptions = new LoggerOptions
+{
+    Uri = "https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==",
+    MessageFormatterFunc = (message, ex, category, logLevel, properties) =>
+    {
+        var messageProperties = new Dictionary<string, string>();
+        messageProperties["date"] = DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff zzz"); //use nlog format for datetime with timezone offset
+
+        foreach (var o in properties.Where(x => x.Value != null && x.Key != "date"))
+        {
+            messageProperties[o.Key] = o.Value.ToString();
+        }
+
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            messageProperties["message"] = message;
+        }
+
+        messageProperties["level"] = logLevel.ToString();
+
+        if (ex != null)
+        {
+            messageProperties["exception"] = ex.ToString();
+        }
+
+        if (category != null)
+        {
+            messageProperties["category"] = category;
+        }
+
+        return JsonConvert.SerializeObject(messageProperties);
+    }
+};
+```
+
+Please note, in the example above, we put the date property first, because sumo logic considers time of the log message as a first date time it finds in the log message.

@@ -25,6 +25,7 @@
  */
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 
 namespace SumoLogic.Logging.AspNetCore
@@ -112,5 +113,22 @@ namespace SumoLogic.Logging.AspNetCore
         /// </summary>
         public ILogger DebuggingLogger { get; set; }
 
+        /// <summary>
+        /// Gets or Sets Minimum allowed log level. Default value LogLevel.Information.
+        /// </summary>
+        public LogLevel MinLogLevel { get; set; } = LogLevel.Information;
+
+        /// <summary>
+        /// Enables Scope Support. Enabled By Default.
+        /// </summary>
+        public bool EnableScopes { get; set; } = true;
+
+        /// <summary>
+        /// The function that's called by Logger to format log message and add any additional information.
+        /// Func input paramters: log message, exception (if any), logger category, log level, scope variables (if scope is enabled).
+        /// Returns only log message by default. Should be overwritten if you want more rich log messages. Also you can serialize you message as json or xml or any other string format as part of it. 
+        /// </summary>
+        public Func<string, Exception, string, LogLevel, IDictionary<string, object>, string> MessageFormatterFunc { get; set; }
+            = (message, ex, category, level, scopedProperties) => $"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} [{level}] {message} {ex}".TrimEnd();
     }
 }

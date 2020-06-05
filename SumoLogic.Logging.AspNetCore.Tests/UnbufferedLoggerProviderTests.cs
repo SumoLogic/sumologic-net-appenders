@@ -49,6 +49,8 @@ namespace SumoLogic.Logging.AspNetCore.Tests
                 SourceHost = "LoggerProviderTestSourceHost",
                 IsBuffered = false,
                 HttpMessageHandler = _messagesHandler,
+                MinLogLevel = LogLevel.Debug,
+                MessageFormatterFunc = (message, ex, category, level, scopedProperties) => message
             });
 
             _logger = _provider.CreateLogger("OverriddenCategory");
@@ -69,6 +71,14 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             _logger.LogInformation("This is a message");
             Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
             Assert.Equal($"This is a message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+        }
+
+        [Fact]
+        public void LogErrorMessageTest()
+        {
+            _logger.LogError(new Exception("Oh no! Something went wrong"), "This is an error message");
+            Assert.Equal(1, _messagesHandler.ReceivedRequests.Count);
+            Assert.Equal($"This is an error message{Environment.NewLine}", _messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -103,6 +113,26 @@ namespace SumoLogic.Logging.AspNetCore.Tests
             _logger.LogWarning("This is third message");
             _logger.LogError("This is fourth message");
             _logger.LogCritical("This is fifh message");
+            Assert.Equal($"This is fifh message{Environment.NewLine}", _messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
+            Assert.Equal($"This is fourth message{Environment.NewLine}", _messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
+            Assert.Equal($"This is third message{Environment.NewLine}", _messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);
+            Assert.Equal($"This is second message{Environment.NewLine}", _messagesHandler.ReceivedRequests[1].Content.ReadAsStringAsync().Result);
+            Assert.Equal($"This is first message{Environment.NewLine}", _messagesHandler.ReceivedRequests[0].Content.ReadAsStringAsync().Result);
+        }
+
+        /// <summary>
+        /// Test MinLogLevel works
+        /// </summary>
+        [Fact]
+        public void MinLogLevelTest()
+        {
+            _logger.LogTrace("This log message will be ignored, because min log level is set to Debug!");
+            _logger.LogDebug("This is first message");
+            _logger.LogInformation("This is second message");
+            _logger.LogWarning("This is third message");
+            _logger.LogError("This is fourth message");
+            _logger.LogCritical("This is fifh message");
+            Assert.Equal(5, _messagesHandler.ReceivedRequests.Count);
             Assert.Equal($"This is fifh message{Environment.NewLine}", _messagesHandler.ReceivedRequests[4].Content.ReadAsStringAsync().Result);
             Assert.Equal($"This is fourth message{Environment.NewLine}", _messagesHandler.ReceivedRequests[3].Content.ReadAsStringAsync().Result);
             Assert.Equal($"This is third message{Environment.NewLine}", _messagesHandler.ReceivedRequests[2].Content.ReadAsStringAsync().Result);

@@ -37,7 +37,7 @@ namespace SumoLogic.Logging.AspNetCore
     /// Sumo Logic Logger Provider implementation
     /// </summary>
     [ProviderAlias("SumoLogic")]
-    public class LoggerProvider : ILoggerProvider
+    public class LoggerProvider : ILoggerProvider, ISupportExternalScope
     {
         public LoggerOptions LoggerOptions { get; private set; }
 
@@ -50,6 +50,8 @@ namespace SumoLogic.Logging.AspNetCore
         private SumoLogicMessageSenderBufferFlushingTask flushBufferTask = null;
 
         private volatile BufferWithEviction<string> messagesQueue = null;
+
+        private readonly ExternalScopeProviderEnforcer externalScopeProviderEnforcer = new ExternalScopeProviderEnforcer();
 
         public LoggerProvider(IOptionsMonitor<LoggerOptions> options)
         {
@@ -89,10 +91,12 @@ namespace SumoLogic.Logging.AspNetCore
         /// Write a single message line to Sumo Logic
         /// </summary>
         /// <param name="message">the message line to be sent</param>
-        /// <param name="categoryName">not used for now</param>
-        public void WriteLine(String message, String categoryName)
+        /// <param name="ex">Exception if any</param>
+        /// <param name="categoryName">Logger Category Name</param>
+        /// <param name="logLevel">Log message level.</param>
+        public void WriteLine(string message, Exception ex, string categoryName, LogLevel logLevel)
         {
-            if (null == message)
+            if (string.IsNullOrWhiteSpace(message) && ex == null)
             {
                 return;
             }
@@ -103,9 +107,11 @@ namespace SumoLogic.Logging.AspNetCore
                 return;
             }
 
-            String line = string.Concat(
-                message.TrimEnd(Environment.NewLine.ToCharArray()),
-                Environment.NewLine);
+            message = message ?? string.Empty;
+
+            var fullMessage = LoggerOptions.MessageFormatterFunc(message.TrimEnd(Environment.NewLine.ToCharArray()), ex, categoryName,
+                logLevel, externalScopeProviderEnforcer.GetScopeProperties());
+            var line = string.Concat(fullMessage, Environment.NewLine);
 
             if (LoggerOptions.IsBuffered)
             {
@@ -115,6 +121,21 @@ namespace SumoLogic.Logging.AspNetCore
             {
                 WriteLineToSumo(line);
             }
+        }
+
+        void ISupportExternalScope.SetScopeProvider(IExternalScopeProvider scopeProvider)
+        {
+            externalScopeProviderEnforcer.SetExternalScopeProvider(scopeProvider);
+        }
+
+        public IDisposable BeginScope(object state)
+        {
+            if (LoggerOptions.EnableScopes)
+            {
+                return externalScopeProviderEnforcer.BeginScope(state);
+            }
+
+            return null;
         }
 
         private void ReConfig(LoggerOptions options)
@@ -183,6 +204,5 @@ namespace SumoLogic.Logging.AspNetCore
                 .GetAwaiter()
                 .GetResult();
         }
-
     }
 }
