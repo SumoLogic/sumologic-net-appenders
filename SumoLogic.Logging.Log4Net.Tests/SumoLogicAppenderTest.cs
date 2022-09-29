@@ -23,15 +23,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 namespace SumoLogic.Logging.Log4Net.Tests
 {
     using System;
-    using System.Net.Http;
+    using System.IO;
     using log4net;
     using log4net.Core;
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
     using SumoLogic.Logging.Common.Sender;
+    using SumoLogic.Logging.Common.Tests;
     using Xunit;
 
     /// <summary>
@@ -64,20 +66,24 @@ namespace SumoLogic.Logging.Log4Net.Tests
         /// </summary>
         public SumoLogicAppenderTest()
         {
-            this.messagesHandler = new MockHttpMessageHandler();
+            messagesHandler = new MockHttpMessageHandler();
 
-            this.sumoLogicAppender = new SumoLogicAppender(null, this.messagesHandler);
-            this.sumoLogicAppender.Url = "http://www.fakeadress.com";
-            this.sumoLogicAppender.Layout = new PatternLayout("-- %m%n");
-            this.sumoLogicAppender.ActivateOptions();
+            sumoLogicAppender = new SumoLogicAppender(null, messagesHandler);
+            sumoLogicAppender.Url = "http://www.fakeadress.com";
+            sumoLogicAppender.SourceName = "SumoLogicAppenderSourceName";
+            sumoLogicAppender.SourceCategory = "SumoLogicAppenderSourceCategory";
+            sumoLogicAppender.SourceHost = "SumoLogicAppenderSourceHost";
+            sumoLogicAppender.Layout = new PatternLayout("-- %m%n");
+            sumoLogicAppender.UseConsoleLog = true;
+            sumoLogicAppender.ActivateOptions();
 
-            this.log4netLog = LogManager.GetLogger(typeof(SumoLogicAppenderTest));
-            this.log4netLogger = this.log4netLog.Logger as Logger;
-            this.log4netLogger.Additivity = false;
-            this.log4netLogger.Level = Level.All;
-            this.log4netLogger.RemoveAllAppenders();
-            this.log4netLogger.AddAppender(this.sumoLogicAppender);
-            this.log4netLogger.Repository.Configured = true;
+            log4netLog = LogManager.GetLogger(typeof(SumoLogicAppenderTest));
+            log4netLogger = (Logger)log4netLog.Logger;
+            log4netLogger.Additivity = false;
+            log4netLogger.Level = Level.All;
+            log4netLogger.RemoveAllAppenders();
+            log4netLogger.AddAppender(sumoLogicAppender);
+            log4netLogger.Repository.Configured = true;
         }
 
         /// <summary>
@@ -86,10 +92,10 @@ namespace SumoLogic.Logging.Log4Net.Tests
         [Fact]
         public void TestSingleMessage()
         {
-            this.log4netLog.Info("This is a message");
+            log4netLog.Info("This is a message");
 
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("-- This is a message\r\n\r\n", this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            Assert.Equal("-- This is a message" + Environment.NewLine + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -101,11 +107,68 @@ namespace SumoLogic.Logging.Log4Net.Tests
             int numMessages = 20;
             for (int i = 0; i < numMessages / 2; i++)
             {
-                this.log4netLog.Info("info " + i);
-                this.log4netLog.Error("error " + i);
+                log4netLog.Info("info " + i);
+                log4netLog.Error("error " + i);
             }
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
+            });
+        }
 
-            Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+        /// <summary>
+        /// Test that setting <see cref="SumoLogicAppender.UseConsoleLog"/> to true 
+        /// will cause the appender to log to the console.
+        /// </summary>
+        [Fact]
+        public void TestConsoleLogging()
+        {
+            lock (ConsoleMutex.mutex)
+            {
+                var writer = new StringWriter();
+                try
+                {
+                    Console.SetOut(writer);
+
+                    log4netLog.Info("hello");
+                    writer.Flush();
+                    var consoleText = writer.GetStringBuilder().ToString();
+                    Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                }
+                finally
+                {
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                    writer.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tests that an error is generated automatically if no format is provided.
+        /// </summary>
+        [Fact]
+        public void TestRequiresLayout()
+        {
+            var oldLayout = sumoLogicAppender.Layout;
+            var oldErrorHandler = sumoLogicAppender.ErrorHandler;
+            try
+            {
+                sumoLogicAppender.ErrorHandler = new TestErrorHandler();
+                sumoLogicAppender.Layout = null; // set to bogus null/missing value
+                log4netLog.Info("oops"); // push through a message
+
+                // nothing should be thrown, but an error should be generated
+                var errHandler = (TestErrorHandler)sumoLogicAppender.ErrorHandler;
+                Assert.Single(errHandler.Errors);
+                Assert.Contains("No layout set", errHandler.Errors[0]);
+            }
+            finally
+            {
+                sumoLogicAppender.Layout = oldLayout;
+                sumoLogicAppender.ErrorHandler = oldErrorHandler;
+            }
         }
 
         /// <summary>
@@ -113,7 +176,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -125,8 +188,8 @@ namespace SumoLogic.Logging.Log4Net.Tests
         {
             if (disposing)
             {
-                this.log4netLogger.RemoveAllAppenders();
-                this.messagesHandler.Dispose();
+                log4netLogger.RemoveAllAppenders();
+                messagesHandler.Dispose();
             }
         }
     }

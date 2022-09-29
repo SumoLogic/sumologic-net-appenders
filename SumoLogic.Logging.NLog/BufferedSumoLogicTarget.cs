@@ -27,13 +27,12 @@ namespace SumoLogic.Logging.NLog
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IO;
     using System.Net.Http;
-    using System.Text;
-    using System.Timers;
+    using System.Threading;
     using global::NLog;
+    using global::NLog.Config;
     using global::NLog.Targets;
+    using global::NLog.Layouts;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
@@ -74,35 +73,59 @@ namespace SumoLogic.Logging.NLog
         public BufferedSumoLogicTarget(ILog log, HttpMessageHandler httpMessageHandler)
         {
             this.SourceName = "Nlog-SumoObject-Buffered";
+            this.OptimizeBufferReuse = true;
             this.ConnectionTimeout = 60000;
             this.RetryInterval = 10000;
             this.MessagesPerRequest = 100;
             this.MaxFlushInterval = 10000;
             this.FlushingAccuracy = 250;
             this.MaxQueueSizeBytes = 1000000;
-            this.LogLog = log ?? new DummyLog();
+            this.LogLog = new InternalLoggerLog(GetType().Name + ": ", log);
             this.HttpMessageHandler = httpMessageHandler;
-            this.AppendException = true;
+            this.Layout = "${longdate}|${level:uppercase=true}|${logger}|${message}${exception:format=tostring}${newline}";
         }
 
         /// <summary>
         /// Gets or sets the SumoLogic server URL.
         /// </summary>
+        [RequiredParameter]
         [SuppressMessage("Microsoft.Design", "CA1056:UriPropertiesShouldNotBeStrings", Justification = "Property needs to be exposed as string for allowing configuration")]
         public string Url
         {
-            get;
-            set;
+            get { return (_urlLayout as SimpleLayout).Text; }
+            set { _urlLayout = value ?? string.Empty; }
         }
+        Layout _urlLayout;
 
         /// <summary>
         /// Gets or sets the name used for messages sent to SumoLogic server (sent as X-Sumo-Name header).
         /// </summary>
         public string SourceName
         {
-            get;
-            set;
+            get { return (_sourceLayout as SimpleLayout).Text; }
+            set { _sourceLayout = value ?? string.Empty; }
         }
+        Layout _sourceLayout;
+
+        /// <summary>
+        /// Gets or sets the source category for messages sent to SumoLogic server (sent as X-Sumo-Category header).
+        /// </summary>
+        public string SourceCategory
+        {
+            get { return (_categoryLayout as SimpleLayout).Text; }
+            set { _categoryLayout = value ?? string.Empty; }
+        }
+        Layout _categoryLayout;
+
+        /// <summary>
+        /// Gets or sets the source host for messages sent to SumoLogic server (sent as X-Sumo-Host header).
+        /// </summary>
+        public string SourceHost
+        {
+            get { return (_hostLayout as SimpleLayout).Text; }
+            set { _hostLayout = value ?? string.Empty; }
+        }
+        Layout _hostLayout;
 
         /// <summary>
         /// Gets or sets the send message retry interval, in milliseconds.
@@ -162,6 +185,9 @@ namespace SumoLogic.Logging.NLog
         /// <summary>
         /// Gets or sets a value indicating whether the console log should be used.
         /// </summary>
+        /// <remarks>
+        /// Consider using the builtin NLog InternalLogger for troubleshooting
+        /// </remarks>
         public bool UseConsoleLog
         {
             get;
@@ -169,18 +195,17 @@ namespace SumoLogic.Logging.NLog
         }
 
         /// <summary>
+        /// !! Obsolete !! Instead configure Target.Layout to include wanted Exception details Ex. ${exception:format=tostring}
+        /// 
         /// Gets or sets a value indicating whether the exception.ToString() should be automatically appended to the message being sent
         /// </summary>
-        public bool AppendException
-        {
-            get;
-            set;
-        }
+        [Obsolete("Instead configure Target.Layout to include wanted Exception details.")]
+        public bool AppendException { get; set; }
 
         /// <summary>
         /// Gets or sets the log service.
         /// </summary>
-        private ILog LogLog
+        private InternalLoggerLog LogLog
         {
             get;
             set;
@@ -209,7 +234,11 @@ namespace SumoLogic.Logging.NLog
         /// </summary>
         public void ActivateConsoleLog()
         {
-            this.LogLog = new ConsoleLog();
+            // If console output for the NLog InternalLogger is already active, then no need to have double console-output
+            if (!this.LogLog.IsConsoleEnabled)
+            {
+                this.LogLog = new InternalLoggerLog(GetType().Name + ": ", new ConsoleLog());
+            }
         }
 
         /// <summary>
@@ -244,24 +273,36 @@ namespace SumoLogic.Logging.NLog
             // Initialize the sender
             if (this.SumoLogicMessageSender == null)
             {
-                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog);
+                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-nlog-buffered-sender");
             }
+
+            var url = _urlLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceName = _sourceLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceCategory = _categoryLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
+            var sourceHost = _hostLayout?.Render(LogEventInfo.CreateNullEvent()) ?? string.Empty;
 
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);
             this.SumoLogicMessageSender.ConnectionTimeout = TimeSpan.FromMilliseconds(this.ConnectionTimeout);
-            this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(this.Url) ? null : new Uri(this.Url);
+            this.SumoLogicMessageSender.Url = string.IsNullOrEmpty(url) ? null : new Uri(url);
 
             // Initialize flusher
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
             }
 
             // Ensure any existing buffer is flushed
             if (this.flushBufferTask != null)
             {
-                flushBufferTask.FlushAndSend();
+                // this is NOT present in the log4net code. one-time blocking operation.
+                try
+                {
+                    this.flushBufferTask.FlushAndSend().GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    this.LogLog.Warn($"Buffered target failed to flush pending logevents. {ex.GetType()}: {ex.Message}");
+                }
             }
 
             this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
@@ -269,13 +310,16 @@ namespace SumoLogic.Logging.NLog
                 this.SumoLogicMessageSender,
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
                 this.MessagesPerRequest,
-                this.SourceName,
+                sourceName,
+                sourceCategory,
+                sourceHost,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => flushBufferTask.Run();
-
-            this.flushBufferTimer.Start();
+            this.flushBufferTimer = new Timer(
+                _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
+                null,
+                TimeSpan.FromMilliseconds(0),
+                TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -299,19 +343,13 @@ namespace SumoLogic.Logging.NLog
                 return;
             }
 
-            var bodyBuilder = new StringBuilder();
-            using (var textWriter = new StringWriter(bodyBuilder, CultureInfo.InvariantCulture))
+            var body = this.RenderLogEvent(this.Layout, logEvent) ?? string.Empty;
+            if (body.Length < Environment.NewLine.Length || body[body.Length - 1] != Environment.NewLine[Environment.NewLine.Length - 1])
             {
-                textWriter.Write(Layout.Render(logEvent));
-                if (logEvent.Exception != null && this.AppendException)
-                {
-                    textWriter.Write(logEvent.Exception.ToString());
-                }
-
-                textWriter.WriteLine();
+                body = string.Concat(body, Environment.NewLine);
             }
 
-            this.messagesQueue.Add(bodyBuilder.ToString());
+            this.messagesQueue.Add(body);
         }
 
         /// <summary>
@@ -324,30 +362,42 @@ namespace SumoLogic.Logging.NLog
         {
             base.CloseTarget();
 
+            if (this.flushBufferTimer != null)
+            {
+                this.flushBufferTimer.Dispose();
+                this.flushBufferTimer = null;
+            }
+
             if (this.SumoLogicMessageSender != null)
             {
                 this.SumoLogicMessageSender.Dispose();
                 this.SumoLogicMessageSender = null;
             }
-
-            if (this.flushBufferTimer != null)
-            {
-                this.flushBufferTimer.Stop();
-                this.flushBufferTimer.Dispose();
-                this.flushBufferTimer = null;
-            }
         }
 
+        /// <summary>
+        /// Flush any pending log messages asynchronously (in case of asynchronous targets).
+        /// </summary>
+        /// <param name="asyncContinuation">The asynchronous continuation.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is passed to async continuation for proper handling.")]
         protected override void FlushAsync(global::NLog.Common.AsyncContinuation asyncContinuation)
         {
+            if (asyncContinuation == null)
+            {
+                throw new ArgumentNullException("asyncContinuation");
+            }
+
             try
             {
-                var flushBufferTask = this.flushBufferTask;
-                if (flushBufferTask != null)
+                var task = this.flushBufferTask;
+                if (task != null)
                 {
-                    flushBufferTask.FlushAndSend();
+                    task.FlushAndSend().ContinueWith(t => asyncContinuation(t.Exception));
                 }
-                asyncContinuation(null);
+                else
+                {
+                    asyncContinuation(null);
+                }
             }
             catch (Exception ex)
             {

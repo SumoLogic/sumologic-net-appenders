@@ -31,12 +31,13 @@ namespace SumoLogic.Logging.Log4Net
     using System.IO;
     using System.Net.Http;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
     using log4net.Appender;
     using log4net.Core;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
     using SumoLogic.Logging.Common.Sender;
-    using Timer = System.Timers.Timer;
 
     /// <summary>
     /// Buffered SumoLogic Appender implementation.
@@ -53,6 +54,11 @@ namespace SumoLogic.Logging.Log4Net
         /// The messages queue.
         /// </summary>
         private volatile BufferWithEviction<string> messagesQueue;
+
+        /// <summary>
+        /// The flush buffer task.
+        /// </summary>
+        private SumoLogicMessageSenderBufferFlushingTask flushBufferTask;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BufferedSumoLogicAppender"/> class.
@@ -94,6 +100,24 @@ namespace SumoLogic.Logging.Log4Net
         /// Gets or sets the name used for messages sent to SumoLogic server (sent as X-Sumo-Name header).
         /// </summary>
         public string SourceName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source category for messages sent to SumoLogic server
+        /// </summary>
+        public string SourceCategory
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the source host for messages sent to SumoLogic server
+        /// </summary>
+        public string SourceHost
         {
             get;
             set;
@@ -157,11 +181,13 @@ namespace SumoLogic.Logging.Log4Net
         /// <summary>
         /// Gets or sets a value indicating whether the console log should be used.
         /// </summary>
-        public bool UseConsoleLog 
-        { 
-            get; 
-            set; 
+        public bool UseConsoleLog
+        {
+            get;
+            set;
         }
+
+        protected override bool RequiresLayout { get { return true; } }
 
         /// <summary>
         /// Gets or sets the log service.
@@ -223,7 +249,7 @@ namespace SumoLogic.Logging.Log4Net
             // Initialize the sender
             if (this.SumoLogicMessageSender == null)
             {
-                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog);
+                this.SumoLogicMessageSender = new SumoLogicMessageSender(this.HttpMessageHandler, this.LogLog, "sumo-log4net-buffered-sender");
             }
 
             this.SumoLogicMessageSender.RetryInterval = TimeSpan.FromMilliseconds(this.RetryInterval);
@@ -233,22 +259,24 @@ namespace SumoLogic.Logging.Log4Net
             // Initialize flusher
             if (this.flushBufferTimer != null)
             {
-                this.flushBufferTimer.Stop();
                 this.flushBufferTimer.Dispose();
             }
 
-            var flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
+            this.flushBufferTask = new SumoLogicMessageSenderBufferFlushingTask(
                 this.messagesQueue,
                 this.SumoLogicMessageSender,
                 TimeSpan.FromMilliseconds(this.MaxFlushInterval),
                 this.MessagesPerRequest,
                 this.SourceName,
+                this.SourceCategory,
+                this.SourceHost,
                 this.LogLog);
 
-            this.flushBufferTimer = new Timer(TimeSpan.FromMilliseconds(this.FlushingAccuracy).TotalMilliseconds);
-            this.flushBufferTimer.Elapsed += (s, e) => flushBufferTask.Run();
-
-            this.flushBufferTimer.Start();
+            this.flushBufferTimer = new Timer(
+                _ => flushBufferTask.Run(), // No task await to avoid unhandled exception
+                null,
+                TimeSpan.FromMilliseconds(0),
+                TimeSpan.FromMilliseconds(this.FlushingAccuracy));
         }
 
         /// <summary>
@@ -268,7 +296,7 @@ namespace SumoLogic.Logging.Log4Net
                 {
                     this.LogLog.Warn("Appender not initialized. Dropping log entry");
                 }
-                    
+
                 return;
             }
 
@@ -296,19 +324,17 @@ namespace SumoLogic.Logging.Log4Net
         /// </remarks>
         protected override void OnClose()
         {
-            base.OnClose();
-
-            if (this.SumoLogicMessageSender != null)
+            try
             {
-                this.SumoLogicMessageSender.Dispose();
+                this.flushBufferTimer?.Dispose();
+                this.flushBufferTimer = null;
+                Flush(5000);
+                this.SumoLogicMessageSender?.Dispose();
                 this.SumoLogicMessageSender = null;
             }
-
-            if (this.flushBufferTimer != null)
+            catch (Exception ex)
             {
-                this.flushBufferTimer.Stop();
-                this.flushBufferTimer.Dispose();
-                this.flushBufferTimer = null;
+                this.LogLog.Warn($"Appender closed with error. {ex.GetType()}: {ex.Message}");
             }
         }
 
@@ -318,6 +344,25 @@ namespace SumoLogic.Logging.Log4Net
         private void ActivateConsoleLog()
         {
             this.LogLog = new ConsoleLog();
+        }
+
+        /// <summary>
+        /// Flush the any remaining messages that are buffered.
+        /// </summary>
+        /// <param name="millisecondsTimeout"></param>
+        /// <returns></returns>
+        public override bool Flush(int millisecondsTimeout)
+        {
+            try
+            {
+                var flushTask = flushBufferTask?.FlushAndSend() ?? Task.FromResult<object>(null);
+                return Task.WhenAny(flushTask, Task.Delay(TimeSpan.FromMilliseconds(millisecondsTimeout))).GetAwaiter().GetResult().Id == flushTask.Id;
+            }
+            catch (Exception ex)
+            {
+                this.LogLog.Warn($"Appender flush with error. {ex.GetType()}: {ex.Message}");
+                return false;   // Not allowed to throw exceptions, as it will affect flush of other appenders
+            }
         }
     }
 }

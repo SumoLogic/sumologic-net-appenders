@@ -23,12 +23,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 namespace SumoLogic.Logging.Common.Sender
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Threading.Tasks;
     using SumoLogic.Logging.Common.Log;
     using SumoLogic.Logging.Common.Queue;
 
@@ -68,6 +70,16 @@ namespace SumoLogic.Logging.Common.Sender
         protected string MessagesName { get; set; }
 
         /// <summary>
+        /// Gets or sets the category used when sending messages.
+        /// </summary>
+        protected string MessagesCategory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the host used when sending messages.
+        /// </summary>
+        protected string MessagesHost { get; set; }
+
+        /// <summary>
         /// Gets or sets the Log service.
         /// </summary>
         protected ILog Log { get; set; }
@@ -94,25 +106,44 @@ namespace SumoLogic.Logging.Common.Sender
         /// This flush and sends the messages.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception unknown at compile time.")]
-        public void Run()
+        public async Task Run()
         {
-            if (this.NeedsFlushing())
+            try
             {
-                this.IsFlushing = true;
-                try
+                if (this.NeedsFlushing())
                 {
-                    this.FlushAndSend();
+                    this.IsFlushing = true;
+                    await this.FlushAndSend().ConfigureAwait(false);
                 }
-                catch (Exception ex)
+
+                this.IsFlushing = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Warn($"HTTP Sender flush failed: {ex.GetType()}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Flush and send all messages from the queue of messages.
+        /// </summary>
+        public async Task FlushAndSend()
+        {
+            var messages = new List<TBufferItem>();
+            this.MessageQueue.DrainTo(messages);
+
+            if (messages.Count > 0)
+            {
+                if (this.Log.IsDebugEnabled)
                 {
-                    if (this.Log.IsWarnEnabled)
-                    {
-                        this.Log.Warn("Exception while attempting to flush and send, Exception: " + ex.Message);
-                    }
+                    this.Log.Debug(string.Format(CultureInfo.InvariantCulture, "{0} - Flushing and sending out {1} messages ({2} messages left)", DateTime.Now, messages.Count, this.MessageQueue.Count));
                 }
+
+                TMessage body = this.Aggregate(messages);
+                await this.SendOut(body, this.MessagesName, this.MessagesCategory, this.MessagesHost).ConfigureAwait(false);
             }
 
-            this.IsFlushing = false;
+            this.LastFlushedOn = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -127,7 +158,17 @@ namespace SumoLogic.Logging.Common.Sender
         /// </summary>
         /// <param name="body">The body.</param>
         /// <param name="name">The name.</param>
-        protected abstract void SendOut(TMessage body, string name);
+        [Obsolete("use SendOut(TMessage body, string name, string category, string host)")]
+        protected abstract Task SendOut(TMessage body, string name);
+
+        /// <summary>
+        /// Sends aggregated message out. Block until we've successfully sent it.
+        /// </summary>
+        /// <param name="body">The body.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="category">The category.</param>
+        /// <param name="host">The host.</param>
+        protected abstract Task SendOut(TMessage body, string name, string category, string host);
 
         /// <summary>
         /// Returns if the queue needs to flushing messages.
@@ -136,28 +177,6 @@ namespace SumoLogic.Logging.Common.Sender
         private bool NeedsFlushing()
         {
             return this.MessageQueue.Count >= this.MessagesPerRequest || DateTime.UtcNow.Ticks - this.MaxFlushInterval.Ticks >= this.LastFlushedOn.Ticks || this.IsFlushing;
-        }
-
-        /// <summary>
-        /// Flush and send all messages from the queue of messages.
-        /// </summary>
-        public void FlushAndSend()
-        {
-            var messages = new List<TBufferItem>();
-            this.MessageQueue.DrainTo(messages);
-
-            if (messages.Count > 0)
-            {
-                if (this.Log.IsDebugEnabled)
-                {
-                    this.Log.Debug(string.Format(CultureInfo.InvariantCulture, "{0} - Flushing and sending out {1} messages ({2} messages left)", DateTime.Now, messages.Count, this.MessageQueue.Count));
-                }
-                
-                TMessage body = this.Aggregate(messages);
-                this.SendOut(body, this.MessagesName);
-            }
-
-            this.LastFlushedOn = DateTime.UtcNow;
-        }
+        }        
     }
 }

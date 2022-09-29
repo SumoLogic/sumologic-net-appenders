@@ -27,6 +27,7 @@ namespace SumoLogic.Logging.Common.Tests.Queue
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
     using SumoLogic.Logging.Common.Queue;
     using Xunit;
 
@@ -108,6 +109,56 @@ namespace SumoLogic.Logging.Common.Tests.Queue
         }
 
         /// <summary>
+        /// Drain queue while simultaneously writing into it
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unit test")]
+        [Fact]
+        public void DrainToWithWritersTest()
+        {
+            var queue = new CostBoundedConcurrentQueue<string>(10000, new StringLengthCostAssigner());
+            for (int i = 0; i < 5000; i++)
+            {
+                queue.Enqueue(BuildStringOfSize(2));
+            }
+
+            Assert.Equal(10000, queue.Cost);
+
+            // start background writer that will attempt to enqueue
+            // new messages while we drain
+            var token = new CancellationTokenSource();
+            var writerThread = StartBackgroundWriter(queue, 1, 7000, token);
+            try
+            {
+                Thread.Sleep(100);
+                var drainCollection = new List<string>();
+                queue.DrainTo(drainCollection);
+
+                // only the original 5000 messages should be drained, none
+                // of the newly-written messages
+                TestHelper.Eventually(() =>
+                {
+                    Assert.Equal(5000, drainCollection.Count);
+                });
+
+                // background writer should finish writing
+                Thread.Sleep(1000);
+                drainCollection.Clear();
+                queue.DrainTo(drainCollection);
+                TestHelper.Eventually(() =>
+                {
+                    Assert.Equal(7000, drainCollection.Count);
+                });
+            }
+            finally
+            {
+                if (writerThread.IsAlive)
+                {
+                    token.Cancel();
+                }
+            }
+        }
+
+        /// <summary>
         /// Builds a string with a length of 'n' characters.
         /// </summary>
         /// <param name="n">The string length.</param>
@@ -121,6 +172,36 @@ namespace SumoLogic.Logging.Common.Tests.Queue
             }
 
             return str;
+        }
+
+        /// <summary>
+        /// Starts a background thread that will aggressively write elements into the specified queue.
+        /// </summary>
+        /// <param name="queue">Queue into which elements should be written</param>
+        /// <param name="elementCost">Cost of each element</param>
+        /// <param name="howMany">How many total elements should be written</param>
+        /// <returns>The resultant thread. The thread will already be started.</returns>
+        private static Thread StartBackgroundWriter(CostBoundedConcurrentQueue<string> queue, int elementCost, int howMany, CancellationTokenSource token)
+        {
+            Thread t = new Thread(new ThreadStart(() =>
+            {
+                var str = BuildStringOfSize(elementCost);
+
+                // spin as fast as possible, adding elements as soon as capacity becomes available
+                for (int i = 0; i < howMany; i++)
+                {
+                    while (!queue.Enqueue(str))
+                    {
+                        if(token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+                    }
+                }
+            }));
+
+            t.Start();
+            return t;
         }
     }
 }

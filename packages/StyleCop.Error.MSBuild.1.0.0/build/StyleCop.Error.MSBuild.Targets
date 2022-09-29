@@ -1,6 +1,0 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">   
-  <!-- Define StyleCopTreatErrorsAsWarnings as false , this is force stylecop warnings to come as error. -->
-  <PropertyGroup>
-    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
-  </PropertyGroup>
-</Project>

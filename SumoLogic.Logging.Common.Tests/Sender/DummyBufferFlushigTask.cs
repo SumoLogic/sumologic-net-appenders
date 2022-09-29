@@ -23,6 +23,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Threading.Tasks;
+
 namespace SumoLogic.Logging.Common.Tests.Aggregation
 {
     using System;
@@ -43,7 +46,7 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         public DummyBufferFlushingTask(BufferWithEviction<string> queue)
             : base(queue, null)
         {
-            this.SentOut = new List<List<string>>();
+            SentOut = new List<List<string>>();
         }
 
         /// <summary>
@@ -56,9 +59,9 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         public DummyBufferFlushingTask(BufferWithEviction<string> queue, TimeSpan maxFlushInterval, long messagesPerRequest, string name)
             : this(queue)
         {
-            this.MaxFlushInterval = maxFlushInterval;
-            this.MessagesPerRequest = messagesPerRequest;
-            this.MessagesName = name;
+            MaxFlushInterval = maxFlushInterval;
+            MessagesPerRequest = messagesPerRequest;
+            MessagesName = name;
         }
 
         /// <summary>
@@ -78,6 +81,17 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         protected override IList<string> Aggregate(IList<string> messages)
         {
             return messages;
+        } 
+
+        /// <summary>
+        /// This sends out a message.
+        /// </summary>
+        /// <param name="body">Message body.</param>
+        /// <param name="name">Message name.</param>
+        [Obsolete("use SendOut(IList<string> body, string name, string category, string host)")]
+        protected override Task SendOut(IList<string> body, string name)
+        {
+            return Task.Run(() => SentOut.Add(new List<string>(body)));
         }
 
         /// <summary>
@@ -85,9 +99,11 @@ namespace SumoLogic.Logging.Common.Tests.Aggregation
         /// </summary>
         /// <param name="body">Message body.</param>
         /// <param name="name">Message name.</param>
-        protected override void SendOut(IList<string> body, string name)
+        /// <param name="category">Message category.</param>
+        /// <param name="host">Message host.</param>
+        protected override Task SendOut(IList<string> body, string name, string category, string host)
         {
-            this.SentOut.Add(new List<string>(body));
+            return Task.Run(() => SentOut.Add(new List<string>(body)));
         }
     }
 }

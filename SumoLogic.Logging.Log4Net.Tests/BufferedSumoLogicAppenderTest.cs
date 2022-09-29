@@ -23,16 +23,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 namespace SumoLogic.Logging.Log4Net.Tests
 {
     using System;
-    using System.Net.Http;
+    using System.IO;
     using System.Threading;
     using log4net;
     using log4net.Core;
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
     using SumoLogic.Logging.Common.Sender;
+    using SumoLogic.Logging.Common.Tests;
     using Xunit;
 
     /// <summary>
@@ -66,14 +68,34 @@ namespace SumoLogic.Logging.Log4Net.Tests
         [Fact]
         public void TestSingleMessage()
         {
-            this.SetUpLogger(1, 10000, 10);
+            SetUpLogger(1, 10000, 10);
 
-            this.log4netLog.Info("This is a message");
+            log4netLog.Info("This is a message");
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(100));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Assert.Equal("This is a message\r\n\r\n", this.messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+                Assert.Equal("This is a message" + Environment.NewLine + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
+            });
+        }
+
+        /// <summary>
+        /// Test logging of a single message.
+        /// </summary>
+        [Fact]
+        public void TestFlushMessage()
+        {
+            SetUpLogger(1, 10000, 10000);
+
+            log4netLog.Info("This is a message");
+
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+
+            bool success = (log4netLogger.Repository as log4net.Appender.IFlushable)?.Flush(5000) ?? false;
+            Assert.True(success);
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            Assert.Equal("This is a message" + Environment.NewLine + Environment.NewLine, messagesHandler.LastReceivedRequest.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>
@@ -82,16 +104,18 @@ namespace SumoLogic.Logging.Log4Net.Tests
         [Fact]
         public void TestMultipleMessages()
         {
-            this.SetUpLogger(1, 10000, 10);
+            SetUpLogger(1, 10000, 10);
 
             int numMessages = 20;
             for (int i = 0; i < numMessages; i++)
             {
-                this.log4netLog.Info("info " + i);
+                log4netLog.Info("info " + i);
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-
-            Assert.Equal(numMessages, this.messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -101,17 +125,19 @@ namespace SumoLogic.Logging.Log4Net.Tests
         public void TestBatchingBySize()
         {
             // Huge time window, ensure all messages get batched into one
-            this.SetUpLogger(100, 10000, 10);
+            SetUpLogger(100, 10000, 10);
 
             int numMessages = 100;
             for (int i = 0; i < numMessages; i++)
             {
-                this.log4netLog.Info("info " + i);
+                log4netLog.Info("info " + i);
             }
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(2000));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            });
         }
 
         /// <summary>
@@ -121,25 +147,59 @@ namespace SumoLogic.Logging.Log4Net.Tests
         public void TestBatchingByWindow()
         {
             // Small time window, ensure all messages get batched by time
-            this.SetUpLogger(10000, 500, 10);
+            SetUpLogger(10000, 500, 10);
 
             for (int i = 1; i <= 5; ++i)
             {
-                this.log4netLog.Info("message" + i);
+                log4netLog.Info("message" + i);
             }
 
-            Assert.Equal(0, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            });
 
             for (int i = 6; i <= 10; ++i)
             {
-                this.log4netLog.Info("message" + i);
+                log4netLog.Info("message" + i);
             }
 
-            Assert.Equal(1, this.messagesHandler.ReceivedRequests.Count);
-            Thread.Sleep(TimeSpan.FromMilliseconds(520));
-            Assert.Equal(2, this.messagesHandler.ReceivedRequests.Count);
+            Assert.Equal(1, messagesHandler.ReceivedRequests.Count);
+            TestHelper.Eventually(() =>
+            {
+                Assert.Equal(2, messagesHandler.ReceivedRequests.Count);
+            });
+        }
+
+        /// <summary>
+        /// Test that setting <see cref="BufferedSumoLogicAppender.UseConsoleLog"/> to true 
+        /// will cause the appender to log to the console.
+        /// </summary>
+        [Fact]
+        public void TestConsoleLogging()
+        {
+            lock (ConsoleMutex.mutex)
+            {
+                var writer = new StringWriter();
+                try
+                {
+                    Console.SetOut(writer);
+
+                    SetUpLogger(10000, 500, 10);
+                    log4netLog.Info("hello");
+                    writer.Flush();
+                    var consoleText = writer.GetStringBuilder().ToString();
+                    Assert.True(!string.IsNullOrWhiteSpace(consoleText));
+                }
+                finally
+                {
+                    var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+                    standardOutput.AutoFlush = true;
+                    Console.SetOut(standardOutput);
+                    writer.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -147,7 +207,7 @@ namespace SumoLogic.Logging.Log4Net.Tests
         /// </summary>
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -159,8 +219,33 @@ namespace SumoLogic.Logging.Log4Net.Tests
         {
             if (disposing)
             {
-                this.log4netLogger.RemoveAllAppenders();
-                this.messagesHandler.Dispose();
+                log4netLogger.RemoveAllAppenders();
+                messagesHandler.Dispose();
+            }
+        }
+
+        
+        [Fact]
+        public void TestRequiresLayout()
+        {
+            SetUpLogger(1, 10000, 10);
+            var oldLayout = bufferedSumoLogicAppender.Layout;
+            var oldErrorHandler = bufferedSumoLogicAppender.ErrorHandler;
+            try
+            {
+                bufferedSumoLogicAppender.ErrorHandler = new TestErrorHandler();
+                bufferedSumoLogicAppender.Layout = null; // set to bogus null/missing value
+                log4netLog.Info("oops"); // push through a message
+
+                // nothing should be thrown, but an error should be generated
+                var errHandler = (TestErrorHandler)bufferedSumoLogicAppender.ErrorHandler;
+                Assert.Single(errHandler.Errors);
+                Assert.Contains("No layout set", errHandler.Errors[0]);
+            }
+            finally
+            {
+                bufferedSumoLogicAppender.Layout = oldLayout;
+                bufferedSumoLogicAppender.ErrorHandler = oldErrorHandler;
             }
         }
 
@@ -173,24 +258,28 @@ namespace SumoLogic.Logging.Log4Net.Tests
         /// <param name="retryInterval">The retry interval, in milliseconds.</param>
         private void SetUpLogger(long messagesPerRequest, long maxFlushInterval, long flushingAccuracy, long retryInterval = 10000)
         {
-            this.messagesHandler = new MockHttpMessageHandler();
+            messagesHandler = new MockHttpMessageHandler();
 
-            this.bufferedSumoLogicAppender = new BufferedSumoLogicAppender(null, this.messagesHandler);
-            this.bufferedSumoLogicAppender.Url = "http://www.fakeadress.com";
-            this.bufferedSumoLogicAppender.MessagesPerRequest = messagesPerRequest;
-            this.bufferedSumoLogicAppender.MaxFlushInterval = maxFlushInterval;
-            this.bufferedSumoLogicAppender.FlushingAccuracy = flushingAccuracy;
-            this.bufferedSumoLogicAppender.RetryInterval = retryInterval;
-            this.bufferedSumoLogicAppender.Layout = new PatternLayout("%m%n");
-            this.bufferedSumoLogicAppender.ActivateOptions();
+            bufferedSumoLogicAppender = new BufferedSumoLogicAppender(null, messagesHandler);
+            bufferedSumoLogicAppender.Url = "http://www.fakeadress.com";
+            bufferedSumoLogicAppender.SourceName = "BufferedSumoLogicAppenderSourceName";
+            bufferedSumoLogicAppender.SourceCategory = "BufferedSumoLogicAppenderSourceCategory";
+            bufferedSumoLogicAppender.SourceHost = "BufferedSumoLogicAppenderSourceHost";
+            bufferedSumoLogicAppender.MessagesPerRequest = messagesPerRequest;
+            bufferedSumoLogicAppender.MaxFlushInterval = maxFlushInterval;
+            bufferedSumoLogicAppender.FlushingAccuracy = flushingAccuracy;
+            bufferedSumoLogicAppender.RetryInterval = retryInterval;
+            bufferedSumoLogicAppender.Layout = new PatternLayout("%m%n");
+            bufferedSumoLogicAppender.UseConsoleLog = true;
+            bufferedSumoLogicAppender.ActivateOptions();
 
-            this.log4netLog = LogManager.GetLogger(typeof(BufferedSumoLogicAppenderTest));
-            this.log4netLogger = this.log4netLog.Logger as Logger;
-            this.log4netLogger.Additivity = false;
-            this.log4netLogger.Level = Level.All;
-            this.log4netLogger.RemoveAllAppenders();
-            this.log4netLogger.AddAppender(this.bufferedSumoLogicAppender);
-            this.log4netLogger.Repository.Configured = true;
+            log4netLog = LogManager.GetLogger(typeof(BufferedSumoLogicAppenderTest));
+            log4netLogger = (Logger)log4netLog.Logger;
+            log4netLogger.Additivity = false;
+            log4netLogger.Level = Level.All;
+            log4netLogger.RemoveAllAppenders();
+            log4netLogger.AddAppender(bufferedSumoLogicAppender);
+            log4netLogger.Repository.Configured = true;
         }
     }
 }
