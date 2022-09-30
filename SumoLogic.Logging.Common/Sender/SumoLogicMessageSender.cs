@@ -102,7 +102,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <returns>True if the http client has been initialized, false otherwise.</returns>
         public bool CanTrySend
         {
-            get { return this.Url != null && this.ConnectionTimeout != TimeSpan.Zero; }
+            get { return this.Url != null && this.HttpClient != null && this.ConnectionTimeout != TimeSpan.Zero; }
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace SumoLogic.Logging.Common.Sender
         /// <returns>True if the http client has been initialized, false otherwise.</returns>
         public bool CanSend
         {
-            get { return this.Url != null && this.RetryInterval != TimeSpan.Zero && this.ConnectionTimeout != TimeSpan.Zero; }
+            get { return this.Url != null && this.RetryInterval != TimeSpan.Zero && this.HttpClient != null && this.ConnectionTimeout != TimeSpan.Zero; }
         }
 
         /// <summary>
