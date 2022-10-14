@@ -7,7 +7,7 @@
         <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
-        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.0</NetStandardImplicitPackageVersion>
+        <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/SumoLogic/sumologic-net-appenders/master/icon.png</PackageIconUrl>
         <RepositoryUrl>https://github.com/SumoLogic/sumologic-net-appenders</RepositoryUrl>
@@ -24,6 +24,6 @@
             <Link>CustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj"></ProjectReference>
-        <PackageReference Include="log4net" Version="2.0.8" />
+        <PackageReference Include="log4net" Version="2.0.10" />
     </ItemGroup>
 </Project>

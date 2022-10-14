@@ -157,7 +157,21 @@ namespace SumoLogic.Logging.Common.Tests.Http
             changeResponseTask.GetAwaiter().GetResult();
             Assert.True(requestBeforeSuccess < messagesHandler.ReceivedRequests.Count);
             Assert.Equal(HttpStatusCode.OK, messagesHandler.CurrentResponse.StatusCode);
-        }       
+        }     
+
+        /// <summary>
+        /// This test if the http client is called after dispose.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Unit test")]
+        [Fact]
+        public void HttpResponseCodeWhenDisposedTest()
+        {
+            Dispose();
+            Assert.False(sumoLogicMessageSender.CanSend);
+            Assert.False(sumoLogicMessageSender.CanTrySend);
+            sumoLogicMessageSender.Send("body", "name", "category", "host").Wait();
+            Assert.Equal(0, messagesHandler.ReceivedRequests.Count);
+        }
                 
         /// <summary>
         /// Releases the unmanaged resources used and optionally disposes of the managed resources.
