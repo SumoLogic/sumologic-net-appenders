@@ -253,6 +253,8 @@ namespace SumoLogic.Logging.Common.Sender
                         {
                             throw new IOException("The service is unavailable");
                         }
+
+                        throw new Exception($"Received HTTP error from Sumo Service: {response.StatusCode}");
                     }
 
                     if (this.Log.IsDebugEnabled)
