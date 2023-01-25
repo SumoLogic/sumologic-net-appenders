@@ -176,6 +176,62 @@ namespace SumoLogic.Logging.Serilog.Extensions
         }
 
         /// <summary>
+        /// Adds the <c>AuditTo.SumoLogic()</c> extension method to <see cref="LoggerConfiguration"/>.
+        /// </summary>
+        /// <param name="sinkConfiguration">Logger sink configuration.</param>
+        /// <param name="endpointUrl">SumoLogic endpoint URL.</param>
+        /// <param name="outputTemplate">
+        /// A message template describing the format used to write to the sink.
+        /// Default output template is <see cref="DefaultOutputTemplate"/>, set only if <paramref name="formatter"/> is kept <c>null</c>.
+        /// </param>
+        /// <param name="sourceName">The name used for messages sent to SumoLogic server.</param>
+        /// <param name="sourceCategory">The source category for messages sent to SumoLogic server.</param>
+        /// <param name="sourceHost">The source host for messages sent to SumoLogic Server.</param>
+        /// <param name="clientName">The client name value that is included in each request (used for telemetry).</param>
+        /// <param name="connectionTimeout">The connection timeout, in milliseconds.</param>
+        /// <param name="httpMessageHandler">Override HTTP message handler which manages requests to SumoLogic.</param>
+        /// <param name="formatter">
+        /// Controls the rendering of log events into text, for example to log JSON.
+        /// To control plain text formatting supply method with <paramref name="outputTemplate"/> and keep this <c>null</c>.
+        /// </param>
+        /// <param name="levelSwitch">A switch allowing the pass-through minimum level to be changed at runtime.</param>
+        /// <param name="restrictedToMinimumLevel">The minimum level for events passed through the sink. Ignored when <paramref name="levelSwitch"/> is specified.</param>
+        /// <returns>
+        /// Configuration object allowing method chaining.
+        /// </returns>
+        public static LoggerConfiguration SumoLogic(
+            this LoggerAuditSinkConfiguration sinkConfiguration,
+            Uri endpointUrl,
+            string outputTemplate = null,
+            string sourceName = "Serilog-SumoObject",
+            string sourceCategory = null,
+            string sourceHost = null,
+            string clientName = null,
+            long? connectionTimeout = null,
+            HttpMessageHandler httpMessageHandler = null,
+            ITextFormatter formatter = null,
+            LoggingLevelSwitch levelSwitch = null,
+            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
+        {
+            if (endpointUrl is null)
+            {
+                throw new ArgumentNullException(nameof(endpointUrl));
+            }
+
+            var sink = new SumoLogicSink(
+                null,
+                httpMessageHandler,
+                CreateConnection(
+                    endpointUrl,
+                    clientName,
+                    connectionTimeout),
+                CreateSource(sourceName, sourceCategory, sourceHost),
+                formatter ?? CreateTextFormatter(outputTemplate));
+
+            return sinkConfiguration.Sink(sink, restrictedToMinimumLevel, levelSwitch);
+        }
+
+        /// <summary>
         /// Creates SumoLogic connection describer.
         /// </summary>
         /// <returns>
