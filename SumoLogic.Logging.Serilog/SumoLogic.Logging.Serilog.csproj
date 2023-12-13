@@ -24,6 +24,11 @@
             <Link>CustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
-        <PackageReference Include="Serilog" Version="[2.0,3.0)" />
     </ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+            <PackageReference Include="Serilog" Version="[2.0,4.0)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or  '$(TargetFramework)' == 'netstandard1.3'">
+	    <PackageReference Include="Serilog" Version="[2.0,3.0)" />
+	</ItemGroup>
 </Project>
