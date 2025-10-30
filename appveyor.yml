@@ -1,5 +1,10 @@
-image: Visual Studio 2017
+image: Visual Studio 2019
 version: 0.0.0.{build}
+install:
+- ps: |
+    dotnet --version
+    dotnet --list-sdks
+    dotnet --list-runtimes
 build_script:
 - ps: .\ci\build-solution.ps1
 test_script:
