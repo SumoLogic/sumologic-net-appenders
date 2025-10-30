@@ -112,6 +112,10 @@ namespace SumoLogic.Logging.Log4Net.Tests
                 log4netLog.Info("info " + i);
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
+            
+            // Ensure all messages are flushed before checking
+            bufferedSumoLogicAppender.Flush(5000);
+            
             TestHelper.Eventually(() =>
             {
                 Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);

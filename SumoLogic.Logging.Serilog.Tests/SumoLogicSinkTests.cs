@@ -91,6 +91,9 @@ namespace SumoLogic.Logging.Serilog.Tests
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
 
+            // Ensure all messages are flushed before checking
+            logger.Dispose();
+
             TestHelper.Eventually(() =>
             {
                 Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
