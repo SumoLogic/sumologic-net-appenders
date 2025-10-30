@@ -4,7 +4,7 @@
         <Description>Log4Net appender which sends logs to the Sumo Logic machine data analytics platform.</Description>
         <Authors>Sumo Logic</Authors>
         <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+        <TargetFrameworks>net45;netstandard1.3;netstandard2.0</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
         <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
