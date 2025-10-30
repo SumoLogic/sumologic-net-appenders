@@ -4,7 +4,7 @@
         <Description>Serilog sink which sends logs to the Sumo Logic machine data analytics platform.</Description>
         <Authors>Sumo Logic</Authors>
         <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-        <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net45;net48;netstandard2.0</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
         <PackageProjectUrl>https://github.com/SumoLogic/sumologic-net-appenders</PackageProjectUrl>
@@ -24,7 +24,10 @@
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
     </ItemGroup>
-	<ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net48' ">
             <PackageReference Include="Serilog" Version="[2.0,)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+	    <PackageReference Include="Serilog" Version="[2.0,3.0)" />
 	</ItemGroup>
 </Project>
