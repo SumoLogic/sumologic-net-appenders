@@ -26,6 +26,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace SumoLogic.Logging.AspNetCore.Example
@@ -36,31 +37,42 @@ namespace SumoLogic.Logging.AspNetCore.Example
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddControllers();
+            services.AddLogging(builder =>
+            {
+                builder.AddConsole();
+                builder.AddSumoLogic("https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 #if !USE_BUILDER
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            loggerFactory.AddConsole();
-            loggerFactory.AddSumoLogic("https://collectors.us2.sumologic.com/receiver/v1/http/your_endpoint_here==");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
 #else
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
 #endif
     }
