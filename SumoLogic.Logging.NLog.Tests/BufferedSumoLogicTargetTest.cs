@@ -86,11 +86,6 @@ namespace SumoLogic.Logging.NLog.Tests
                 logger.Info(i);
                 Thread.Sleep(TimeSpan.FromMilliseconds(100));
             }
-            
-            // Ensure all messages are flushed before checking
-            bufferedSumoLogicTarget.Flush(_ => { });
-            Thread.Sleep(1000); // Allow time for flush to complete
-            
             TestHelper.Eventually(() =>
             {
                 Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
