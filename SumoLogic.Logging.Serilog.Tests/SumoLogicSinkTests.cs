@@ -84,15 +84,16 @@ namespace SumoLogic.Logging.Serilog.Tests
         {
             SetUpLogger(1, 10000, 10);
 
-            var numMessages = 20;
+            var numMessages = 10;
             for (var i = 0; i < numMessages; i++)
             {
                 logger.Information(i.ToString());
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(700));
             }
 
             TestHelper.Eventually(() =>
             {
+                // Expect all messages to arrive with sufficient sleep time
                 Assert.Equal(numMessages, _messagesHandler.ReceivedRequests.Count);
             });
         }

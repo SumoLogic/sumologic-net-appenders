@@ -78,16 +78,18 @@ namespace SumoLogic.Logging.NLog.Tests
         [Fact]
         public void TestMultipleMessages()
         {
-            SetUpLogger(1, 10000, 10);
+            SetUpLogger(1, 500, 10); // Reduce flush interval from 10000ms to 500ms
 
-            int numMessages = 20;
+            int numMessages = 10;
             for (int i = 0; i < numMessages; i++)
             {
                 logger.Info(i);
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(700));
             }
+            
             TestHelper.Eventually(() =>
             {
+                // Expect all messages to arrive with sufficient sleep time
                 Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
             });
         }

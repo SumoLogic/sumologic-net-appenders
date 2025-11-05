@@ -4,7 +4,7 @@
         <Description>Serilog sink which sends logs to the Sumo Logic machine data analytics platform.</Description>
         <Authors>Sumo Logic</Authors>
         <Copyright>Copyright © 2018 Sumo Logic Inc. - All Rights Reserved</Copyright>
-        <TargetFrameworks>net45;netstandard1.3;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net45;net46;net47;net48;netstandard1.3;netstandard2.0</TargetFrameworks>
         <SignAssembly Condition="'$(Configuration)' == 'Release' ">true</SignAssembly>
         <AssemblyOriginatorKeyFile>..\SumoLogic.Logging.snk</AssemblyOriginatorKeyFile>
         <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.3' ">1.6.1</NetStandardImplicitPackageVersion>
@@ -25,7 +25,7 @@
         </CodeAnalysisDictionary>
         <ProjectReference Include="..\SumoLogic.Logging.Common\SumoLogic.Logging.Common.csproj" />
     </ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'net48' Or '$(TargetFramework)' == 'net47' Or '$(TargetFramework)' == 'net46' ">
             <PackageReference Include="Serilog" Version="[2.0,)" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or  '$(TargetFramework)' == 'netstandard1.3'">

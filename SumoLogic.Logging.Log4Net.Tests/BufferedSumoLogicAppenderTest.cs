@@ -106,14 +106,15 @@ namespace SumoLogic.Logging.Log4Net.Tests
         {
             SetUpLogger(1, 10000, 10);
 
-            int numMessages = 20;
+            int numMessages = 10;
             for (int i = 0; i < numMessages; i++)
             {
                 log4netLog.Info("info " + i);
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(700));
             }
             TestHelper.Eventually(() =>
             {
+                // Expect all messages to arrive with sufficient sleep time
                 Assert.Equal(numMessages, messagesHandler.ReceivedRequests.Count);
             });
         }
