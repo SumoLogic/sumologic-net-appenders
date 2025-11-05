@@ -81,3 +81,4 @@ run-pack SumoLogic.Logging.Log4Net
 run-pack SumoLogic.Logging.NLog
 run-pack SumoLogic.Logging.Serilog
 run-pack SumoLogic.Logging.AspNetCore
+

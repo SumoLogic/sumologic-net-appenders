@@ -1,14 +1,26 @@
-image: Visual Studio 2017
+image: Visual Studio 2019
 version: 0.0.0.{build}
+
+before_build:
+  - ps: dotnet --list-sdks
+  - ps: dotnet --list-runtimes
+  - ps: dotnet --info
+
 build_script:
-- ps: .\ci\build-solution.ps1
+  - ps: echo "SDK used for build:"
+  - ps: dotnet --version
+  - ps: .\ci\build-solution.ps1
+
 test_script:
-- ps: .\ci\run-test.ps1
+  - ps: dotnet --info
+  - ps: .\ci\run-test.ps1
+
 artifacts:
-- path: SumoLogic.Logging.Nuget\**.nupkg
+  - path: SumoLogic.Logging.Nuget\**.nupkg
+
 deploy:
-- provider: NuGet
-  api_key:
-    secure: $(NUGET_API_KEY)
-  on:
-    appveyor_repo_tag: true
+  - provider: NuGet
+    api_key:
+      secure: $(NUGET_API_KEY)
+    on:
+      appveyor_repo_tag: true
