@@ -13,6 +13,12 @@
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="sample-message.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <!--
   <ItemGroup>
     <ProjectReference Include="..\SumoLogic.Logging.Serilog\SumoLogic.Logging.Serilog.csproj" />

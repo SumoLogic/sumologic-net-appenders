@@ -45,9 +45,10 @@ dotnet run
 - Configure your own parameters:
   - Messages per second
   - Duration
-  - Message size (Small/Medium/Large)
+  - Message size (Small/Medium/Large/XLarge/JSON from file)
   - Buffered vs Unbuffered
   - Buffer configuration
+  - Custom JSON file path (when using JSON from file option)
 
 ## Configuration Parameters
 
@@ -106,6 +107,8 @@ Success rate: 100.00%
 - **Small:** ~100 bytes (timestamp + counter)
 - **Medium:** ~300 bytes (includes 200 char payload)
 - **Large:** ~1100 bytes (includes 1000 char payload)
+- **XLarge:** ~1 MB (1,048,576 bytes of random characters)
+- **JSON from file:** Variable size (reads from a JSON file and injects counter for uniqueness)
 
 ## Monitoring for Issues
 
@@ -114,21 +117,56 @@ Watch for these warnings in console output:
 - `"Sink not initialized"` - Configuration error
 - High failure rate - Network or endpoint issues
 
-## Tips
-
-1. **Start small:** Begin with Burst Test (10 seconds) to verify connectivity
-2. **Monitor Sumo Logic:** Check that logs are appearing in your Sumo Logic account
-3. **Adjust buffer:** If you see eviction warnings, increase `maxQueueSizeBytes`
-4. **Network matters:** Results will vary based on network latency to Sumo Logic
-
 ## Endpoint Configuration
 
 The test is pre-configured with the endpoint:
 ```
-https://long-endpoint1-events.sumologic.net/receiver/v1/http/ZaVnC4dhaV...
+https://collectors.sumologic.com/receiver/v1/http/YOUR_ENDPOINT_HERE
 ```
 
 To use a different endpoint, modify the `SumoLogicEndpoint` constant in `Program.cs`.
+
+## Using Custom JSON Messages
+
+The load test supports sending custom JSON payloads from files:
+
+1. Create a JSON file with your message structure (e.g., `sample-message.json`)
+2. Select option 6 (Custom Test) from the main menu
+3. Choose option 5 (JSON from file) for message size
+4. Provide the path to your JSON file (or press Enter for default `sample-message.json`)
+
+The tool will:
+- Read your JSON file once at startup
+- Inject a unique counter into each message for tracking: `"counter":{counter},"timestamp":`
+- Send the message repeatedly according to your test parameters
+
+Example JSON structure (`sample-message.json` included):
+```json
+{
+  "timestamp": "2024-01-15T10:30:45.123Z",
+  "orderId": "ORD-20240115-4829",
+  "customerId": "CUST-A1B2C3D4",
+  "payment": {
+    "amount": 149.99,
+    "currency": "USD",
+    "method": "credit_card"
+  }
+}
+```
+
+After processing, each message will have a counter injected:
+```json
+{
+  "counter": 1,
+  "timestamp": "2024-01-15T10:30:45.123Z",
+  ...
+}
+```
+
+This allows you to:
+- Test with realistic message structures from your production system
+- Track individual messages in Sumo Logic using the counter field
+- Measure throughput with actual payload sizes
 
 ## Understanding Results
 
@@ -136,13 +174,11 @@ To use a different endpoint, modify the `SumoLogicEndpoint` constant in `Program
 - Actual rate matches target rate
 - Zero or minimal failed messages
 - No "Evicted messages" warnings
-- Logs appear in Sumo Logic with minimal delay
 
 ### Performance Issues:
 - Actual rate < target rate (backpressure)
 - High failure rate (network/endpoint issues)
 - Many evicted messages (buffer too small)
-- Logs delayed or missing in Sumo Logic
 
 ## Advanced Usage
 
@@ -158,4 +194,3 @@ dotnet run
 # Run with release optimizations
 dotnet run -c Release
 ```
-

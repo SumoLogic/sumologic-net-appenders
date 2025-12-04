@@ -1,0 +1,68 @@
+{
+  "timestamp": "2025-12-04T12:00:00.000Z",
+  "level": "INFO",
+  "service": "payment-processor",
+  "traceId": "abc123-def456-ghi789",
+  "spanId": "span-001",
+  "userId": "user-12345",
+  "transactionId": "txn-98765",
+  "event": "payment_processed",
+  "details": {
+    "amount": 129.99,
+    "currency": "USD",
+    "paymentMethod": "credit_card",
+    "cardType": "visa",
+    "last4": "4242",
+    "merchantId": "merchant-001",
+    "merchantName": "Example Store",
+    "category": "Electronics",
+    "items": [
+      {
+        "sku": "LAPTOP-001",
+        "name": "Professional Laptop",
+        "quantity": 1,
+        "price": 99.99
+      },
+      {
+        "sku": "MOUSE-002",
+        "name": "Wireless Mouse",
+        "quantity": 1,
+        "price": 29.99
+      }
+    ],
+    "billingAddress": {
+      "street": "123 Main St",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94105",
+      "country": "USA"
+    },
+    "shippingAddress": {
+      "street": "456 Oak Ave",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94102",
+      "country": "USA"
+    }
+  },
+  "metadata": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "sessionId": "session-xyz-789",
+    "deviceId": "device-abc-123",
+    "platform": "web",
+    "version": "2.5.1"
+  },
+  "performance": {
+    "requestDurationMs": 245,
+    "dbQueryTimeMs": 89,
+    "externalApiTimeMs": 102,
+    "cacheHit": true
+  },
+  "tags": [
+    "payment",
+    "credit-card",
+    "success",
+    "high-value"
+  ]
+}

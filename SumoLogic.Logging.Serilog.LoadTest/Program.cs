@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -12,6 +13,8 @@ namespace SumoLogic.Logging.Serilog.LoadTest
     {
         private static readonly string SumoLogicEndpoint = 
             "https://collectors.sumologic.com/receiver/v1/http/YOUR_ENDPOINT_HERE";
+        
+        private static string _jsonMessageTemplate = null;
 
         static async Task Main(string[] args)
         {
@@ -186,7 +189,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
             Console.Write("Duration (seconds): ");
             config.DurationSeconds = int.Parse(Console.ReadLine() ?? "60");
 
-            Console.Write("Message size (1=Small, 2=Medium, 3=Large, 4=XLarge 1MB): ");
+            Console.Write("Message size (1=Small, 2=Medium, 3=Large, 4=XLarge 1MB, 5=JSON from file): ");
             var sizeChoice = Console.ReadLine();
             config.MessageSize = sizeChoice switch
             {
@@ -194,8 +197,31 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 "2" => MessageSize.Medium,
                 "3" => MessageSize.Large,
                 "4" => MessageSize.XLarge,
+                "5" => MessageSize.JsonFile,
                 _ => MessageSize.Medium
             };
+            
+            if (config.MessageSize == MessageSize.JsonFile)
+            {
+                Console.Write("Path to JSON file (press Enter for default 'sample-message.json'): ");
+                var jsonPath = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(jsonPath))
+                {
+                    jsonPath = "sample-message.json";
+                }
+                
+                try
+                {
+                    _jsonMessageTemplate = File.ReadAllText(jsonPath);
+                    Console.WriteLine($"Loaded JSON template ({_jsonMessageTemplate.Length} bytes)");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error reading JSON file: {ex.Message}");
+                    Console.WriteLine("Falling back to Medium message size.");
+                    config.MessageSize = MessageSize.Medium;
+                }
+            }
 
             Console.Write("Use buffered sink? (y/n): ");
             config.UseBufferedSink = Console.ReadLine()?.ToLower() == "y";
@@ -357,6 +383,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 MessageSize.Medium => baseMessage + " | " + new string('X', 200),
                 MessageSize.Large => baseMessage + " | " + new string('X', 1000),
                 MessageSize.XLarge => baseMessage + " | " + new string('X', 1_000_000), // ~1MB message
+                MessageSize.JsonFile => _jsonMessageTemplate?.Replace("\"timestamp\":", $"\"counter\":{counter},\"timestamp\":") ?? baseMessage,
                 _ => baseMessage
             };
         }
@@ -395,6 +422,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         Small,
         Medium,
         Large,
-        XLarge
+        XLarge,
+        JsonFile
     }
 }
