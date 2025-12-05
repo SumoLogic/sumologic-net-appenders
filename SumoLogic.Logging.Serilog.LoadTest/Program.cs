@@ -399,7 +399,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
             {
                 MessageSize.Small => baseMessage,
                 MessageSize.Medium => baseMessage + " | " + new string('X', 200),
-                MessageSize.Large => baseMessage + " | " + new string('X', 1000),
+                MessageSize.Large => baseMessage + " | " + new string('X', 57000),
                 MessageSize.XLarge => baseMessage + " | " + new string('X', 1_000_000), // ~1MB message
                 MessageSize.JsonFile => _jsonMessageTemplate?.Replace("\"timestamp\":", $"\"counter\":{counter},\"timestamp\":") ?? baseMessage,
                 _ => baseMessage
