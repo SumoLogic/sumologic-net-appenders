@@ -21,7 +21,6 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         static async Task Main(string[] args)
         {
             Console.WriteLine("=== Sumo Logic Serilog Load Test ===");
-            Console.WriteLine($"Endpoint: {SumoLogicEndpoint.Substring(0, 50)}...");
             Console.WriteLine();
 
             // Display menu
@@ -247,6 +246,13 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 config.SourceCategory = sourceCategory;
             }
 
+            Console.Write("Sumo Logic endpoint (press Enter to use default): ");
+            var endpoint = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(endpoint))
+            {
+                config.SumologicEndpoint = endpoint;
+            }
+
             Console.WriteLine();
             await ExecuteLoadTest(config);
         }
@@ -360,7 +366,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
             if (config.UseBufferedSink)
             {
                 logConfig.WriteTo.BufferedSumoLogic(
-                    new Uri(SumoLogicEndpoint),
+                    new Uri(config.SumologicEndpoint),
                     sourceName: $"LoadTest-{config.TestName}",
                     sourceCategory: config.SourceCategory,
                     sourceHost: Environment.MachineName,
@@ -375,7 +381,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
             else
             {
                 logConfig.WriteTo.SumoLogic(
-                    new Uri(SumoLogicEndpoint),
+                    new Uri(config.SumologicEndpoint),
                     sourceName: $"LoadTest-{config.TestName}",
                     sourceCategory: config.SourceCategory,
                     sourceHost: Environment.MachineName);
@@ -448,6 +454,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
     class LoadTestConfig
     {
         public string TestName { get; set; }
+        public string SumologicEndpoint { get; set; } = "https://long-endpoint1-events.sumologic.net/receiver/v1/http/EndpointHere==";
         public int TargetMessagesPerSecond { get; set; }
         public int DurationSeconds { get; set; }
         public MessageSize MessageSize { get; set; }
