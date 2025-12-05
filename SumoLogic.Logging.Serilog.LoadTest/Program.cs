@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -12,9 +13,10 @@ namespace SumoLogic.Logging.Serilog.LoadTest
     class Program
     {
         private static readonly string SumoLogicEndpoint = 
-            "https://collectors.sumologic.com/receiver/v1/http/YOUR_ENDPOINT_HERE";
+            "https://long-endpoint1-events.sumologic.net/receiver/v1/http/EndpointHere=="; // Replace with your actual endpoint
         
         private static string _jsonMessageTemplate = null;
+        private static TrackingHttpMessageHandler _httpTracker;
 
         static async Task Main(string[] args)
         {
@@ -238,6 +240,13 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 config.MessagesPerRequest = long.Parse(Console.ReadLine() ?? "100");
             }
 
+            Console.Write("Source category (press Enter for default 'LoadTest/Serilog'): ");
+            var sourceCategory = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(sourceCategory))
+            {
+                config.SourceCategory = sourceCategory;
+            }
+
             Console.WriteLine();
             await ExecuteLoadTest(config);
         }
@@ -336,14 +345,15 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 stopwatch.Stop();
 
                 Console.WriteLine("\n=== FINAL RESULTS ===");
-                PrintStats(stats, stopwatch.Elapsed);
-                Console.WriteLine($"\nActual rate: {stats.MessagesSent / stopwatch.Elapsed.TotalSeconds:F2} msgs/sec");
-                Console.WriteLine($"Success rate: {(stats.MessagesSent - stats.MessagesFailed) * 100.0 / stats.MessagesSent:F2}%");
+                Console.WriteLine($"Messages sent to buffer: {stats.MessagesSent:N0}");
             }
         }
 
         static ILogger CreateLogger(LoadTestConfig config)
         {
+            // Create HTTP tracker to monitor actual delivery
+            _httpTracker = new TrackingHttpMessageHandler();
+
             var logConfig = new LoggerConfiguration()
                 .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Warning);
 
@@ -352,8 +362,10 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 logConfig.WriteTo.BufferedSumoLogic(
                     new Uri(SumoLogicEndpoint),
                     sourceName: $"LoadTest-{config.TestName}",
-                    sourceCategory: "LoadTest/Serilog",
+                    sourceCategory: config.SourceCategory,
                     sourceHost: Environment.MachineName,
+                    connectionTimeout: 30000,
+                    httpMessageHandler: _httpTracker,
                     maxQueueSizeBytes: config.MaxQueueSizeBytes,
                     flushingAccuracy: config.FlushingAccuracy,
                     messagesPerRequest: config.MessagesPerRequest,
@@ -365,7 +377,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 logConfig.WriteTo.SumoLogic(
                     new Uri(SumoLogicEndpoint),
                     sourceName: $"LoadTest-{config.TestName}",
-                    sourceCategory: "LoadTest/Serilog",
+                    sourceCategory: config.SourceCategory,
                     sourceHost: Environment.MachineName);
             }
 
@@ -394,6 +406,45 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         }
     }
 
+    class TrackingHttpMessageHandler : DelegatingHandler
+    {
+        private long _successCount;
+        private long _errorCount;
+
+        public TrackingHttpMessageHandler() : base(new HttpClientHandler())
+        {
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var response = await base.SendAsync(request, cancellationToken);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    Interlocked.Increment(ref _successCount);
+                }
+                else
+                {
+                    Interlocked.Increment(ref _errorCount);
+                }
+                
+                return response;
+            }
+            catch
+            {
+                Interlocked.Increment(ref _errorCount);
+                throw;
+            }
+        }
+
+        public (long successful, long failed) GetStats()
+        {
+            return (Interlocked.Read(ref _successCount), Interlocked.Read(ref _errorCount));
+        }
+    }
+
     class LoadTestConfig
     {
         public string TestName { get; set; }
@@ -409,6 +460,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         public int SpikeMultiplier { get; set; } = 10;
         public bool GradualIncrease { get; set; }
         public int MaxMessagesPerSecond { get; set; } = 5000;
+        public string SourceCategory { get; set; } = "LoadTest/Serilog";
     }
 
     class LoadTestStats
