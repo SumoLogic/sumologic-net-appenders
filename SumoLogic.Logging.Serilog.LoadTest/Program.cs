@@ -1,11 +1,16 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Display;
+using SumoLogic.Logging.Common.Log;
+using SumoLogic.Logging.Serilog;
+using SumoLogic.Logging.Serilog.Config;
 using SumoLogic.Logging.Serilog.Extensions;
 
 namespace SumoLogic.Logging.Serilog.LoadTest
@@ -17,10 +22,18 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         
         private static string _jsonMessageTemplate = null;
         private static TrackingHttpMessageHandler _httpTracker;
+        private static ConsoleLog _consoleLog;
 
         static async Task Main(string[] args)
         {
+            // Enable Serilog self-logging to capture internal warnings including buffer drops
+            global::Serilog.Debugging.SelfLog.Enable(msg => 
+            {
+                Console.WriteLine($"[Serilog Internal] {msg}");
+            });
+
             Console.WriteLine("=== Sumo Logic Serilog Load Test ===");
+            Console.WriteLine("Note: Serilog internal messages will appear if there are buffer issues or errors");
             Console.WriteLine();
 
             // Display menu
@@ -229,8 +242,9 @@ namespace SumoLogic.Logging.Serilog.LoadTest
 
             if (config.UseBufferedSink)
             {
-                Console.Write("Max queue size (MB): ");
-                config.MaxQueueSizeBytes = long.Parse(Console.ReadLine() ?? "10") * 1_000_000;
+                Console.Write("Max queue size bytes (default 1000000): ");
+                var queueSizeInput = Console.ReadLine();
+                config.MaxQueueSizeBytes = string.IsNullOrWhiteSpace(queueSizeInput) ? 1_000_000 : long.Parse(queueSizeInput);
 
                 Console.Write("Flushing accuracy (ms): ");
                 config.FlushingAccuracy = long.Parse(Console.ReadLine() ?? "250");
@@ -283,7 +297,7 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 Console.WriteLine($"Buffered: {config.UseBufferedSink}");
                 if (config.UseBufferedSink)
                 {
-                    Console.WriteLine($"Buffer size: {config.MaxQueueSizeBytes / 1_000_000} MB");
+                    Console.WriteLine($"Buffer size: {config.MaxQueueSizeBytes:N0} bytes");
                     Console.WriteLine($"Flushing accuracy: {config.FlushingAccuracy}ms");
                     Console.WriteLine($"Messages per request: {config.MessagesPerRequest}");
                 }
@@ -350,8 +364,27 @@ namespace SumoLogic.Logging.Serilog.LoadTest
                 
                 stopwatch.Stop();
 
+                var expectedMessages = config.TargetMessagesPerSecond * config.DurationSeconds;
+                var actualRate = stats.MessagesSent / stopwatch.Elapsed.TotalSeconds;
+                var evictedCount = _consoleLog?.TotalEvictedMessages ?? 0;
+                var messagesAcceptedByBuffer = stats.MessagesSent - evictedCount;
+
                 Console.WriteLine("\n=== FINAL RESULTS ===");
+                Console.WriteLine($"Expected messages: {expectedMessages:N0}");
                 Console.WriteLine($"Messages sent to buffer: {stats.MessagesSent:N0}");
+                Console.WriteLine($"Messages evicted from buffer: {evictedCount:N0}");
+                Console.WriteLine($"Messages accepted by buffer: {messagesAcceptedByBuffer:N0}");
+                Console.WriteLine($"Messages failed: {stats.MessagesFailed:N0}");
+                Console.WriteLine($"Target rate: {config.TargetMessagesPerSecond:N0} msg/s");
+                Console.WriteLine($"Actual rate: {actualRate:F2} msg/s");
+                
+                if (evictedCount > 0)
+                {
+                    var evictionRate = (evictedCount * 100.0) / stats.MessagesSent;
+                    Console.WriteLine($"\n⚠️  BUFFER EVICTIONS DETECTED");
+                    Console.WriteLine($"   Eviction rate: {evictionRate:F1}% of sent messages");
+                    Console.WriteLine($"   Recommendation: Increase maxQueueSizeBytes or reduce message rate");
+                }
             }
         }
 
@@ -365,18 +398,41 @@ namespace SumoLogic.Logging.Serilog.LoadTest
 
             if (config.UseBufferedSink)
             {
-                logConfig.WriteTo.BufferedSumoLogic(
-                    new Uri(config.SumologicEndpoint),
-                    sourceName: $"LoadTest-{config.TestName}",
-                    sourceCategory: config.SourceCategory,
-                    sourceHost: Environment.MachineName,
-                    connectionTimeout: 30000,
-                    httpMessageHandler: _httpTracker,
-                    maxQueueSizeBytes: config.MaxQueueSizeBytes,
-                    flushingAccuracy: config.FlushingAccuracy,
-                    messagesPerRequest: config.MessagesPerRequest,
-                    maxFlushInterval: 10000,
-                    retryInterval: 5000);
+                // Use direct instantiation with ConsoleLog to see buffer eviction warnings
+                _consoleLog = new ConsoleLog();
+                var consoleLog = _consoleLog;
+                
+                var connection = new SumoLogicConnection
+                {
+                    Uri = new Uri(config.SumologicEndpoint),
+                    ClientName = "LoadTestClient",
+                    ConnectionTimeout = TimeSpan.FromSeconds(30),
+                    RetryInterval = TimeSpan.FromSeconds(5),
+                    MaxFlushInterval = TimeSpan.FromSeconds(10),
+                    FlushingAccuracy = TimeSpan.FromMilliseconds(config.FlushingAccuracy),
+                    MessagesPerRequest = config.MessagesPerRequest,
+                    MaxQueueSizeBytes = config.MaxQueueSizeBytes
+                };
+
+                var source = new SumoLogicSource
+                {
+                    SourceName = $"LoadTest-{config.TestName}",
+                    SourceCategory = config.SourceCategory,
+                    SourceHost = Environment.MachineName
+                };
+
+                var formatter = new MessageTemplateTextFormatter(
+                    "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}",
+                    CultureInfo.InvariantCulture);
+
+                var sink = new BufferedSumoLogicSink(
+                    consoleLog,              // Pass ConsoleLog to see eviction warnings
+                    _httpTracker,            // HTTP message handler
+                    connection,
+                    source,
+                    formatter);
+
+                logConfig.WriteTo.Sink(sink);
             }
             else
             {
@@ -408,7 +464,9 @@ namespace SumoLogic.Logging.Serilog.LoadTest
 
         static void PrintStats(LoadTestStats stats, TimeSpan elapsed)
         {
-            Console.WriteLine($"[{elapsed:mm\\:ss}] Sent: {stats.MessagesSent:N0} | Failed: {stats.MessagesFailed:N0} | Rate: {stats.MessagesSent / elapsed.TotalSeconds:F2} msg/s");
+            var evictedCount = _consoleLog?.TotalEvictedMessages ?? 0;
+            var evictedInfo = evictedCount > 0 ? $" | Evicted: {evictedCount:N0}" : "";
+            Console.WriteLine($"[{elapsed:mm\\:ss}] Sent: {stats.MessagesSent:N0} | Failed: {stats.MessagesFailed:N0} | Rate: {stats.MessagesSent / elapsed.TotalSeconds:F2} msg/s{evictedInfo}");
         }
     }
 
@@ -483,5 +541,58 @@ namespace SumoLogic.Logging.Serilog.LoadTest
         Large,
         XLarge,
         JsonFile
+    }
+
+    /// <summary>
+    /// Console logger implementation for internal sink diagnostics.
+    /// Tracks cumulative buffer eviction count instead of printing each eviction.
+    /// </summary>
+    class ConsoleLog : ILog
+    {
+        private long _totalEvictedMessages = 0;
+
+        public long TotalEvictedMessages => Interlocked.Read(ref _totalEvictedMessages);
+
+        public bool IsTraceEnabled => false;
+        public bool IsDebugEnabled => false;
+        public bool IsInfoEnabled => true;
+        public bool IsWarnEnabled => true;
+        public bool IsErrorEnabled => true;
+
+        public void Trace(string msg) { }
+        public void Debug(string msg) { }
+
+        public void Info(string msg)
+        {
+            Console.WriteLine($"[INFO] {msg}");
+        }
+
+        public void Warn(string msg)
+        {
+            // Check if this is an eviction message and extract the count
+            if (msg.StartsWith("Evicted ") && msg.Contains(" messages from buffer"))
+            {
+                var parts = msg.Split(' ');
+                if (parts.Length >= 2 && long.TryParse(parts[1], out var evictedCount))
+                {
+                    Interlocked.Add(ref _totalEvictedMessages, evictedCount);
+                    return; // Don't print individual evictions
+                }
+            }
+
+            // Print non-eviction warnings
+            var previousColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"[WARN] {msg}");
+            Console.ForegroundColor = previousColor;
+        }
+
+        public void Error(string msg)
+        {
+            var previousColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"[ERROR] {msg}");
+            Console.ForegroundColor = previousColor;
+        }
     }
 }

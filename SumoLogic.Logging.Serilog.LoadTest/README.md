@@ -106,7 +106,7 @@ Success rate: 100.00%
 
 - **Small:** ~100 bytes (timestamp + counter)
 - **Medium:** ~300 bytes (includes 200 char payload)
-- **Large:** ~1100 bytes (includes 1000 char payload)
+- **Large:** ~57000 bytes (includes 57000 char payload)
 - **XLarge:** ~1 MB (1,048,576 bytes of random characters)
 - **JSON from file:** Variable size (reads from a JSON file and injects counter for uniqueness)
 
